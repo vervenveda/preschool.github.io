@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>A is for Alligator 🐊</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #b9e8ff, #fff9d6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#book {
+  width: 90%;
+  max-width: 800px;
+  height: 500px;
+  perspective: 1500px;
+  position: relative;
+  margin-top: 40px;
+}
+
+/* Each page */
+.page {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  position: absolute;
+  backface-visibility: hidden;
+  transform-origin: left;
+  transition: transform 1s;
+  overflow: hidden;
+}
+
+.page-content {
+  padding: 40px 30px 100px;
+  text-align: center;
+}
+
+/* Images */
+.page img {
+  max-width: 60%;
+  height: auto;
+  margin: 10px auto;
+  display: block;
+  transition: transform 1s;
+}
+
+/* Flipped page */
+.page.flipped {
+  transform: rotateY(-180deg);
+}
+
+/* Navigation buttons - moved BELOW the book */
+.nav-buttons {
+  margin-top: 20px;
+  text-align: center;
+}
+
+button {
+  background-color: #69c57e;
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 18px;
+  margin: 0 15px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+button:hover {
+  background-color: #4aa460;
+}
+
+/* Simple animations */
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes floatLetters {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-200px) rotate(360deg); opacity: 0; }
+}
+
+/* Letter A animation */
+.letterA {
+  font-size: 120px;
+  color: #ff5757;
+  animation: bounce 2s infinite;
+}
+
+/* Floating letters at the end */
+.floating-letters span {
+  display: inline-block;
+  font-size: 40px;
+  animation: floatLetters 4s ease-in infinite;
+}
+</style>
+</head>
+
+<body>
+  <h1 style="text-align:center;color:#2e8b57;font-size:28px;margin-top:10px;">📘 A is for Alligator</h1>
+  <div id="book">
+    <!-- Page 1 -->
+    <div class="page" id="page1">
+      <div class="page-content">
+        <h1 class="letterA">A</h1>
+        <h2>A is for Alligator!</h2>
+        <p>The Alligator lives by the Alphabet River.<br>He loves to learn his letters every day!</p>
+        <img id="gator" src="ALLIGATOR_IMAGE_URL_HERE" alt="Alligator">
+      </div>
+    </div>
+
+    <!-- Page 2 -->
+    <div class="page" id="page2" style="transform: rotateY(180deg);">
+      <div class="page-content">
+        <h2>The Adventure</h2>
+        <p>One morning, Alligator found an Apple!<br>
+           The red Apple looked like a round circle.<br>
+           “A is for Apple!” said the Alligator.</p>
+        <img id="apple" src="https://cdn.pixabay.com/photo/2016/03/05/19/02/apple-1239423_1280.png" alt="Apple">
+      </div>
+    </div>
+
+    <!-- Page 3 -->
+    <div class="page" id="page3" style="transform: rotateY(180deg);">
+      <div class="page-content">
+        <h2>Alligator’s Song</h2>
+        <p>After snack time, Alligator sang his ABCs.<br>
+           “A, A, A!” he cheered with joy.<br>
+           Learning letters is awesome!</p>
+        <div class="floating-letters">
+          <span style="animation-delay:0s;">A</span>
+          <span style="animation-delay:0.5s;">B</span>
+          <span style="animation-delay:1s;">C</span>
+          <span style="animation-delay:1.5s;">D</span>
+          <span style="animation-delay:2s;">E</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation below the book -->
+  <div class="nav-buttons">
+    <button id="prevBtn">⬅️ Back</button>
+    <button id="nextBtn">Next ➡️</button>
+  </div>
+
+<script>
+const pages = document.querySelectorAll('.page');
+let current = 0;
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (current < pages.length - 1) {
+    pages[current].classList.add('flipped');
+    current++;
+    playSound('pageFlip');
+  }
+});
+
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (current > 0) {
+    current--;
+    pages[current].classList.remove('flipped');
+    playSound('pageFlip');
+  }
+});
+
+const sounds = {
+  pageFlip: new Audio('page-flip.mp3'),
+  chomp: new Audio('chomp.mp3'),
+  abcSong: new Audio('abc-song.mp3')
+};
+
+function playSound(name) {
+  const sound = sounds[name];
+  if (sound) sound.play().catch(()=>{});
+}
+
+/* 🍎 Click animation */
+const apple = document.getElementById('apple');
+apple.addEventListener('click', () => {
+  apple.style.transform = 'scale(1.3)';
+  playSound('chomp');
+  setTimeout(() => apple.style.transform = 'scale(1)', 500);
+});
+</script>
+</body>
+</html>
