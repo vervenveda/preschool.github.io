@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shapes Match Deluxe</title>
+<style>
+  body{
+    margin:0;
+    font-family:"Comic Sans MS","Chalkboard SE",sans-serif;
+    background:linear-gradient(180deg,#6a5acd,#9370db,#ff69b4);
+    color:#fff;text-align:center;padding:20px;overflow-x:hidden;
+  }
+  h1{font-size:40px;color:#FFD700;text-shadow:3px 3px #444;margin-bottom:6px;}
+  #scoreboard{font-size:22px;margin:10px 0;color:#fff;display:none;}
+  .game-area{display:flex;justify-content:center;flex-wrap:wrap;gap:40px;margin-top:20px;}
+  .shapes,.shadows{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:500px;}
+  .shape,.shadow{
+    width:100px;height:100px;border:4px solid #FFD700;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:#fff;user-select:none;cursor:grab;transition:transform .2s;
+  }
+  .shape:hover{transform:scale(1.08);}
+  .shadow{background:rgba(0,0,0,0.15);cursor:default;}
+  svg{width:80px;height:80px;}
+  #progressWrap{width:280px;height:14px;border:2px solid #fff;border-radius:8px;margin:6px auto 14px;display:none;}
+  #progressBar{width:100%;height:100%;background:#FFD700;border-radius:8px;transition:width 1s linear;}
+  /* start screen + modal */
+  #startScreen,#modal{
+    position:fixed;inset:0;display:flex;justify-content:center;align-items:center;
+    background:rgba(0,0,0,0.75);z-index:99;flex-direction:column;text-align:center;
+  }
+  #startScreen h2{font-size:2em;color:#FFD700;margin-bottom:12px;text-shadow:2px 2px #000;}
+  #startScreen button,#modal button{
+    background:#FFD700;color:#000;border:none;border-radius:10px;padding:12px 24px;
+    margin:8px;font-size:1.1em;cursor:pointer;transition:.25s;
+  }
+  #startScreen button:hover,#modal button:hover{background:#fff;color:#333;}
+  #modal{display:none;color:#000;background:rgba(255,255,255,0.96);}
+  #modal h3{font-size:2em;color:#ff69b4;margin-bottom:6px;}
+  #modal p{font-size:1.2em;margin:0 0 10px;}
+  .celebration{position:fixed;inset:0;pointer-events:none;overflow:hidden;}
+  .confetti{
+    position:absolute;width:10px;height:10px;border-radius:50%;
+    animation:fall 3s linear forwards;
+  }
+  @keyframes fall{
+    0%{transform:translateY(-10px)rotate(0deg);opacity:1;}
+    100%{transform:translateY(100vh)rotate(720deg);opacity:0;}
+  }
+  @media(max-width:700px){
+    .shape,.shadow{width:80px;height:80px;}
+    svg{width:60px;height:60px;}
+  }
+</style>
+</head>
+<body>
+<h1>🎨 Shapes Match Deluxe 🎨</h1>
+<div id="scoreboard">Score: <span id="score">0</span></div>
+<div id="progressWrap"><div id="progressBar"></div></div>
+
+<div class="game-area">
+  <div class="shapes" id="shapes"></div>
+  <div class="shadows" id="shadows"></div>
+</div>
+<div class="celebration" id="celebration"></div>
+
+<!-- start screen -->
+<div id="startScreen">
+  <h2>Choose your level</h2>
+  <button onclick="startGame(3)">Easy (3)</button>
+  <button onclick="startGame(5)">Medium (5)</button>
+  <button onclick="startGame(8)">Hard (8)</button>
+  <button onclick="startGame(5,true)">Free Play (no timer)</button>
+</div>
+
+<!-- modal -->
+<div id="modal">
+  <h3 id="modalTitle">🎉</h3>
+  <p id="modalMsg"></p>
+  <button onclick="closeModal()">Play Again</button>
+</div>
+
+<script>
+const SHAPES=[
+{name:"circle",color:"#FF4C4C",svg:'<circle cx="40" cy="40" r="35" fill="currentColor"/>'},
+{name:"square",color:"#1E90FF",svg:'<rect x="10" y="10" width="60" height="60" fill="currentColor"/>'},
+{name:"triangle",color:"#32CD32",svg:'<polygon points="40,5 75,75 5,75" fill="currentColor"/>'},
+{name:"rectangle",color:"#FFD700",svg:'<rect x="5" y="20" width="70" height="40" fill="currentColor"/>'},
+{name:"hexagon",color:"#FF69B4",svg:'<polygon points="40,5 70,25 70,55 40,75 10,55 10,25" fill="currentColor"/>'},
+{name:"octagon",color:"#FF9933",svg:'<polygon points="30,5 50,5 75,30 75,50 50,75 30,75 5,50 5,30" fill="currentColor"/>'},
+{name:"heart",color:"#e74c3c",svg:'<path d="M40 70 L10 40 A15 15 0 0 1 40 15 A15 15 0 0 1 70 40 Z" fill="currentColor"/>'},
+{name:"oval",color:"#8A2BE2",svg:'<ellipse cx="40" cy="40" rx="30" ry="20" fill="currentColor"/>'}
+];
+const narration={
+circle:new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"),
+square:new Audio("https://actions.google.com/sounds/v1/cartoon/wood_twang.ogg"),
+triangle:new Audio("https://actions.google.com/sounds/v1/cartoon/concussive_drum_hit.ogg"),
+rectangle:new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"),
+hexagon:new Audio("https://actions.google.com/sounds/v1/cartoon/slide_whistle.ogg"),
+octagon:new Audio("https://actions.google.com/sounds/v1/cartoon/clang.ogg"),
+heart:new Audio("https://actions.google.com/sounds/v1/cartoon/boing.ogg"),
+oval:new Audio("https://actions.google.com/sounds/v1/cartoon/bubble_pop.ogg")
+};
+const successSound=new Audio("https://www.soundjay.com/button/sounds/button-10.mp3");
+let score=0,timer=60,matched=0,totalShapes=0,noTimer=false,countdown;
+
+/* helpers */
+function shuffle(a){return a.sort(()=>Math.random()-.5);}
+function speakName(name){
+  try{
+    const u=new SpeechSynthesisUtterance(name);
+    u.lang="en-US";u.rate=.9;window.speechSynthesis.speak(u);
+  }catch{}
+}
+
+/* main */
+function startGame(difficulty=5,free=false){
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("scoreboard").style.display="block";
+  document.getElementById("progressWrap").style.display=free?"none":"block";
+  score=0;matched=0;totalShapes=difficulty;noTimer=free;
+  document.getElementById("score").textContent=0;
+  buildSets(difficulty);
+  if(!free){startTimer();}else{clearInterval(countdown);}
+}
+function buildSets(n){
+  const shapesBox=document.getElementById("shapes"),shadowBox=document.getElementById("shadows");
+  shapesBox.innerHTML=shadowBox.innerHTML="";
+  const chosen=shuffle([...SHAPES]).slice(0,n);
+  const left=shuffle([...chosen]),right=shuffle([...chosen]);
+  left.forEach(sh=>{
+    const el=document.createElement("div");
+    el.className="shape";el.draggable=true;el.dataset.shape=sh.name;
+    el.style.color=sh.color;el.innerHTML=`<svg viewBox='0 0 80 80'>${sh.svg}</svg>`;
+    el.ondragstart=e=>{
+      e.dataTransfer.setData("text",sh.name);
+      (narration[sh.name]?.play().catch(()=>speakName(sh.name)));
+    };
+    shapesBox.appendChild(el);
+  });
+  right.forEach(sh=>{
+    const el=document.createElement("div");
+    el.className="shadow";el.dataset.shape=sh.name;
+    el.innerHTML=`<svg viewBox='0 0 80 80' style='color:black;opacity:.5'>${sh.svg}</svg>`;
+    el.ondragover=e=>e.preventDefault();
+    el.ondrop=e=>{
+      const d=e.dataTransfer.getData("text");
+      if(d===sh.name){
+        el.style.opacity=.3;
+        document.querySelector(`.shape[data-shape='${sh.name}']`).style.visibility="hidden";
+        score+=10;matched++;
+        document.getElementById("score").textContent=score;
+        successSound.play();
+        if(matched===totalShapes)win();
+      }
+    };
+    shadowBox.appendChild(el);
+  });
+}
+function startTimer(){
+  clearInterval(countdown);
+  timer=60;
+  const bar=document.getElementById("progressBar");
+  bar.style.width="100%";
+  countdown=setInterval(()=>{
+    timer--;bar.style.width=(timer/60*100)+"%";
+    if(timer<=0){clearInterval(countdown);showModal("⏰ Time’s Up!","Your score: "+score);}
+  },1000);
+}
+function win(){
+  clearInterval(countdown);
+  celebrate();
+  showModal("🎉 Great Job!","You matched all "+totalShapes+" shapes! Final score: "+score);
+}
+
+/* confetti */
+function celebrate(){
+  const wrap=document.getElementById("celebration");
+  for(let i=0;i<80;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"%";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    c.style.animationDuration=(2+Math.random()*3)+"s";
+    wrap.appendChild(c);
+    setTimeout(()=>c.remove(),4000);
+  }
+}
+
+/* modal */
+function showModal(title,msg){
+  document.getElementById("modalTitle").textContent=title;
+  document.getElementById("modalMsg").textContent=msg;
+  document.getElementById("modal").style.display="flex";
+}
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+  document.getElementById("startScreen").style.display="flex";
+  document.getElementById("scoreboard").style.display="none";
+  document.getElementById("progressWrap").style.display="none";
+  document.getElementById("shapes").innerHTML="";
+  document.getElementById("shadows").innerHTML="";
+}
+</script>
+</body>
+</html>
