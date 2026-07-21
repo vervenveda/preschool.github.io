@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pel™ Personal Editing Lab — Pre-K</title>
+<style>
+  body{
+    font-family:"Comic Sans MS", system-ui, sans-serif;
+    background:#CCE3FF;
+    margin:0;
+    text-align:center;
+  }
+  h1{color:#ff4081;margin:10px 0;text-shadow:1px 1px #3333;}
+  #toolbar{
+    display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;
+    background:#fff;padding:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    border-bottom:2px solid #ccc;
+    position:sticky; top:0; z-index:5;
+  }
+  button{
+    font-size:15px;padding:7px 11px;border:none;border-radius:8px;cursor:pointer;
+    background:#eee;transition:background .2s, transform .06s;
+  }
+  button:hover{background:#ddd;}
+  button:active{transform:translateY(1px);}
+  button.active{
+    background:#ffd1e3;
+    outline:2px solid rgba(255,64,129,.45);
+  }
+  .color-btn{
+    width:30px;height:30px;border-radius:50%;
+    border:2px solid #333;margin:2px;cursor:pointer;display:inline-block;
+  }
+  #brushSize{width:110px; vertical-align:middle;}
+  #canvas{
+    border:3px solid #333;border-radius:12px;margin:15px auto;display:block;background:#fff;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+    touch-action:none;
+    max-width:96vw;
+    height:auto;
+  }
+  #stickersPanel{
+    display:none;margin:10px auto;padding:8px;background:#fff;width:fit-content;
+    border-radius:8px;border:1px solid #ccc;
+  }
+  .sticker{
+    font-size:28px;cursor:grab;margin:4px;display:inline-block;
+    user-select:none;
+  }
+  #gallery{
+    margin:10px auto;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;
+    padding:0 10px 16px;
+  }
+  .thumb{
+    width:100px;height:70px;border:2px solid #999;border-radius:8px;object-fit:cover;cursor:pointer;
+    background:#fff;
+  }
+  .mini{
+    font-size:12px;color:#444;margin:-4px 0 10px 0;
+    opacity:.85;
+  }
+</style>
+</head>
+<body>
+
+<h1>Pel™<br>Personal Editing Lab<br>Pre-K Version</h1>
+<div class="mini">Offline • No ads • Saves last 5 drawings on this device</div>
+
+<div id="toolbar">
+  <button id="tool_brush"  onclick="setTool('brush')">🖌 Brush</button>
+  <button id="tool_marker" onclick="setTool('marker')">🖍 Marker</button>
+  <button id="tool_crayon" onclick="setTool('crayon')">🧁 Crayon</button>
+  <button id="tool_pencil" onclick="setTool('pencil')">✏️ Pencil</button>
+  <button id="tool_eraser" onclick="setTool('eraser')">🩹 Eraser</button>
+
+  <label style="display:flex;align-items:center;gap:6px">
+    Size:
+    <input type="range" id="brushSize" min="2" max="30" value="8" />
+    <span id="sizeLbl">8</span>
+  </label>
+
+  <input type="color" id="colorPicker" title="Custom Color" value="#000000" />
+
+  <button onclick="undo()">↩️ Undo</button>
+  <button onclick="redo()">↪️ Redo</button>
+  <button onclick="clearCanvas()">🧹 Clear</button>
+  <button onclick="toggleStickers()">🌟 Stickers</button>
+  <button onclick="saveArtwork()">💾 Save</button>
+</div>
+
+<div id="colors" style="margin:6px 0 0 0;">
+  <div class="color-btn" style="background:#e53935" onclick="setColor('#e53935')"></div>
+  <div class="color-btn" style="background:#fb8c00" onclick="setColor('#fb8c00')"></div>
+  <div class="color-btn" style="background:#fdd835" onclick="setColor('#fdd835')"></div>
+  <div class="color-btn" style="background:#43a047" onclick="setColor('#43a047')"></div>
+  <div class="color-btn" style="background:#1e88e5" onclick="setColor('#1e88e5')"></div>
+  <div class="color-btn" style="background:#8e24aa" onclick="setColor('#8e24aa')"></div>
+  <div class="color-btn" style="background:#f06292" onclick="setColor('#f06292')"></div>
+  <div class="color-btn" style="background:#795548" onclick="setColor('#795548')"></div>
+  <div class="color-btn" style="background:#000000" onclick="setColor('#000000')"></div>
+  <div class="color-btn" style="background:#ffffff" onclick="setColor('#ffffff')"></div>
+</div>
+
+<div id="stickersPanel" aria-label="Stickers">
+  <span class="sticker" draggable="true">⭐</span>
+  <span class="sticker" draggable="true">🌸</span>
+  <span class="sticker" draggable="true">🌈</span>
+  <span class="sticker" draggable="true">☀️</span>
+  <span class="sticker" draggable="true">🎈</span>
+  <span class="sticker" draggable="true">❤️</span>
+  <span class="sticker" draggable="true">🌻</span>
+  <span class="sticker" draggable="true">🌙</span>
+  <span class="sticker" draggable="true">🍀</span>
+  <span class="sticker" draggable="true">🦋</span>
+  <span class="sticker" draggable="true">🎨</span>
+  <span class="sticker" draggable="true">💎</span>
+  <span class="sticker" draggable="true">✨</span>
+  <span class="sticker" draggable="true">💫</span>
+  <span class="sticker" draggable="true">🌿</span>
+  <span class="sticker" draggable="true">🍎</span>
+  <span class="sticker" draggable="true">🌼</span>
+  <span class="sticker" draggable="true">🪶</span>
+  <span class="sticker" draggable="true">🎵</span>
+  <span class="sticker" draggable="true">🌊</span>
+  <span class="sticker" draggable="true">☁️</span>
+  <span class="sticker" draggable="true">🌺</span>
+  <span class="sticker" draggable="true">🪄</span>
+  <span class="sticker" draggable="true">🌞</span>
+  <span class="sticker" draggable="true">🖌️</span>
+  <span class="sticker" draggable="true">🖍️</span>
+  <span class="sticker" draggable="true">🪷</span>
+  <span class="sticker" draggable="true">🎆</span>
+  <span class="sticker" draggable="true">🧡</span>
+  <span class="sticker" draggable="true">💜</span>
+  <span class="sticker" draggable="true">💖</span>
+  <span class="sticker" draggable="true">💚</span>
+  <span class="sticker" draggable="true">🌾</span>
+  <span class="sticker" draggable="true">🍂</span>
+  <span class="sticker" draggable="true">🌵</span>
+  <span class="sticker" draggable="true">🦜</span>
+  <span class="sticker" draggable="true">🎁</span>
+  <span class="sticker" draggable="true">🧩</span>
+  <span class="sticker" draggable="true">🎶</span>
+  <span class="sticker" draggable="true">🎀</span>
+  <span class="sticker" draggable="true">🕊️</span>
+</div>
+
+<canvas id="canvas" width="800" height="500"></canvas>
+<div id="gallery" aria-label="Saved gallery"></div>
+
+<script>
+/* ======================
+   Pel™ Pre-K — Clean Build
+   Offline, safe, no deps.
+   ====================== */
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d", { alpha: true });
+
+let painting = false;
+let currentColor = "#000000";
+let tool = "brush";
+let brushSize = 8;
+
+let draggingSticker = null;
+
+let undoStack = [];
+let redoStack = [];
+const MAX_HISTORY = 20;
+
+const $ = (id)=>document.getElementById(id);
+
+function sanitizeFilename(name){
+  name = String(name || "").trim();
+  // Remove characters that break filenames on most systems
+  name = name.replace(/[\\\/:*?"<>|]+/g, "");
+  // Reduce whitespace
+  name = name.replace(/\s+/g, "_");
+  // Limit length
+  if(!name) name = "artwork";
+  return name.slice(0, 40);
+}
+
+function saveState(){
+  try{
+    if(undoStack.length >= MAX_HISTORY) undoStack.shift();
+    undoStack.push(canvas.toDataURL("image/png"));
+    redoStack = [];
+  }catch(e){
+    // If device storage is tight or dataURL too big
+    console.warn("saveState failed:", e);
+  }
+}
+
+function restoreFromDataURL(dataURL){
+  const img = new Image();
+  img.onload = () => {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.globalAlpha = 1;
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  };
+  img.src = dataURL;
+}
+
+function undo(){
+  if(undoStack.length === 0) return;
+  try{
+    redoStack.push(canvas.toDataURL("image/png"));
+    const prev = undoStack.pop();
+    if(prev) restoreFromDataURL(prev);
+  }catch(e){}
+}
+
+function redo(){
+  if(redoStack.length === 0) return;
+  try{
+    undoStack.push(canvas.toDataURL("image/png"));
+    const next = redoStack.pop();
+    if(next) restoreFromDataURL(next);
+  }catch(e){}
+}
+
+function setTool(t){
+  tool = t;
+  ["brush","marker","crayon","pencil","eraser"].forEach(k=>{
+    const b = $("tool_"+k);
+    if(b) b.classList.toggle("active", k===t);
+  });
+}
+
+function setColor(c){
+  currentColor = c;
+  const cp = $("colorPicker");
+  if(cp && cp.value.toLowerCase() !== String(c).toLowerCase()){
+    // keep picker synced when a palette dot is clicked
+    try{ cp.value = c; }catch{}
+  }
+}
+
+$("brushSize").addEventListener("input", e=>{
+  brushSize = Number(e.target.value || 8);
+  $("sizeLbl").textContent = String(brushSize);
+});
+$("colorPicker").addEventListener("input", e=>setColor(e.target.value));
+
+/* Coordinate scaling: works even if canvas is displayed at a different CSS size */
+function getPosFromEvent(e){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  return { x, y };
+}
+
+function startPosition(e){
+  painting = true;
+  saveState();
+  // Start path at current position (prevents a line jump from 0,0)
+  const {x,y} = getPosFromEvent(e);
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+  draw(e);
+}
+
+function endPosition(){
+  painting = false;
+  ctx.beginPath();
+  ctx.globalAlpha = 1;
+}
+
+function applyToolStyle(){
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.globalAlpha = 1;
+
+  if(tool === "eraser"){
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = brushSize + 10;
+    return;
+  }
+
+  ctx.strokeStyle = currentColor;
+
+  switch(tool){
+    case "brush":
+      ctx.lineWidth = brushSize;
+      ctx.globalAlpha = 1;
+      break;
+    case "marker":
+      ctx.lineWidth = brushSize + 4;
+      ctx.globalAlpha = 0.6;
+      break;
+    case "crayon":
+      ctx.lineWidth = brushSize + 6;
+      ctx.globalAlpha = 0.45;
+      break;
+    case "pencil":
+      ctx.lineWidth = Math.max(1, brushSize / 2);
+      ctx.globalAlpha = 1;
+      break;
+    default:
+      ctx.lineWidth = brushSize;
+      ctx.globalAlpha = 1;
+  }
+}
+
+function draw(e){
+  if(!painting) return;
+  const {x,y} = getPosFromEvent(e);
+
+  applyToolStyle();
+  ctx.lineTo(x,y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+}
+
+/* Mouse */
+canvas.addEventListener("mousedown", startPosition);
+canvas.addEventListener("mouseup", endPosition);
+canvas.addEventListener("mouseleave", endPosition);
+canvas.addEventListener("mousemove", draw);
+
+/* Touch */
+canvas.addEventListener("touchstart", (ev)=>{
+  ev.preventDefault();
+  startPosition(ev.touches[0]);
+},{passive:false});
+canvas.addEventListener("touchend", (ev)=>{
+  ev.preventDefault();
+  endPosition();
+},{passive:false});
+canvas.addEventListener("touchmove", (ev)=>{
+  ev.preventDefault();
+  draw(ev.touches[0]);
+},{passive:false});
+
+function clearCanvas(){
+  if(confirm("Clear your canvas?")){
+    saveState();
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+}
+
+/* Stickers */
+function toggleStickers(){
+  const p = $("stickersPanel");
+  p.style.display = (p.style.display==="none" || !p.style.display) ? "block" : "none";
+}
+
+document.querySelectorAll(".sticker").forEach(s=>{
+  s.addEventListener("dragstart", (ev)=>{
+    draggingSticker = s.textContent;
+    try{ ev.dataTransfer.setData("text/plain", draggingSticker); }catch{}
+  });
+});
+
+/* Drop onto canvas */
+canvas.addEventListener("dragover", e=>e.preventDefault());
+canvas.addEventListener("drop", e=>{
+  e.preventDefault();
+  const sticker = (()=>{
+    try{
+      const dt = e.dataTransfer.getData("text/plain");
+      if(dt) return dt;
+    }catch{}
+    return draggingSticker;
+  })();
+
+  if(sticker){
+    saveState();
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+
+    ctx.globalAlpha = 1;
+    ctx.font = "40px Comic Sans MS, system-ui, sans-serif";
+    ctx.fillText(sticker, x-20, y+20);
+
+    draggingSticker = null;
+  }
+});
+
+/* Save artwork + mini gallery (last 5) */
+function saveArtwork(){
+  const title = prompt("Title your artwork:");
+  if(!title) return;
+
+  const imgData = canvas.toDataURL("image/png");
+  const safe = sanitizeFilename(title);
+  const date = new Date().toISOString().slice(0,10);
+
+  const link = document.createElement("a");
+  link.download = `${safe}_${date}.png`;
+  link.href = imgData;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  addToGallery(imgData, title);
+}
+
+function addToGallery(imgData, title){
+  // Guard: dataURLs can be large; keep last 5 only
+  let gallery = [];
+  try{ gallery = JSON.parse(localStorage.getItem("artGallery") || "[]"); }catch{}
+  gallery.unshift({ img: imgData, title: String(title||"").slice(0,60), ts: Date.now() });
+  if(gallery.length > 5) gallery = gallery.slice(0,5);
+  try{ localStorage.setItem("artGallery", JSON.stringify(gallery)); }catch{}
+  renderGallery();
+}
+
+function renderGallery(){
+  const galleryDiv = $("gallery");
+  galleryDiv.innerHTML = "";
+  let gallery = [];
+  try{ gallery = JSON.parse(localStorage.getItem("artGallery") || "[]"); }catch{}
+  gallery.forEach(g=>{
+    const img = document.createElement("img");
+    img.src = g.img;
+    img.className = "thumb";
+    img.title = g.title || "Saved";
+    img.alt = g.title || "Saved";
+    img.addEventListener("click", ()=>{
+      // Load onto canvas
+      saveState();
+      restoreFromDataURL(g.img);
+    });
+    galleryDiv.appendChild(img);
+  });
+}
+
+/* Init */
+setTool("brush");
+$("sizeLbl").textContent = String(brushSize);
+renderGallery();
+</script>
+</body>
+</html>
