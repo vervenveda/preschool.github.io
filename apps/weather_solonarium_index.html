@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Solanar™ Planetarium — Kid Mode</title>
+  <meta name="description" content="Solanar Planetarium Kid Mode — friendly weather for kids: simple today view, 6‑hour outlook, moon phase, and read‑aloud." />
+  <meta name="theme-color" content="#ffd86b">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --sky1:#fff7e6; --sky2:#ffe3b3; --ink:#2b2b2b; --ink2:#555;
+      --card:#ffffff; --good:#2ec27e; --warn:#f6a600; --bad:#ff5c5c; --accent:#4da3ff;
+      --btn:#ffd76a; --btn2:#ffc63f; --radius:18px;
+    }
+    html,body{margin:0;height:100%;background:linear-gradient(180deg,var(--sky1),var(--sky2));color:var(--ink);font-family:'Poppins',system-ui,Arial,sans-serif}
+    header{padding:18px 14px;text-align:center}
+    header h1{margin:0;font-family:'Baloo 2', cursive;font-size:clamp(24px,4.5vw,44px);letter-spacing:0.5px}
+    header .tag{color:#6a5b2a;font-size:.95rem}
+
+    .wrap{max-width:980px;margin:0 auto;padding:10px 14px 28px}
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+
+    .search{background:var(--card);padding:12px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+    .search input{padding:12px 14px;border-radius:12px;border:2px solid #ffd76a;background:#fff8db;min-width:220px}
+    .btn{background:var(--btn);border:none;border-radius:14px;padding:10px 14px;font-weight:600;cursor:pointer;box-shadow:0 3px 0 var(--btn2)}
+    .btn:hover{filter:brightness(1.02)}
+    .pill{background:#fff;border:2px solid #ffd76a;border-radius:999px;padding:8px 12px;font-weight:600}
+    .units button{border:none;background:transparent;padding:8px 10px;border-radius:999px;font-weight:600;cursor:pointer}
+    .units .on{background:#ffe9a8}
+
+    .cards{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+    @media(min-width:760px){ .cards{grid-template-columns:1.2fr .8fr} }
+
+    .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 8px 20px rgba(0,0,0,.08)}
+    .card h2{margin:0 0 8px;font-family:'Baloo 2', cursive;font-size:1.4rem}
+
+    /* Today banner */
+    .today{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+    .big-emoji{font-size:64px;line-height:1}
+    .temp{font-size:44px;font-weight:700}
+    .sub{color:var(--ink2);font-size:.95rem}
+    .tips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .tip{background:#f7fbff;border:2px dashed #b2d7ff;border-radius:12px;padding:6px 10px;font-weight:600}
+
+    /* Dress stickers */
+    .stickers{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+    .sticker{display:flex;align-items:center;gap:8px;background:#fff9e8;border:2px solid #ffd76a;border-radius:14px;padding:8px 10px;box-shadow:0 3px 0 #ffc63f}
+    .sticker .e{font-size:24px;line-height:1}
+    .sticker .l{font-weight:700}
+
+    /* Facts carousel */
+    .facts{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .fact{flex:1;background:#f2faff;border:2px solid #bfe4ff;border-radius:14px;padding:10px 12px;font-weight:600}
+    .btn.small{padding:8px 10px;border-radius:10px;font-size:.9rem}
+
+    /* 6‑hour outlook */
+    .hours{display:flex;gap:10px;overflow:auto;padding-bottom:6px}
+    .hour{min-width:90px;background:#fff7e8;border:2px solid #ffd76a;border-radius:14px;padding:10px 8px;text-align:center}
+    .hour .t{font-weight:700}
+
+    /* Moon */
+    .moongrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .moonbadge{background:#f2f6ff;border:2px solid #bfd4ff;border-radius:12px;padding:10px;text-align:center;font-weight:700}
+
+    /* Speak controls */
+    .speak{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .toggle{appearance:none;width:54px;height:30px;background:#ffd76a;border-radius:999px;position:relative;cursor:pointer;border:2px solid #e6b200}
+    .toggle:checked{background:#2ec27e;border-color:#1c8a5a}
+    .toggle::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;border-radius:50%;transition:transform .18s ease}
+    .toggle:checked::after{transform:translateX(24px)}
+    .note{font-size:.9rem;color:#6a5b2a}
+
+    footer{padding:18px;text-align:center;color:#6a5b2a}
+  /* Mascot Sunny */
+    .mascot{position:fixed;right:12px;bottom:12px;width:124px;height:124px;pointer-events:none;z-index:50;filter:drop-shadow(0 8px 14px rgba(0,0,0,.18))}
+    .mascot svg{width:100%;height:100%}
+    .mascot .rays{animation:spinSlow 24s linear infinite;transform-origin:50% 50%}
+    .mascot .face{animation:bob 3.8s ease-in-out infinite}
+    @keyframes bob{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+    @keyframes spinSlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @media (prefers-reduced-motion: reduce){.mascot .rays,.mascot .face{animation:none !important}}
+  /* === Games UI === */
+    .games-card h2{display:flex;align-items:center;gap:8px}
+    .game-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+    .game-tabs .tab{background:#fff;border:2px solid #ffd76a;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
+    .game-tabs .tab.on{background:#ffe9a8}
+    .game-wrap{background:#fffef7;border:2px solid #ffe29a;border-radius:14px;padding:12px;min-height:160px}
+    .game-screen{display:none}
+    .game-screen.on{display:block}
+    .choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .opt{background:#f7fbff;border:2px solid #bfe4ff;border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer}
+    .opt.correct{background:#d9ffe8;border-color:#79d7a8}
+    .opt.wrong{background:#ffe0e0;border-color:#ff9090}
+    .score{margin-top:8px;color:#6a5b2a;font-weight:700}
+    .small-note{color:#6a5b2a;font-size:.9rem}
+    .mini-chart{display:flex;gap:6px;align-items:flex-end;height:120px;margin-top:8px}
+    .bar{width:26px;background:#ffd76a;border:2px solid #ffc63f;border-bottom-width:6px;border-radius:10px 10px 4px 4px}
+    .bar.rain{background:#bfe4ff;border-color:#93cdf7}
+  /* === Drag & Drop (Water Cycle) === */
+    .dnd-area{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+    .tiles{display:flex;flex-wrap:wrap;gap:8px;min-height:56px}
+    .tile{background:#f7fbff;border:2px solid #bfe4ff;border-radius:12px;padding:8px 10px;font-weight:700;cursor:grab}
+    .tile:active{cursor:grabbing}
+    .tile .e{margin-right:6px}
+    .slots{display:flex;gap:10px;align-items:stretch}
+    .slot{flex:1;min-height:56px;background:#fff9e8;border:2px dashed #ffd76a;border-radius:12px;padding:6px;display:flex;align-items:center;justify-content:center}
+    .slot.filled{border-style:solid}
+
+    /* === Storm Prep grid === */
+    .kit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:8px}
+    .kit-item{background:#f7fbff;border:2px solid #bfe4ff;border-radius:12px;padding:10px;font-weight:700;cursor:pointer;text-align:left}
+    .kit-item .e{margin-right:6px}
+    .kit-item.on{background:#e9f7ff;border-color:#93cdf7}
+    .kit-item.good{background:#d9ffe8;border-color:#79d7a8}
+    .kit-item.bad{background:#ffe0e0;border-color:#ff9090}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌞 Solanar Planetarium — Kid Mode</h1>
+    <div class="tag">Simple. Friendly. Fun.</div>
+  </header>
+
+  <div class="wrap">
+    <div class="card search">
+      <div class="row">
+        <input id="q" placeholder="Type a city or ZIP (e.g., Holiday, FL or 90210)" />
+        <button class="btn" id="go">Go</button>
+        <button class="btn" id="geo">📍 My Location</button>
+        <div class="units pill">
+          Units:
+          <button id="uF" class="on">°F</button>
+          <button id="uC">°C</button>
+        </div>
+      </div>
+      <div class="speak" style="margin-top:10px">
+        <label class="pill"><input id="tts" type="checkbox" class="toggle" aria-label="Read aloud"> Read aloud</label>
+        <span class="note">(I’ll speak the weather in a kind, slow voice.)</span>
+      </div>
+    </div>
+
+    <section class="cards">
+      <div class="card">
+        <h2>Today</h2>
+        <div class="today" aria-live="polite">
+          <div class="big-emoji" id="icon">⛅</div>
+          <div>
+            <div class="temp" id="temp">—</div>
+            <div class="sub"><b id="city">—</b> • <span id="cond">—</span> • feels like <span id="feels">—</span></div>
+            <div class="sub">Humidity <span id="hum">—</span> • Wind <span id="wind">—</span></div>
+          </div>
+        </div>
+        <div class="tips" id="tips"></div>
+        <div class="stickers" id="dress" aria-label="Dress for today"></div>
+      </div>
+
+      <div class="card">
+        <h2>Next 6 Hours</h2>
+        <div class="hours" id="hours"></div>
+      </div>
+
+      <div class="card">
+        <h2>🌙 Moon</h2>
+        <div class="moongrid">
+          <div class="moonbadge" id="moonPhase">—</div>
+          <div class="moonbadge" id="moonTimes">Rise — • Set —</div>
+        </div>
+      </div>
+          <div class="card">
+        <h2>🌟 Weather Fun Fact</h2>
+        <div class="facts">
+          <div class="fact" id="factText">Loading a fun fact…</div>
+          <button class="btn small" id="factNext" title="Show another">Next</button>
+        </div>
+      </div>
+          <div class="card games-card">
+        <h2>✨ Games</h2>
+        <div class="game-tabs">
+          <button class="tab on" id="tabCloud">Cloud Detective</button>
+          <button class="tab" id="tabGraph">Graph‑It Lab</button>
+          <button class="tab" id="tabWater">Water Cycle</button>
+          <button class="tab" id="tabStorm">Storm Prep</button>
+        </div>
+        <div class="game-wrap">
+          <!-- Cloud Detective -->
+          <div id="gameCloud" class="game-screen on">
+            <div class="row" style="justify-content:space-between">
+              <div class="pill">Round: <span id="cdRound">1</span>/5 • Score: <span id="cdScore">0</span></div>
+              <div class="pill">Level: 
+                <select id="cdLevel" class="pill" style="border:none;background:#ffe9a8">
+                  <option value="A">A (PreK–K)</option>
+                  <option value="B">B (Grades 1–2)</option>
+                  <option value="C">C (Grades 3–5)</option>
+                </select>
+              </div>
+            </div>
+            <div id="cdCard" style="margin-top:10px">
+              <div id="cdArt" style="text-align:center"></div>
+              <div id="cdClue" class="small-note" style="margin-top:6px"></div>
+              <div class="choices" id="cdChoices"></div>
+            </div>
+            <div class="score" id="cdFeedback" aria-live="polite"></div>
+            <div style="margin-top:8px"><button class="btn small" id="cdNext">Next</button></div>
+          </div>
+
+          <!-- Graph-It Lab -->
+          <div id="gameGraph" class="game-screen">
+            <div class="pill">Question <span id="giRound">1</span>/5 • Score: <span id="giScore">0</span></div>
+            <div id="giChart" class="mini-chart"></div>
+            <div id="giQ" style="margin-top:8px;font-weight:700"></div>
+            <div id="giChoices" class="choices"></div>
+            <div class="score" id="giFeedback" aria-live="polite"></div>
+            <div style="margin-top:8px"><button class="btn small" id="giNext">New Question</button></div>
+          </div>
+
+          <!-- Water Cycle Builder -->
+          <div id="gameWater" class="game-screen">
+            <div class="small-note">Drag the steps into order: <b>Evaporate → Condense → Precipitate</b></div>
+            <div class="dnd-area">
+              <div class="tiles" id="wcBank"></div>
+              <div class="slots">
+                <div class="slot" data-idx="0" aria-label="Step 1"></div>
+                <div class="slot" data-idx="1" aria-label="Step 2"></div>
+                <div class="slot" data-idx="2" aria-label="Step 3"></div>
+              </div>
+            </div>
+            <div class="row">
+              <button class="btn small" id="wcReset">Reset</button>
+              <button class="btn small" id="wcCheck">Check</button>
+              <div class="score" id="wcFeedback" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <!-- Storm Prep Challenge -->
+          <div id="gameStorm" class="game-screen">
+            <div class="pill">Scenario: <span id="spName">Thunderstorm</span> • Round <span id="spRound">1</span>/3 • Score <span id="spScore">0</span></div>
+            <div id="spPrompt" class="small-note" style="margin-top:6px"></div>
+            <div class="kit-grid" id="spGrid"></div>
+            <div class="row">
+              <button class="btn small" id="spSubmit">Submit</button>
+              <button class="btn small" id="spNext">New Scenario</button>
+              <div class="score" id="spFeedback" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+            <div id="cdCard" style="margin-top:10px">
+              <div id="cdArt" style="text-align:center"></div>
+              <div id="cdClue" class="small-note" style="margin-top:6px"></div>
+              <div class="choices" id="cdChoices"></div>
+            </div>
+            <div class="score" id="cdFeedback" aria-live="polite"></div>
+            <div style="margin-top:8px"><button class="btn small" id="cdNext">Next</button></div>
+          </div>
+
+          <!-- Graph-It Lab -->
+          <div id="gameGraph" class="game-screen">
+            <div class="pill">Question <span id="giRound">1</span>/5 • Score: <span id="giScore">0</span></div>
+            <div id="giChart" class="mini-chart"></div>
+            <div id="giQ" style="margin-top:8px;font-weight:700"></div>
+            <div id="giChoices" class="choices"></div>
+            <div class="score" id="giFeedback" aria-live="polite"></div>
+            <div style="margin-top:8px"><button class="btn small" id="giNext">New Question</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>© 2025 Solanar Planetarium • Khaemenes Academy</footer>
+
+  <script>
+    // ====== Settings ======
+    const STORE = {
+      unit: localStorage.getItem('kidmode_units') || 'imperial' // 'imperial' or 'metric'
+    };
+    const LAST = {times:[], temps:[], pops:[]};
+
+    function tUnit(){ return STORE.unit==='imperial' ? '°F' : '°C'; }
+    function vUnit(){ return STORE.unit==='imperial' ? 'mph' : 'km/h'; }
+    function omUnits(){
+      return STORE.unit==='imperial'
+        ? 'temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch'
+        : 'temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=millimeter';
+    }
+
+    // ====== DOM ======
+    const el = id => document.getElementById(id);
+    const q = el('q'), go = el('go'), geo = el('geo');
+    const uF = el('uF'), uC = el('uC');
+    const icon = el('icon'), temp = el('temp'), city = el('city'), cond = el('cond'), feels = el('feels'), hum = el('hum'), wind = el('wind');
+    const tips = el('tips'), hours = el('hours');
+    const ttsToggle = el('tts');
+
+    // ====== Helpers ======
+    const WMO = (code, isDay) => ({
+      0: isDay? 'Sunny' : 'Clear night',
+      1: 'Mostly sunny', 2: 'Partly cloudy', 3: 'Cloudy',
+      45: 'Foggy', 48: 'Icy fog',
+      51: 'Light drizzle', 53: 'Drizzle', 55: 'Heavy drizzle',
+      56: 'Freezing drizzle', 57: 'Freezing drizzle (heavy)',
+      61: 'Light rain', 63: 'Rain', 65: 'Heavy rain',
+      66: 'Freezing rain', 67: 'Freezing rain (heavy)',
+      71: 'Light snow', 73: 'Snow', 75: 'Heavy snow',
+      77: 'Snow grains',
+      80: 'Rain showers', 81: 'Heavy showers', 82: 'Violent showers',
+      85: 'Snow showers', 86: 'Heavy snow showers',
+      95: 'Thunderstorm', 96: 'Storm w/ hail', 99: 'Severe storm'
+    })[code] || 'Weather';
+
+    const ICON = (code, isDay) => {
+      const sun = '☀️', moon='🌙', cloud='☁️', rain='🌧️', storm='⛈️', snow='❄️', fog='🌫️', part='⛅';
+      if(code===0) return isDay ? sun : moon;
+      if(code===1||code===2) return part;
+      if(code===3) return cloud;
+      if(code===45||code===48) return fog;
+      if([51,53,55,56,57,61,63,65,80,81,82].includes(code)) return rain;
+      if([71,73,75,77,85,86].includes(code)) return snow;
+      if([95,96,99].includes(code)) return storm;
+      return part;
+    };
+
+    function speak(text){
+      try{
+        if(!('speechSynthesis' in window)) return;
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.92; u.pitch = 1.0; u.volume = 1.0;
+        // Prefer a friendly English voice if available
+        const vs = speechSynthesis.getVoices();
+        const nice = vs.find(v=>/Google US English|Microsoft.*Online.*(Natural)?/i.test(v.name)) || vs[0];
+        if(nice) u.voice = nice;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      }catch(e){}
+    }
+
+    function kidTips(tempNow, pop, windNow){
+      const s = [];
+      if((STORE.unit==='imperial' && tempNow>=90) || (STORE.unit==='metric' && tempNow>=32)) s.push('Drink water 💧');
+      if((STORE.unit==='imperial' && tempNow<=55) || (STORE.unit==='metric' && tempNow<=13)) s.push('Wear a jacket 🧥');
+      if(pop>=50) s.push('Bring a raincoat ☔');
+      if((STORE.unit==='imperial' && windNow>=25) || (STORE.unit==='metric' && windNow>=40)) s.push('Hold on to your hat 🧢');
+      if(s.length===0) s.push('Have fun and play outside! 🌈');
+      return s;
+    }
+
+    function renderDress(now, pop, uvMax=0){
+      const row = document.getElementById('dress'); if(!row) return; row.innerHTML='';
+      const isMetric = STORE.unit==='metric';
+      const cold = isMetric ? now.temp<=13 : now.temp<=55;
+      const windy = isMetric ? now.wind>=32 : now.wind>=20;
+      const rainy = pop>=50;
+      const sunny = now.isDay && [0,1,2].includes(now.code);
+      function add(e,l){ const d=document.createElement('div'); d.className='sticker'; d.innerHTML=`<span class="e">${e}</span><span class="l">${l}</span>`; row.appendChild(d); }
+      if(cold || (windy && (isMetric ? now.temp<=13 : now.temp<=55))) add('🧥','Jacket');
+      if(rainy) add('☔','Umbrella');
+      if(now.isDay && uvMax>=6) add('🧴','Sunscreen');
+      if(sunny || windy) add('🧢','Hat');
+      if(!row.children.length) add('👟','Comfy shoes');
+    }
+
+    function renderExtras(now, uvMax){
+      const pop = Number(hours?.dataset.popmax||0) || 0;
+      // tips
+      tips.innerHTML = '';
+      kidTips(now.temp, pop, now.wind).forEach(s=>{ const b=document.createElement('div'); b.className='tip'; b.textContent=s; tips.appendChild(b); });
+      // stickers
+      renderDress(now, pop, uvMax);
+    }
+
+    // ====== Data ======
+    async function geocode(query){
+      const isZip = /^\d{5}$/.test(query.trim());
+      if(isZip){
+        const r = await fetch(`https://api.zippopotam.us/us/${query}`);
+        if(!r.ok) throw new Error('ZIP not found');
+        const z = await r.json();
+        return { lat:+z.places[0].latitude, lon:+z.places[0].longitude, label:`${z.places[0]['place name']}, ${z.places[0].state}` };
+      } else {
+        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
+        const r = await fetch(url); if(!r.ok) throw new Error('Geocoding failed');
+        const g = await r.json(); if(!g.results||!g.results.length) throw new Error('Location not found');
+        const c=g.results[0]; const label=[c.name,c.admin1,c.country_code].filter(Boolean).join(', ');
+        return {lat:c.latitude, lon:c.longitude, label};
+      }
+    }
+
+    async function fetchWeather(lat, lon, label){
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day&hourly=temperature_2m,precipitation_probability,weather_code,uv_index&daily=sunrise,sunset&timezone=auto&${omUnits()}`;
+      const r = await fetch(url); if(!r.ok) throw new Error('Weather failed');
+      const d = await r.json();
+      const c = d.current;
+      const now = {
+        city: label,
+        temp: Math.round(c.temperature_2m),
+        feels: Math.round(c.apparent_temperature),
+        hum: c.relative_humidity_2m,
+        wind: Math.round(c.wind_speed_10m),
+        code: c.weather_code,
+        isDay: !!c.is_day
+      };
+
+      // Next 6 hours slices
+      let times=[], temps=[], pops=[], uvs=[], uvMax=0;
+      if(d.hourly && d.hourly.time){
+        const tms = d.hourly.time.map(t=>new Date(t).getTime());
+        const idx = Math.max(0, tms.findIndex(t=>t>=Date.now()));
+        times = d.hourly.time.slice(idx, idx+6);
+        temps = d.hourly.temperature_2m.slice(idx, idx+6);
+        pops  = (d.hourly.precipitation_probability||[]).slice(idx, idx+6);
+        uvs   = (d.hourly.uv_index||[]).slice(idx, idx+6);
+        uvMax = Math.max(0, ...uvs.filter(v=>v!=null));
+        LAST.times = times; LAST.temps = temps; LAST.pops = pops;
+      }
+      renderToday(now);
+      renderHours(times, temps, pops);
+      renderExtras(now, uvMax);
+      fetchAstronomy(lat, lon).catch(()=>{});
+
+      if(ttsToggle.checked){
+        const line = `${label}. ${ICON(now.code, now.isDay)} ${WMO(now.code, now.isDay)}. ${now.temp}${tUnit()}, feels like ${now.feels}${tUnit()}. Humidity ${now.hum} percent. Wind ${now.wind} ${vUnit()}.`;
+        speak(line);
+      }
+    }
+
+    async function fetchAstronomy(lat, lon){
+      const url = `https://api.open-meteo.com/v1/astronomy?latitude=${lat}&longitude=${lon}&daily=moon_phase,moonrise,moonset&timezone=auto`;
+      const r = await fetch(url); if(!r.ok) return;
+      const a = await r.json();
+      const phase = a.daily?.moon_phase?.[0];
+      const rise = a.daily?.moonrise?.[0];
+      const set  = a.daily?.moonset?.[0];
+      const phases = ['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous','Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+      const name = (typeof phase==='number') ? (phases[Math.floor(((phase%1)+1)%1 * 8)] || 'Moon') : 'Moon';
+      el('moonPhase').textContent = name;
+      const fmt = t=> t ? new Date(t).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '—';
+      el('moonTimes').textContent = `Rise ${fmt(rise)} • Set ${fmt(set)}`;
+    }
+
+    // ====== Render ======
+    function renderToday(now){
+      icon.textContent = ICON(now.code, now.isDay);
+      temp.textContent = `${now.temp}${tUnit()}`;
+      city.textContent = now.city;
+      cond.textContent = WMO(now.code, now.isDay);
+      feels.textContent = `${now.feels}${tUnit()}`;
+      hum.textContent = `${now.hum}%`;
+      wind.textContent = `${now.wind} ${vUnit()}`;
+
+      // Simple kid tips
+      const pop = Number(hours?.dataset.popmax||0) || 0; // will be set by renderHours
+      tips.innerHTML = '';
+      kidTips(now.temp, pop, now.wind).forEach(s=>{
+        const b=document.createElement('div'); b.className='tip'; b.textContent=s; tips.appendChild(b);
+      });
+    }
+
+    function renderHours(times=[], temps=[], pops=[]){
+      hours.innerHTML='';
+      let popmax = 0;
+      for(let i=0;i<times.length;i++){
+        const box=document.createElement('div'); box.className='hour';
+        const t=new Date(times[i]).toLocaleTimeString([], {hour:'numeric'});
+        const tt=Math.round(temps[i]);
+        const pop=(pops[i]??0);
+        popmax = Math.max(popmax, pop);
+        const ico = ICON((pops[i]>=50?63:0), 1); // if high pop, show rain icon; else sun/clear-ish
+        box.innerHTML = `<div>${t}</div><div style="font-size:28px">${ico}</div><div class="t">${tt}${tUnit()}</div><div style="font-size:.9rem;color:#7a6a3a">Rain ${pop||0}%</div>`;
+        hours.appendChild(box);
+      }
+      hours.dataset.popmax = String(popmax);
+    }
+
+    // ====== Events ======
+    async function doSearch(){
+      const val = q.value.trim(); if(!val){ alert('Type a city or ZIP'); return; }
+      try{ const {lat, lon, label} = await geocode(val); await fetchWeather(lat, lon, label); } catch(e){ alert(e.message || 'Lookup failed'); }
+    }
+    go.addEventListener('click', doSearch);
+    q.addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+    geo.addEventListener('click', ()=>{
+      if(!navigator.geolocation) return alert('Geolocation not supported');
+      navigator.geolocation.getCurrentPosition(async pos=>{
+        const {latitude:lat, longitude:lon} = pos.coords;
+        try{
+          const r = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=en&format=json`);
+          const g = r.ok ? await r.json() : null; const label = g?.results?.[0]?.name ? `${g.results[0].name}, ${g.results[0].admin1 || ''}`.trim() : 'My Location';
+          await fetchWeather(lat, lon, label);
+        }catch{ await fetchWeather(lat, lon, 'My Location'); }
+      }, err=> alert(err.message||'Permission denied'));
+    });
+
+    function setUnits(u){
+      STORE.unit = u; localStorage.setItem('kidmode_units', u);
+      uF.classList.toggle('on', u==='imperial'); uC.classList.toggle('on', u==='metric');
+      // Rerun last search if we have a city shown
+      if(city.textContent && city.textContent!=='—'){
+        doSearch();
+      } else {
+        // fall back to default
+        start();
+      }
+    }
+    uF.addEventListener('click', ()=> setUnits('imperial'));
+    uC.addEventListener('click', ()=> setUnits('metric'));
+
+    // ====== Boot ======
+    async function start(){
+      try{
+        const {lat, lon, label} = await geocode('Holiday, FL');
+        await fetchWeather(lat, lon, label);
+      }catch(e){ /* ignore */ }
+    }
+    // Start after voices loaded (avoid speaking with default if toggled on)
+    window.speechSynthesis?.addEventListener('voiceschanged', ()=>{});
+    start();
+
+    // ====== Facts carousel ======
+    const FACTS = [
+      'Thunder is the sound made by lightning. ⚡️',
+      'Clouds are made of tiny water droplets or ice crystals.',
+      'A rainbow always appears opposite the sun. 🌈',
+      'The sun helps make wind by heating air unevenly.',
+      'Cumulus clouds can weigh millions of pounds!',
+      'Snowflakes form around tiny particles like dust.',
+      'Hurricanes are called typhoons in the western Pacific.',
+      'A bolt of lightning is hotter than the surface of the sun.',
+      'Fog is just a cloud touching the ground.',
+      'The Jet Stream is a fast river of air high in the sky.',
+      'Raindrops are shaped more like hamburger buns than teardrops.',
+      'The moon doesn’t make light; it reflects the sun.'
+    ];
+    (function factsInit(){
+      const box = document.getElementById('factText');
+      const nextBtn = document.getElementById('factNext');
+      if(!box) return;
+      let idx=0, timer=null;
+      function show(i){ idx=(i+FACTS.length)%FACTS.length; box.textContent=FACTS[idx]; }
+      function next(){ show(idx+1); restart(); }
+      function restart(){ clearInterval(timer); timer=setInterval(()=> show(idx+1), 8000); }
+      nextBtn?.addEventListener('click', next);
+      box.parentElement?.addEventListener('mouseenter', ()=> clearInterval(timer));
+      box.parentElement?.addEventListener('mouseleave', restart);
+      document.addEventListener('visibilitychange', ()=>{ if(document.hidden) clearInterval(timer); else restart(); });
+      show(0); restart();
+    })();
+  // === Games Logic ===
+(function games(){
+  // Tabs
+  const tCloud = document.getElementById('tabCloud');
+  const tGraph = document.getElementById('tabGraph');
+  const tWater = document.getElementById('tabWater');
+  const tStorm = document.getElementById('tabStorm');
+  const sCloud = document.getElementById('gameCloud');
+  const sGraph = document.getElementById('gameGraph');
+  const sWater = document.getElementById('gameWater');
+  const sStorm = document.getElementById('gameStorm');
+  function activate(which){
+    [tCloud,tGraph,tWater,tStorm].forEach(t=> t?.classList.remove('on'));
+    [sCloud,sGraph,sWater,sStorm].forEach(s=> s?.classList.remove('on'));
+    if(which==='cloud'){ tCloud?.classList.add('on'); sCloud?.classList.add('on'); }
+    if(which==='graph'){ tGraph?.classList.add('on'); sGraph?.classList.add('on'); }
+    if(which==='water'){ tWater?.classList.add('on'); sWater?.classList.add('on'); }
+    if(which==='storm'){ tStorm?.classList.add('on'); sStorm?.classList.add('on'); }
+  }
+  tCloud?.addEventListener('click', ()=>activate('cloud'));
+  tGraph?.addEventListener('click', ()=>activate('graph'));
+  tWater?.addEventListener('click', ()=>activate('water'));
+  tStorm?.addEventListener('click', ()=>activate('storm'));
+
+  // ===== Cloud Detective =====
+  const CLOUDS = [
+    {name:'Cumulus', clueA:'Puffy cotton balls', clueB:'Low, puffy heaps • fair weather', clueC:'Low-level heaps • fair weather; vertical growth can mean showers', draw:(el)=>{
+      el.innerHTML = `<svg viewBox="0 0 200 100" width="200" height="100"><g fill="#eaf3ff" stroke="#bcd6ff" stroke-width="3"><ellipse cx="70" cy="60" rx="32" ry="22"/><ellipse cx="95" cy="52" rx="28" ry="20"/><ellipse cx="120" cy="60" rx="34" ry="24"/></g></svg>`;
+    }},
+    {name:'Stratus', clueA:'Gray blanket cloud', clueB:'Flat layer • can bring drizzle', clueC:'Low, uniform layer; reduces visibility', draw:(el)=>{
+      el.innerHTML = `<svg viewBox="0 0 200 100" width="200" height="100"><rect x="20" y="55" width="160" height="24" rx="10" fill="#e0e6ef" stroke="#b8c5d6" stroke-width="3"/></svg>`;
+    }},
+    {name:'Cirrus', clueA:'Feathery streaks', clueB:'High, wispy ice clouds', clueC:'High, fibrous streaks; made of ice; fair but changing weather', draw:(el)=>{
+      el.innerHTML = `<svg viewBox="0 0 200 100" width="200" height="100"><path d="M20 40 C60 20, 100 20, 140 40" stroke="#d6e9ff" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M40 60 C90 40, 120 40, 170 60" stroke="#c2ddff" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`;
+    }},
+  ];
+  let cdScore=0, cdRound=1, cdAnswer=null; const levelSel=document.getElementById('cdLevel');
+  const cdArt=document.getElementById('cdArt'), cdClue=document.getElementById('cdClue'), cdChoices=document.getElementById('cdChoices'), cdFeedback=document.getElementById('cdFeedback'), cdRoundEl=document.getElementById('cdRound'), cdScoreEl=document.getElementById('cdScore');
+
+  function cdSpeak(msg){ if(document.getElementById('tts')?.checked) speak(msg); }
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+  function newCloudQ(){
+    const correct = CLOUDS[Math.floor(Math.random()*CLOUDS.length)];
+    cdAnswer = correct.name;
+    cdArt.innerHTML=''; correct.draw(cdArt);
+    const level = levelSel?.value||'A';
+    cdClue.textContent = level==='A'? correct.clueA : level==='B'? correct.clueB : correct.clueC;
+    const opts = shuffle([correct.name, ...shuffle(CLOUDS.filter(c=>c.name!==correct.name)).slice(0,2).map(c=>c.name)]);
+    cdChoices.innerHTML='';
+    opts.forEach(name=>{
+      const b=document.createElement('button'); b.className='opt'; b.textContent=name; b.addEventListener('click', ()=> cdCheck(name, b)); cdChoices.appendChild(b);
+    });
+    cdFeedback.textContent='';
+  }
+  function cdCheck(name, btn){
+    [...cdChoices.children].forEach(ch=> ch.disabled=true);
+    if(name===cdAnswer){ btn.classList.add('correct'); cdScore++; cdFeedback.textContent='Great job! That\'s right.'; cdSpeak('Great job!'); }
+    else { btn.classList.add('wrong'); cdFeedback.textContent=`Oops—answer: ${cdAnswer}.`; cdSpeak(`Oops. The answer is ${cdAnswer}.`); }
+    cdScoreEl.textContent=cdScore; cdRoundEl.textContent=cdRound;
+  }
+  function cdNext(){ cdRound++; if(cdRound>5){ cdSpeak('Round finished! Want to play again?'); cdRound=1; cdScore=0; } cdRoundEl.textContent=cdRound; cdScoreEl.textContent=cdScore; newCloudQ(); }
+  document.getElementById('cdNext')?.addEventListener('click', cdNext);
+  levelSel?.addEventListener('change', ()=> newCloudQ());
+
+  // ===== Graph-It Lab =====
+  let giScore=0, giRound=1; const giScoreEl=document.getElementById('giScore'), giRoundEl=document.getElementById('giRound');
+  const giChart=document.getElementById('giChart'), giQ=document.getElementById('giQ'), giChoices=document.getElementById('giChoices');
+  function drawChart(){ giChart.innerHTML=''; if(!LAST.times.length){ giChart.innerHTML = '<div class="small-note">Search a city first to load data.</div>'; return; }
+    const maxT = Math.max(...LAST.temps), minT = Math.min(...LAST.temps);
+    for(let i=0;i<LAST.times.length;i++){
+      const h = Math.max(10, ((LAST.temps[i]-minT)/(maxT-minT||1))*100+10);
+      const bar=document.createElement('div'); bar.className='bar'; bar.style.height=h+'px'; bar.title=new Date(LAST.times[i]).toLocaleTimeString([], {hour:'numeric'})+': '+Math.round(LAST.temps[i])+tUnit(); giChart.appendChild(bar);
+      const rbar=document.createElement('div'); rbar.className='bar rain'; rbar.style.height=Math.max(8, (LAST.pops[i]/100)*90)+'px'; rbar.title='Rain '+(LAST.pops[i]||0)+'%'; giChart.appendChild(rbar);
+    }
+  }
+  function newGraphQ(){ if(!LAST.times.length){ drawChart(); giQ.textContent='Type a city first to generate a question.'; giChoices.innerHTML=''; return; }
+    // choose a question type
+    const type = Math.random()<0.5 ? 'warmest' : 'rain';
+    if(type==='warmest'){
+      const idx = LAST.temps.indexOf(Math.max(...LAST.temps));
+      giQ.textContent='Which hour is the warmest?';
+      makeChoices(idx, (i)=> new Date(LAST.times[i]).toLocaleTimeString([], {hour:'numeric'}));
+    } else {
+      const idx = LAST.pops.indexOf(Math.max(...LAST.pops));
+      giQ.textContent='Which hour has the highest chance of rain?';
+      makeChoices(idx, (i)=> `${new Date(LAST.times[i]).toLocaleTimeString([], {hour:'numeric'})} (${LAST.pops[i]||0}%)`);
+    }
+    drawChart();
+  }
+  function makeChoices(correctIdx, labeler){
+    const idxs=[0,1,2,3,4,5].filter(i=> i<LAST.times.length);
+    // pick 3 wrong and 1 correct
+    const wrong=idxs.filter(i=>i!==correctIdx).sort(()=>Math.random()-0.5).slice(0,3);
+    const opts=[correctIdx, ...wrong].sort(()=>Math.random()-0.5);
+    giChoices.innerHTML='';
+    opts.forEach(i=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=labeler(i); b.addEventListener('click', ()=> giCheck(i===correctIdx, b)); giChoices.appendChild(b); });
+    document.getElementById('giFeedback').textContent='';
+  }
+  function giCheck(ok, btn){
+    [...giChoices.children].forEach(ch=> ch.disabled=true);
+    const fb=document.getElementById('giFeedback');
+    if(ok){ btn.classList.add('correct'); giScore++; fb.textContent='Nice! You found it.'; if(document.getElementById('tts')?.checked) speak('Nice!'); }
+    else { btn.classList.add('wrong'); fb.textContent='Not quite—try the next one!'; if(document.getElementById('tts')?.checked) speak('Not quite.'); }
+    giScoreEl.textContent=giScore; giRoundEl.textContent=giRound;
+  }
+  function giNext(){ giRound++; if(giRound>5){ if(document.getElementById('tts')?.checked) speak('Round finished!'); giRound=1; giScore=0; } giScoreEl.textContent=giScore; giRoundEl.textContent=giRound; newGraphQ(); }
+  document.getElementById('giNext')?.addEventListener('click', giNext);
+
+  // ===== Water Cycle Builder =====
+  const WC_ORDER = ['Evaporate','Condense','Precipitate'];
+  const WC_EMO = { Evaporate:'💧☀️', Condense:'☁️', Precipitate:'🌧️' };
+  const wcBank = document.getElementById('wcBank');
+  const wcSlots = Array.from(document.querySelectorAll('#gameWater .slot'));
+  const wcFb = document.getElementById('wcFeedback');
+  function wcMakeTile(name){
+    const b=document.createElement('button'); b.className='tile'; b.draggable=true; b.dataset.name=name;
+    b.innerHTML = `<span class="e">${WC_EMO[name]||'💧'}</span> ${name}`;
+    b.addEventListener('click', ()=> wcBank.appendChild(b));
+    b.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', name); b.classList.add('dragging'); });
+    b.addEventListener('dragend', ()=> b.classList.remove('dragging'));
+    return b;
+  }
+  function wcReset(){
+    wcFb.textContent=''; wcBank.innerHTML='';
+    WC_ORDER.slice().sort(()=>Math.random()-0.5).forEach(n=> wcBank.appendChild(wcMakeTile(n)));
+    wcSlots.forEach(s=>{ s.innerHTML=''; s.classList.remove('filled'); s.dataset.name=''; });
+  }
+  wcSlots.forEach(s=>{
+    s.addEventListener('dragover', e=> e.preventDefault());
+    s.addEventListener('drop', e=>{ e.preventDefault(); const name=e.dataTransfer.getData('text/plain');
+      const tile=document.querySelector(`.tile.dragging[data-name="${name}"]`); if(!tile) return;
+      if(s.dataset.name){ const old=s.querySelector('.tile'); if(old) wcBank.appendChild(old); }
+      s.innerHTML=''; s.appendChild(tile); s.dataset.name=name; s.classList.add('filled');
+    });
+  });
+  wcBank?.addEventListener('dragover', e=> e.preventDefault());
+  wcBank?.addEventListener('drop', e=>{ e.preventDefault(); const name=e.dataTransfer.getData('text/plain'); const tile=document.querySelector(`.tile.dragging[data-name="${name}"]`); if(tile) wcBank.appendChild(tile); });
+  document.getElementById('wcReset')?.addEventListener('click', wcReset);
+  document.getElementById('wcCheck')?.addEventListener('click', ()=>{
+    const arr = wcSlots.map(s=> s.dataset.name || '');
+    const ok = arr.join(',') === WC_ORDER.join(',');
+    if(ok){ wcFb.textContent='Perfect! Water evaporates, then condenses, then falls as precipitation.'; if(document.getElementById('tts')?.checked) speak('Perfect!'); }
+    else { wcFb.textContent='Almost! Try arranging: Evaporate → Condense → Precipitate.'; if(document.getElementById('tts')?.checked) speak('Almost! Try again.'); }
+  });
+  wcReset();
+
+  // ===== Storm Prep Challenge =====
+  const SP_SCENES = [
+    {name:'Thunderstorm', prompt:'Pick the best items to stay safe in a thunderstorm.', correct:['flashlight','batteries','radio','raincoat','shoes','firstaid']},
+    {name:'Tornado', prompt:'Pick items for sheltering from a tornado.', correct:['flashlight','batteries','radio','helmet','whistle','firstaid','shoes','water']},
+    {name:'Hurricane', prompt:'Pick items for a 1–2 day hurricane kit.', correct:['water','food','radio','batteries','charger','firstaid','cash','papers']},
+  ];
+  const SP_ITEMS = [
+    {id:'flashlight', label:'Flashlight', emoji:'🔦'},
+    {id:'batteries', label:'Batteries', emoji:'🔋'},
+    {id:'radio', label:'Weather Radio', emoji:'📻'},
+    {id:'firstaid', label:'First Aid', emoji:'🩹'},
+    {id:'water', label:'Water', emoji:'💧'},
+    {id:'food', label:'Food', emoji:'🥫'},
+    {id:'whistle', label:'Whistle', emoji:'📯'},
+    {id:'raincoat', label:'Raincoat', emoji:'☔'},
+    {id:'shoes', label:'Sturdy Shoes', emoji:'👟'},
+    {id:'helmet', label:'Helmet', emoji:'🪖'},
+    {id:'charger', label:'Phone Charger', emoji:'🔌'},
+    {id:'cash', label:'Cash', emoji:'💵'},
+    {id:'papers', label:'Important Papers', emoji:'📄'},
+  ];
+  let spScore=0, spRound=1, spIdx=0;
+  const spName=document.getElementById('spName'), spPrompt=document.getElementById('spPrompt'), spGrid=document.getElementById('spGrid'), spFeedback=document.getElementById('spFeedback'), spScoreEl=document.getElementById('spScore'), spRoundEl=document.getElementById('spRound');
+  function spNew(){
+    spFeedback.textContent='';
+    spIdx = Math.floor(Math.random()*SP_SCENES.length);
+    const sc = SP_SCENES[spIdx];
+    spName.textContent = sc.name; spPrompt.textContent = sc.prompt;
+    spGrid.innerHTML='';
+    SP_ITEMS.slice().sort(()=>Math.random()-0.5).slice(0,12).forEach(it=>{
+      const b=document.createElement('button'); b.className='kit-item'; b.dataset.id=it.id; b.innerHTML = `<span class="e">${it.emoji}</span> ${it.label}`; b.addEventListener('click', ()=> b.classList.toggle('on')); spGrid.appendChild(b);
+    });
+    spScoreEl.textContent=spScore; spRoundEl.textContent=spRound;
+  }
+  function spSubmit(){
+    const sc = SP_SCENES[spIdx];
+    const selected = Array.from(spGrid.querySelectorAll('.kit-item.on')).map(b=>b.dataset.id);
+    const corr = new Set(sc.correct);
+    let right=0, extra=0;
+    SP_ITEMS.forEach(it=>{
+      const node = spGrid.querySelector(`.kit-item[data-id="${it.id}"]`); if(!node) return;
+      const sel = selected.includes(it.id); const isCorr = corr.has(it.id);
+      node.classList.remove('good','bad');
+      if(sel && isCorr){ node.classList.add('good'); right++; }
+      if(sel && !isCorr){ node.classList.add('bad'); extra++; }
+    });
+    const msg = `You picked ${right} correct item${right!==1?'s':''}${extra?` and ${extra} extra.`:''}`;
+    spFeedback.textContent = msg; if(document.getElementById('tts')?.checked) speak(msg);
+    if(right >= Math.max(3, Math.floor(sc.correct.length*0.6))){ spScore++; }
+    spScoreEl.textContent=spScore;
+  }
+  function spNext(){ spRound++; if(spRound>3){ spRound=1; spScore=0; } spNew(); }
+  document.getElementById('spSubmit')?.addEventListener('click', spSubmit);
+  document.getElementById('spNext')?.addEventListener('click', spNext);
+  spNew();
+
+  // init screens
+  newCloudQ();
+  newGraphQ();
+})();
+</script>
+<div class="mascot" id="sunny" role="img" aria-label="Sunny the mascot" title="Hi! I'm Sunny ☀️">
+  <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="gSun" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff9c4"/>
+        <stop offset="70%" stop-color="#ffe082"/>
+        <stop offset="100%" stop-color="#ffca28"/>
+      </radialGradient>
+    </defs>
+    <g class="rays" stroke="#ffd54f" stroke-width="6" stroke-linecap="round" opacity="0.85">
+      <line x1="60" y1="6" x2="60" y2="22"/>
+      <line x1="60" y1="98" x2="60" y2="114"/>
+      <line x1="6" y1="60" x2="22" y2="60"/>
+      <line x1="98" y1="60" x2="114" y2="60"/>
+      <line x1="22" y1="22" x2="34" y2="34"/>
+      <line x1="86" y1="86" x2="98" y2="98"/>
+      <line x1="22" y1="98" x2="34" y2="86"/>
+      <line x1="86" y1="34" x2="98" y2="22"/>
+    </g>
+    <circle class="face" cx="60" cy="60" r="34" fill="url(#gSun)"/>
+    <circle cx="48" cy="56" r="4" fill="#5a6a2a"/>
+    <circle cx="72" cy="56" r="4" fill="#5a6a2a"/>
+    <path d="M46 72 Q60 80 74 72" fill="none" stroke="#5a6a2a" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+</div>
+</body>
+</html>
