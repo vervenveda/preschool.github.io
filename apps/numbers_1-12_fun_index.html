@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numbers 1–12 Fun!</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    text-align: center;
+    background: #FAF3E0;
+    padding: 20px;
+  }
+  #number-display {
+    font-size: 5rem;
+    color: #FF8C00;
+    margin: 20px;
+  }
+  #count-btns button {
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    background: #87CEEB;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #count-btns button:hover {
+    background: #00BFFF;
+  }
+  .dot-container {
+    margin: 10px auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #FF6F61;
+  }
+</style>
+</head>
+<body>
+
+<h1>Learn Numbers 1–12!</h1>
+<div id="number-display">1</div>
+
+<div id="count-btns">
+  <button onclick="changeNumber(-1)">⬅️ Prev</button>
+  <button onclick="changeNumber(1)">Next ➡️</button>
+</div>
+
+<div id="dots" class="dot-container"></div>
+
+<script>
+  let current = 1;
+  const maxNum = 12;
+  const display = document.getElementById('number-display');
+  const dotsDiv = document.getElementById('dots');
+
+  function updateDisplay() {
+    display.textContent = current;
+    dotsDiv.innerHTML = '';
+
+    for (let i = 0; i < current; i++) {
+      const d = document.createElement('div');
+      d.classList.add('dot');
+      dotsDiv.appendChild(d);
+    }
+  }
+
+  function changeNumber(delta) {
+    current = Math.min(maxNum, Math.max(1, current + delta));
+    updateDisplay();
+  }
+
+  updateDisplay();
+</script>
+
+</body>
+</html>
