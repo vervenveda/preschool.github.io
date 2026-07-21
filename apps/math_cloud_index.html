@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pre‑K Math Cloud — Sovereign Edition</title>
+<style>
+  :root{
+    --bg1:linear-gradient(180deg,#fff4d6 0%, #ffe0f0 50%, #d6f0ff 100%);
+    --ink:#222;
+    --muted:#555;
+    --brand:#ff7a59; /* coral */
+    --brand2:#6c5ce7; /* violet */
+    --good:#10b981;   /* green */
+    --bad:#ef4444;    /* red */
+    --gold:#f59e0b;   /* gold */
+    --card: #ffffffcc;
+    --radius: 24px;
+    --shadow: 0 12px 28px rgba(0,0,0,.12);
+  }
+  html,body{height:100%; margin:0;}
+  body{
+    font-family:"Comic Sans MS","Baloo 2","Poppins",system-ui,Arial,sans-serif;
+    background: var(--bg1);
+    display:flex;align-items:center;justify-content:center;
+    padding:16px; box-sizing:border-box;
+  }
+  .app{ width: min(1200px, 100%); background: var(--card); backdrop-filter: blur(8px);
+        border-radius: var(--radius); box-shadow: var(--shadow); padding:18px; }
+  header{ display:flex; gap:12px; align-items:center; justify-content:space-between; }
+  .title{ display:flex; align-items:center; gap:12px; }
+  .logo{ width:54px;height:54px; border-radius:16px; background: conic-gradient(from 0deg,#ffd166,#f77,#9af,#7ff); box-shadow: inset 0 0 0 6px #fff9;}
+  h1{ margin:0; font-size:28px; color:var(--ink); letter-spacing:.5px; }
+  .sub{ color:var(--muted); font-size:12px; }
+  nav{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .btn{ border:0; padding:14px 16px; border-radius:18px; font-weight:700; cursor:pointer; font-size:16px; 
+        background:linear-gradient(135deg,#fff,#f5f5f5); box-shadow: 0 6px 0 #00000020; transition: transform .06s ease, box-shadow .06s ease; }
+  .btn:active{ transform: translateY(2px); box-shadow: 0 3px 0 #00000020; }
+  .btn.big{ font-size:18px; padding:18px 22px; }
+  .pill{ background:linear-gradient(135deg,#ffd6a5,#ffb5e8); }
+  .pill2{ background:linear-gradient(135deg,#a5e3ff,#c7b7ff); }
+  .pill3{ background:linear-gradient(135deg,#b8ffcb,#ffd6a5); }
+
+  .grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap:16px; }
+  @media (max-width: 920px){ .grid{ grid-template-columns: 1fr; } }
+  .card{ background:#fff; border-radius:20px; padding:16px; box-shadow: var(--shadow); position:relative; }
+  .card h2{ margin:0 0 8px; font-size:22px; }
+  .card p{ margin:0 0 12px; color:var(--muted) }
+
+  .lesson-hero{ display:flex; gap:12px; align-items:center; }
+  .hero-num{ width:80px; height:80px; border-radius:22px; display:grid; place-items:center; font-size:46px; font-weight:900; color:white;
+              background: radial-gradient(circle at 30% 20%, #fff5, transparent 60%), linear-gradient(135deg,#ff7a59,#f59e0b); box-shadow: inset 0 -6px 12px #0003; }
+
+  .weekbar{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{ padding:8px 10px; border-radius:999px; background:#f1f5f9; font-size:13px; cursor:pointer; }
+  .chip.active{ background: #111827; color: #fff; }
+
+  .flex{ display:flex; gap:8px; flex-wrap:wrap; }
+  .right{ text-align:right; }
+  .muted{ color:var(--muted); }
+  .stat{ background:#111827; color:#fff; border-radius:14px; padding:10px 12px; font-weight:700; }
+
+  .game{ border: 3px dashed #e5e7eb; border-radius: 18px; padding:12px; display:grid; gap:10px; grid-template-columns: repeat(5, 1fr); }
+  .dot{ width:66px;height:66px;border-radius:18px; display:grid; place-items:center; font-weight:900; font-size:24px; cursor:pointer;
+        user-select:none; background:linear-gradient(135deg,#fff,#f0f0f0); box-shadow: 0 6px #00000012; }
+  .dot.good{ background:linear-gradient(135deg,#d1fae5,#bbf7d0); box-shadow: 0 6px #00000018; }
+  .dot.bad{ background:linear-gradient(135deg,#fee2e2,#fecaca); box-shadow: 0 6px #00000018; }
+
+  .kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background:#111827; color:#fff; padding:3px 7px; border-radius:7px; }
+
+  .hidden{ display:none !important; }
+  .divider{ height:1px; background:#eee; margin:12px 0; }
+
+  /* Modal */
+  .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: #0008; z-index: 50; }
+  .modal.show{ display:flex; }
+  .sheet{ width:min(720px,95%); background:#fff; border-radius:24px; padding:18px; box-shadow: var(--shadow); max-height:90vh; overflow:auto; }
+
+  /* Confetti canvas */
+  #confetti{ position: fixed; inset: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="app" id="app">
+  <header>
+    <div class="title">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Pre‑K Math Cloud</h1>
+        <div class="sub">Sovereign • Offline‑first • No external servers</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="stat" id="statStars">⭐ 0</div>
+    </div>
+  </header>
+
+  <nav>
+    <button class="btn big pill" id="btnStart">Start Today’s Lesson</button>
+    <button class="btn big pill2" id="btnLibrary">Lesson Library</button>
+    <button class="btn big pill3" id="btnQuiz">Weekly Quiz</button>
+    <button class="btn big pill" id="btnTests">Quarterly & Final</button>
+    <button class="btn big pill2" id="btnRewards">Rewards</button>
+    <button class="btn big pill3" id="btnCloud">Cloud</button>
+    <button class="btn big pill" id="btnTeacher">Teacher Portal</button>
+  </nav>
+
+  <div class="divider"></div>
+
+  <section class="grid">
+    <div class="card" id="cardLesson">
+      <h2>Today’s Lesson</h2>
+      <div class="lesson-hero">
+        <div class="hero-num" id="heroNum">#</div>
+        <div>
+          <div id="lessonTitle" style="font-weight:800;font-size:18px;">Welcome!</div>
+          <div id="lessonDesc" class="muted">Tap <span class="kbd">Start Today’s Lesson</span> to begin.</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div id="game" class="game"></div>
+    </div>
+
+    <div class="card" id="cardPlan">
+      <h2>42‑Week Plan</h2>
+      <p class="muted">5 lessons per week • Weekly quiz • Quarter tests in Weeks 9, 18, 27, 36 • Final in Week 42.</p>
+      <div class="weekbar" id="weekbar"></div>
+      <div class="divider"></div>
+      <div id="planDetail" class="muted">Select a week to view focus.</div>
+    </div>
+  </section>
+</div>
+
+<!-- ======= MODALS ======= -->
+<div class="modal" id="modalCloud">
+  <div class="sheet">
+    <h2>Cloud Vault</h2>
+    <p class="muted">Your sovereign cloud lives inside your browser using IndexedDB + OPFS. Export a backup file to move between devices, or use <b>Peer Sync</b> to connect two browsers via WebRTC by copy‑paste (no server).</p>
+    <div class="divider"></div>
+    <h3>Vault Controls</h3>
+    <div class="flex">
+      <button class="btn pill" id="btnExport">Export Vault (.json)</button>
+      <button class="btn pill2" id="btnImport">Import Vault</button>
+      <button class="btn pill3" id="btnBackupOPFS">Backup to OPFS</button>
+      <button class="btn" id="btnListOPFS">List OPFS Files</button>
+    </div>
+    <pre id="opfsList" style="white-space:pre-wrap;background:#f8fafc;padding:10px;border-radius:12px;margin-top:10px;max-height:180px;overflow:auto;"></pre>
+
+    <div class="divider"></div>
+    <h3>Peer Sync (serverless)</h3>
+    <p class="muted">On <b>Device A</b>, click <em>Create Offer</em> and copy the text to <b>Device B</b>. On Device B, click <em>Paste Offer → Create Answer</em>, copy the answer back to Device A, then click <em>Finalize</em>. When connected, press <em>Send Vault</em> to sync.</p>
+    <div class="flex">
+      <button class="btn" id="btnOffer">Create Offer</button>
+      <button class="btn" id="btnAnswer">Paste Offer → Create Answer</button>
+      <button class="btn" id="btnFinalize">Finalize</button>
+      <button class="btn pill3" id="btnSendVault">Send Vault</button>
+    </div>
+    <textarea id="signalBox" style="width:100%;min-height:120px;margin-top:10px;border-radius:12px;border:1px solid #e5e7eb;padding:10px;font-family:ui-monospace,Menlo,monospace"></textarea>
+    <div id="peerStatus" class="muted" style="margin-top:8px;">Status: idle</div>
+  </div>
+</div>
+
+<div class="modal" id="modalTeacher">
+  <div class="sheet">
+    <h2>Teacher Portal</h2>
+    <p class="muted">Password‑protected gradebook and controls. First time here? Set a password.</p>
+    <div class="divider"></div>
+    <div id="teacherAuth">
+      <input id="teacherPass" type="password" placeholder="Enter password" style="width:60%;padding:10px;border-radius:12px;border:1px solid #e5e7eb;">
+      <button class="btn pill" id="btnTeacherLogin">Unlock</button>
+      <button class="btn pill2" id="btnTeacherSet">Set / Reset Password</button>
+      <div id="authMsg" class="muted"></div>
+    </div>
+    <div id="teacherPanel" class="hidden">
+      <div class="flex">
+        <button class="btn" id="btnViewGrades">View Gradebook</button>
+        <button class="btn" id="btnExportGrades">Export Grades CSV</button>
+        <button class="btn" id="btnResetStudent">Reset Student</button>
+      </div>
+      <div id="gradeTableWrap" style="margin-top:10px;max-height:300px;overflow:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalQuiz">
+  <div class="sheet">
+    <h2 id="quizTitle">Weekly Quiz</h2>
+    <div id="quizArea"></div>
+    <div class="divider"></div>
+    <div class="flex">
+      <button class="btn" id="btnSubmitQuiz">Submit</button>
+      <button class="btn" id="btnExitQuiz">Close</button>
+    </div>
+    <div id="quizMsg" class="muted"></div>
+  </div>
+</div>
+
+<!-- ======= SCRIPT ======= -->
+<script>
+// =============================================================
+//  PRE‑K MATH CLOUD — Sovereign, Single‑File (Vanilla JS)
+//  Offline‑first storage (localStorage + OPFS when available)
+//  Serverless P2P sync via WebRTC data channel (manual signaling)
+//  42‑week curriculum scaffolding with quizzes & tests
+// =============================================================
+
+const App = {
+  state: {
+    stars: 0,
+    week: 1, day: 1, // day 1..5
+    student: 'Student',
+    vault: null,
+    peer: null,
+  }
+};
+
+// ---------------------- UTILITIES ----------------------
+const $ = sel => document.querySelector(sel);
+const el = (tag, attrs={}, children=[])=>{ const n=document.createElement(tag); Object.assign(n, attrs); children.forEach(c=>n.appendChild(c)); return n; };
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a }
+
+// SHA‑256 for teacher password
+async function sha256(text){ const h=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)); return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+// Simple beep (correct answers)
+function beepOK(){ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.type='triangle'; o.frequency.value=880; o.connect(g); g.gain.setValueAtTime(0.001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.25); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.26); }
+
+// Confetti (tiny built‑in)
+(function confettiInit(){
+  const c = document.getElementById('confetti');
+  const ctx = c.getContext('2d');
+  function resize(){ c.width = innerWidth; c.height= innerHeight; }
+  addEventListener('resize', resize); resize();
+  const pieces = [];
+  function make(){ for(let i=0;i<90;i++) pieces.push({x:Math.random()*c.width, y:-10-Math.random()*100, s:4+Math.random()*6, vy:2+Math.random()*3, vx:(Math.random()-.5)*2, r:Math.random()*360}); }
+  function draw(){ ctx.clearRect(0,0,c.width,c.height); pieces.forEach(p=>{ p.y+=p.vy; p.x+=p.vx; p.r+=p.vy; if(p.y>c.height+20){ p.y=-10; p.x=Math.random()*c.width; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r*Math.PI/180); ctx.fillStyle = `hsl(${(p.x+p.y)%360} 90% 60%)`; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); }); requestAnimationFrame(draw); }
+  draw();
+  window.shower = ()=>{ make(); setTimeout(()=>{},700); };
+})();
+
+// ---------------------- CURRICULUM ----------------------
+function generateCurriculum(){
+  const weeks = [];
+  const focus = [
+    'Meet Numbers 0–5','Meet Numbers 6–10','Count to 10','Zero & Nothing','Compare Big / Small', // 1–5
+    'Count Objects 0–10','Write 0–10','Number Order','Patterns ABAB','Shapes & Counting',       // 6–10
+    'Quarter 1 Review','Numbers 11–15','Numbers 16–20','Count Teen Numbers','Tally Marks',      // 11–15
+    'More/Less (0–20)','Compose 10','Decompose 10','Number Lines 0–20','Story Problems (add 0–5)', // 16–20
+    'Quarter 2 Review','Add within 5','Add within 10','Doubles to 10','Make Ten',               // 21–25
+    'Subtraction within 5','Subtraction within 10','Equal / Not Equal','Compare Numbers 0–20','Sorting & Classify', // 26–30
+    'Quarter 3 Review','Graphs (picture)','Time (morning/noon/night)','Money (pennies)','Measurement (long/short)', // 31–35
+    'Quarter 4 Review','Review 0–20','Add & Sub Mix','Word Problems mix','Ready for K Final'   // 36–40
+  ];
+  // Ensure 42 weeks; last two weeks = Final Prep + Final
+  while(focus.length<41) focus.push('Review & Play');
+  focus[41] = 'Final Exam & Celebration';
+  for(let w=1; w<=42; w++){
+    const topic = focus[w-1] || 'Fun Math Play';
+    const lessons = Array.from({length:5}, (_,d)=>({
+      id:`W${w}D${d+1}`,
+      title:`Week ${w} • Day ${d+1}`,
+      target: lessonTargetForWeek(w,d+1,topic),
+    }));
+    weeks.push({week:w, topic, lessons});
+  }
+  return weeks;
+}
+
+function lessonTargetForWeek(week,day,topic){
+  // Lightweight generator for intro‑to‑numbers focus
+  if(week<=3){
+    const nBase = week===1?0: (week===2?6:10);
+    const target = Math.min(10, nBase + day);
+    return { kind:'number', value: target, text:`Recognize and count ${target}` };
+  }
+  if(week===42){ return {kind:'final', text:'Final exam'} }
+  return { kind:'play', text: topic };
+}
+
+const CURRICULUM = generateCurriculum();
+
+// ---------------------- VAULT (local data) ----------------------
+const Vault = {
+  key: 'prek-math-cloud.v3',
+  data: { meta:{ created: Date.now(), version:3 }, student:'Student', stars:0, progress:{}, grades:[], admin:{hash:null} },
+  load(){ try{ const raw=localStorage.getItem(this.key); if(raw){ this.data = JSON.parse(raw); } }catch(e){ console.warn('Vault load',e) }
+    App.state.stars = this.data.stars||0; App.state.student=this.data.student||'Student'; updateStars(); },
+  save(){ try{ localStorage.setItem(this.key, JSON.stringify(this.data)); }catch(e){ console.warn('Vault save',e) } },
+  setStudent(name){ this.data.student=name; App.state.student=name; this.save(); },
+  awardStars(n){ this.data.stars=(this.data.stars||0)+n; App.state.stars=this.data.stars; this.save(); updateStars(); shower(); beepOK(); },
+  logGrade(entry){ this.data.grades.push({...entry, ts: Date.now()}); this.save(); },
+  snapshot(){ return JSON.stringify(this.data, null, 2); },
+  import(json){ try{ const obj=JSON.parse(json); if(obj && obj.meta){ this.data=obj; this.save(); App.state.stars=this.data.stars||0; updateStars(); return true; } }catch(e){ return false }
+    return false; }
+};
+
+// ---------------------- OPFS (Origin Private File System) ----------------------
+const OPFS = {
+  root: null,
+  async init(){ if(!('storage' in navigator) || !('getDirectory' in navigator.storage)){ return false; }
+    try{ this.root = await navigator.storage.getDirectory(); return true; }catch{ return false }
+  },
+  async writeText(name, text){ if(!this.root) return false; const handle = await this.root.getFileHandle(name,{create:true}); const w = await handle.createWritable(); await w.write(new Blob([text],{type:'application/json'})); await w.close(); return true; },
+  async list(){ if(!this.root) return []; const out=[]; for await (const [name,handle] of this.root.entries()){ out.push(name); } return out; }
+};
+
+// ---------------------- P2P (manual WebRTC) ----------------------
+function PeerLink(){
+  const iceServers = []; // serverless; works best on same LAN
+  const pc = new RTCPeerConnection({iceServers});
+  let dc = null; let open=false;
+  const statusEl = $('#peerStatus');
+  function setStatus(t){ statusEl.textContent = 'Status: ' + t; }
+  pc.onicecandidate = e=>{ if(e.candidate) return; // gather complete
+    $('#signalBox').value = JSON.stringify(pc.localDescription); };
+  pc.onconnectionstatechange = ()=> setStatus(pc.connectionState);
+  pc.ondatachannel = e=>{ dc = e.channel; bindDC(); };
+  function bindDC(){ if(!dc) return; dc.onopen=()=>{ open=true; setStatus('connected'); }; dc.onclose=()=>{ open=false; setStatus('closed'); };
+    dc.onmessage = ev=>{ try{ const packet = JSON.parse(ev.data); if(packet.type==='vault'){ const ok = Vault.import(packet.payload); setStatus('received vault ' + (ok?'✓':'×')); if(ok){ alert('Vault received & loaded.'); } } }catch(err){} } }
+  return {
+    async makeOffer(){ dc = pc.createDataChannel('sync'); bindDC(); const offer = await pc.createOffer(); await pc.setLocalDescription(offer); setStatus('offer created'); },
+    async makeAnswer(){ const offer = JSON.parse($('#signalBox').value||'{}'); await pc.setRemoteDescription(offer); const answer = await pc.createAnswer(); await pc.setLocalDescription(answer); await sleep(200);
+      $('#signalBox').value = JSON.stringify(pc.localDescription); setStatus('answer created'); },
+    async finalize(){ const answer = JSON.parse($('#signalBox').value||'{}'); await pc.setRemoteDescription(answer); setStatus('finalized, connecting…'); },
+    sendVault(){ if(!open) return alert('Peer not connected'); dc.send(JSON.stringify({type:'vault', payload: Vault.snapshot()})); setStatus('sent vault'); }
+  }
+}
+
+// ---------------------- QUIZ/TEST ENGINE ----------------------
+function makeMCQ_Number0_20(){
+  const correct = randInt(0,20);
+  const pool = new Set([correct]);
+  while(pool.size<4) pool.add(randInt(0,20));
+  const options = shuffle([...pool]);
+  return { kind:'mcq', prompt:`Which number is ${correct}?`, options, answer: options.indexOf(correct) };
+}
+
+function makeCountDots(){
+  const count = randInt(1,10);
+  const opts = shuffle([count, randInt(0,10), randInt(0,10), randInt(0,10)]);
+  const dots = Array.from({length:count},()=>'<span style="display:inline-block;width:16px;height:16px;border-radius:6px;background:#111827;margin:3px"></span>').join('');
+  return { kind:'mcqHtml', prompt:`How many dots? ${dots}`, options:opts.map(n=>String(n)), answer: opts.indexOf(count) };
+}
+
+function buildQuiz(n=8){
+  const items=[]; for(let i=0;i<n;i++){ items.push( i%2? makeCountDots() : makeMCQ_Number0_20() ); }
+  return items;
+}
+
+function renderQuiz(items, container){
+  container.innerHTML='';
+  items.forEach((q,idx)=>{
+    const wrap = el('div',{className:'card', style:'margin:10px 0;padding:12px'});
+    wrap.append(el('div',{innerHTML:`<b>Q${idx+1}.</b> ${q.prompt}`}));
+    const row = el('div',{className:'flex', style:'margin-top:8px'});
+    q.options.forEach((opt,i)=>{
+      const b = el('button',{className:'btn', textContent:String(opt)});
+      b.onclick=()=>{ [...row.children].forEach(ch=>ch.classList.remove('pill','pill2')); b.classList.add('pill'); q.choice=i; };
+      row.append(b);
+    });
+    wrap.append(row);
+    container.append(wrap);
+  });
+}
+
+function gradeQuiz(items){
+  let ok=0; items.forEach(q=>{ if(q.choice===q.answer) ok++; });
+  const pct = Math.round((ok/items.length)*100);
+  return { ok, total: items.length, pct };
+}
+
+// ---------------------- GAME (lesson mini‑task) ----------------------
+function renderLessonGame(target){
+  const g = $('#game'); g.innerHTML='';
+  if(target.kind==='number'){
+    $('#lessonDesc').textContent = `Find all the ${target.value}s!`;
+    $('#heroNum').textContent = target.value;
+    const cells = shuffle([target.value,target.value,target.value,randInt(0,10),randInt(0,10),randInt(0,10),randInt(0,10),randInt(0,10),randInt(0,10),randInt(0,10)]);
+    cells.forEach(n=>{
+      const d = el('div',{className:'dot', textContent:String(n)});
+      d.onclick=()=>{
+        if(n===target.value){ d.classList.add('good'); Vault.awardStars(1); }
+        else { d.classList.add('bad'); }
+        d.style.pointerEvents='none';
+      };
+      g.append(d);
+    });
+  } else if(target.kind==='final'){
+    $('#lessonDesc').textContent = 'Time for the Final Exam! Go to Tests → Final.';
+    $('#heroNum').textContent = '🏁';
+    g.innerHTML = '<div class="muted">Open <b>Quarterly & Final</b> to begin.</div>';
+  } else {
+    $('#lessonDesc').textContent = target.text || 'Let\'s play!';
+    $('#heroNum').textContent = '★';
+    for(let i=0;i<10;i++){ const d=el('div',{className:'dot', textContent:String(randInt(0,10))}); g.append(d);}    
+  }
+}
+
+// ---------------------- TEACHER / GRADES ----------------------
+function asCSV(rows){ return rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n'); }
+function renderGradebook(){
+  const rows = [[ 'Date','Type','Week','Score','Percent' ]];
+  Vault.data.grades.forEach(g=> rows.push([ new Date(g.ts).toLocaleDateString(), g.kind, g.week||'', `${g.ok}/${g.total}`, g.pct+"%" ]));
+  const html = `<table style="width:100%;border-collapse:collapse">${ rows.map((r,i)=>`<tr>${r.map(c=>`<td style=\"border:1px solid #eee;padding:6px;${i?'' :'font-weight:700;background:#f8fafc'}\">${c}</td>`).join('')}</tr>`).join('') }</table>`;
+  $('#gradeTableWrap').innerHTML = html;
+  return rows;
+}
+
+// ---------------------- UI WIRING ----------------------
+function updateStars(){ $('#statStars').textContent = `⭐ ${App.state.stars}`; }
+
+function openModal(id){ $(id).classList.add('show'); }
+function closeModals(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show')); }
+
+// Build week bar
+function renderWeeks(){
+  const bar = $('#weekbar'); bar.innerHTML='';
+  CURRICULUM.forEach(w=>{
+    const ch = el('div',{className:'chip'+(w.week===App.state.week?' active':''), textContent:`W${w.week}`});
+    ch.onclick=()=>{ App.state.week=w.week; renderWeeks(); $('#planDetail').textContent = `Week ${w.week}: ${w.topic}`; const L = w.lessons[App.state.day-1]; renderLessonGame(L.target); };
+    bar.appendChild(ch);
+  });
+  $('#planDetail').textContent = `Week ${App.state.week}: ${CURRICULUM[App.state.week-1].topic}`;
+}
+
+// Start today’s lesson
+$('#btnStart').onclick=()=>{
+  const w = CURRICULUM[App.state.week-1];
+  const L = w.lessons[App.state.day-1];
+  $('#lessonTitle').textContent = `${L.title} — ${w.topic}`;
+  renderLessonGame(L.target);
+};
+
+$('#btnLibrary').onclick=()=>{
+  const w = CURRICULUM[App.state.week-1];
+  alert(`Week ${w.week}: ${w.topic}\n\nLessons:\n` + w.lessons.map(x=>`• ${x.title}`).join('\n'));
+};
+
+// Weekly quiz
+$('#btnQuiz').onclick=()=>{
+  const quiz = buildQuiz(8);
+  openModal('#modalQuiz');
+  $('#quizTitle').textContent = `Weekly Quiz — Week ${App.state.week}`;
+  renderQuiz(quiz, $('#quizArea'));
+  $('#btnSubmitQuiz').onclick=()=>{
+    const res = gradeQuiz(quiz);
+    $('#quizMsg').textContent = `You got ${res.ok}/${res.total} (${res.pct}%).`;
+    Vault.logGrade({kind:'Weekly Quiz', week:App.state.week, ...res});
+    if(res.pct>=80) Vault.awardStars(5); else if(res.pct>=50) Vault.awardStars(2);
+  };
+};
+$('#btnExitQuiz').onclick=()=> closeModals();
+
+// Tests
+$('#btnTests').onclick=()=>{
+  const menu = `Choose a test:\n1) Quarter Test (Weeks 1–9)\n2) Quarter Test (10–18)\n3) Quarter Test (19–27)\n4) Quarter Test (28–36)\n5) Final Exam (Week 42)`;
+  const pick = prompt(menu,'1');
+  if(!pick) return;
+  const count = pick==='5'? 30 : 20;
+  openModal('#modalQuiz');
+  $('#quizTitle').textContent = (pick==='5'?'Final Exam':'Quarterly Test');
+  const quiz = buildQuiz(count);
+  renderQuiz(quiz, $('#quizArea'));
+  $('#btnSubmitQuiz').onclick=()=>{
+    const res = gradeQuiz(quiz);
+    $('#quizMsg').textContent = `You got ${res.ok}/${res.total} (${res.pct}%).`;
+    Vault.logGrade({kind: $('#quizTitle').textContent, week:App.state.week, ...res});
+    if(res.pct>=80) { Vault.awardStars(15); shower(); }
+    else if(res.pct>=60) Vault.awardStars(8);
+  };
+};
+
+// Rewards
+$('#btnRewards').onclick=()=>{
+  const s = Vault.data.stars||0;
+  const msg = s>=50 ? 'You unlocked the Rainbow Crown! 👑'
+            : s>=25 ? 'You earned a Golden Badge! 🥇'
+            : 'Keep going! Collect ⭐ to unlock prizes!';
+  alert(`${msg}\n\nStars: ${s}`);
+};
+
+// Cloud modal
+$('#btnCloud').onclick=()=> openModal('#modalCloud');
+
+// Teacher portal
+$('#btnTeacher').onclick=()=> openModal('#modalTeacher');
+
+// Teacher auth logic
+$('#btnTeacherLogin').onclick=async ()=>{
+  const pass = $('#teacherPass').value;
+  const hash = await sha256(pass);
+  if(!Vault.data.admin.hash){ $('#authMsg').textContent='No password set. Click "Set / Reset Password" first.'; return; }
+  if(hash===Vault.data.admin.hash){ $('#authMsg').textContent='Unlocked ✓'; $('#teacherPanel').classList.remove('hidden'); } else { $('#authMsg').textContent='Wrong password'; }
+};
+$('#btnTeacherSet').onclick=async ()=>{
+  const p1 = prompt('Set a new Teacher password:'); if(!p1) return;
+  const hash = await sha256(p1); Vault.data.admin.hash = hash; Vault.save(); alert('Password set.');
+};
+$('#btnViewGrades').onclick=()=> renderGradebook();
+$('#btnExportGrades').onclick=()=>{
+  const rows = renderGradebook();
+  const csv = asCSV(rows);
+  downloadText('grades.csv', csv, 'text/csv');
+};
+$('#btnResetStudent').onclick=()=>{
+  if(confirm('Reset all progress for this student?')){ Vault.data.stars=0; Vault.data.grades=[]; Vault.save(); App.state.stars=0; updateStars(); alert('Reset complete.'); }
+};
+
+// Cloud controls
+$('#btnExport').onclick=()=> downloadText('prek-math-vault.json', Vault.snapshot(), 'application/json');
+$('#btnImport').onclick=()=> pickFileText().then(txt=>{ if(!txt) return; const ok=Vault.import(txt); alert(ok?'Import successful.':'Import failed.'); });
+$('#btnBackupOPFS').onclick=async ()=>{ const ok = await OPFS.writeText('prek-math-vault.json', Vault.snapshot()); alert(ok?'Saved to OPFS.':'OPFS not available in this browser.'); };
+$('#btnListOPFS').onclick=async ()=>{ const list=await OPFS.list(); $('#opfsList').textContent = list.length? list.join('\n') : 'No OPFS support or empty.'; };
+
+// P2P wiring
+let peer;
+$('#btnOffer').onclick=async ()=>{ peer = PeerLink(); await peer.makeOffer(); };
+$('#btnAnswer').onclick=async ()=>{ peer = peer || PeerLink(); await peer.makeAnswer(); };
+$('#btnFinalize').onclick=async ()=>{ if(!peer) return; await peer.finalize(); };
+$('#btnSendVault').onclick=()=>{ if(peer) peer.sendVault(); };
+
+// File helpers
+function downloadText(filename, text, mime){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text],{type:mime||'text/plain'}));
+  a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+}
+function pickFileText(){ return new Promise(res=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,.txt'; inp.onchange=async ()=>{ const f=inp.files[0]; const txt = await f.text(); res(txt); }; inp.click(); }); }
+
+// Startup
+(async function init(){
+  Vault.load();
+  await OPFS.init();
+  renderWeeks();
+  $('#lessonTitle').textContent = `Week ${App.state.week} • Day ${App.state.day}`;
+  const L = CURRICULUM[App.state.week-1].lessons[0]; renderLessonGame(L.target);
+
+  // Close modal on backdrop click
+  document.querySelectorAll('.modal').forEach(m=> m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('show'); }));
+})();
+</script>
+</body>
+</html>
