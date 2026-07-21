@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Wondercabinet™ — Demo Shell</title>
+
+<!-- Fonts: Cinzel from Google; Brandon Grotesque must be self-hosted if available -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#FFF7ED; --card:#fff; --accent:#5A2E5D; --accent-2:#C58FA0; --gold:#E8B04A; --muted:#6b5560;
+    --glass: rgba(255,255,255,0.7);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Brandon Grotesque", "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:linear-gradient(180deg,#fffaf3,#fff6ee);color:#2b1f25;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px}
+  header{width:100%;max-width:1100px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-size:28px;box-shadow:0 6px 18px rgba(90,46,93,0.15)}
+  h1{font-family:"Cinzel",serif;margin:0;font-size:1.25rem;color:var(--accent)}
+  .subtitle{font-size:0.85rem;color:var(--muted)}
+  .controls{display:flex;gap:8px;align-items:center}
+  button, select{padding:8px 10px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:600;cursor:pointer}
+  select{background:var(--accent-2);color:white;padding-left:12px}
+
+  /* cabinet grid */
+  .cabinet{width:100%;max-width:1100px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .module{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 8px 20px rgba(0,0,0,0.06);min-height:160px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+  .module .title{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--accent)}
+  .module .emoji{font-size:1.6rem}
+  .module .body{margin-top:8px;color:#42323a;flex:1}
+
+  /* small card styles */
+  .tiny-btn{background:linear-gradient(90deg,var(--accent-2),var(--accent));color:white;padding:6px 8px;border-radius:10px;border:none;cursor:pointer}
+  .word-pill{display:inline-block;background:#fff3f8;padding:6px 10px;border-radius:999px;margin:6px 6px 6px 0;color:var(--accent-2);font-weight:700;box-shadow:0 4px 10px rgba(197,143,160,0.12)}
+
+  /* sight words area */
+  #sightWordsArea .wordGrid{display:flex;flex-wrap:wrap;gap:8px}
+
+  /* drawer animation for jokes */
+  .drawer{position:relative;overflow:hidden}
+  .drawer .panel{transform-origin:top center;transform:rotateX(-90deg);opacity:0;transition:transform 450ms ease,opacity 350ms;backface-visibility:hidden;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fffaf7);box-shadow:0 10px 30px rgba(0,0,0,0.06)}
+  .drawer.open .panel{transform:rotateX(0);opacity:1}
+
+  /* easel / canvas */
+  .canvasWrap{background:linear-gradient(180deg,#fff,#fffaf7);border-radius:8px;padding:8px;border:1px dashed #f0e6e6}
+  canvas{width:100%;height:180px;border-radius:8px;touch-action:none}
+
+  /* breathing crystal */
+  .crystal{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+  .orb{width:78px;height:78px;border-radius:999px;background:linear-gradient(135deg,#fff0d6,#fff6f4);box-shadow:0 10px 30px rgba(232,176,74,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--accent);transform-origin:center;transition:transform 800ms ease}
+
+  /* treasure chest badges */
+  .badges{display:flex;flex-wrap:wrap;gap:8px}
+  .badge{background:linear-gradient(90deg,var(--gold),#ffd88a);padding:8px 10px;border-radius:12px;font-weight:800;color:#4b2f00;box-shadow:0 6px 16px rgba(232,176,74,0.18)}
+
+  /* storybook list */
+  .stories{max-height:120px;overflow:auto;padding:6px;border-radius:8px;background:linear-gradient(180deg,#fff,#fffaf7)}
+
+  footer{margin-top:18px;color:var(--muted);font-size:0.85rem}
+  /* small responsive tweaks */
+  @media (max-width:880px){header{flex-direction:column;align-items:flex-start} .controls{align-self:stretch;justify-content:space-between;width:100%}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">✨</div>
+    <div>
+      <h1>The Wondercabinet™</h1>
+      <div class="subtitle">A private, artful micro-universe — 5 sight-words · tracing · drawing · gentle rewards</div>
+    </div>
+  </div>
+  <div class="controls">
+    <button id="exportBtn" title="Export progress">Export</button>
+    <button id="importBtn" title="Import progress">Import</button>
+    <select id="kidSelect" title="Choose child profile"><option value="default">Default</option></select>
+  </div>
+</header>
+
+<main class="cabinet" id="cabinet">
+
+  <!-- Sight Words Jar -->
+  <section class="module" id="sightJar">
+    <div class="title"><div class="emoji">🫙</div>Jar of Sight Words</div>
+    <div class="body" id="sightWordsArea">
+      <div><small>Tap to pick today’s five words</small></div>
+      <div style="margin-top:8px">
+        <button class="tiny-btn" id="pickWordsBtn">Pick 5 Words</button>
+        <div id="wordsPicked" style="margin-top:10px"></div>
+      </div>
+      <div style="margin-top:10px"><small>Activities: trace · spell · find</small></div>
+    </div>
+  </section>
+
+  <!-- Jokes Drawer -->
+  <section class="module drawer" id="jokesDrawer">
+    <div class="title"><div class="emoji">🪄</div>Drawer of Jokes</div>
+    <div class="body">
+      <div><small>Open for a giggle</small></div>
+      <div style="margin-top:10px"><button class="tiny-btn" id="openJokeBtn">Open Drawer</button></div>
+      <div style="margin-top:12px">
+        <div class="panel" id="jokePanel" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Story Starters Shelf -->
+  <section class="module" id="storyShelf">
+    <div class="title"><div class="emoji">📚</div>Shelf of Story Starters</div>
+    <div class="body">
+      <div><small>Tap for a tiny story seed</small></div>
+      <div style="margin-top:8px"><button class="tiny-btn" id="newStoryBtn">New Prompt</button></div>
+      <div style="margin-top:10px" class="stories" id="storyList"></div>
+      <div style="margin-top:8px"><small>Saved story starters are private.</small></div>
+    </div>
+  </section>
+
+  <!-- Shapes & Letters Cabinet -->
+  <section class="module" id="shapesCabinet">
+    <div class="title"><div class="emoji">🔺</div>Shapes & Letters</div>
+    <div class="body">
+      <div><small>Tap shapes or letters to hear them</small></div>
+      <div style="margin-top:8px">
+        <div id="shapeRow" style="display:flex;gap:8px;margin-bottom:8px"></div>
+        <div id="letterRow" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wand / Tracing -->
+  <section class="module" id="wandModule">
+    <div class="title"><div class="emoji">✍️</div>Glowing Wand (Trace)</div>
+    <div class="body">
+      <div><small>Choose a word from your picked words to trace</small></div>
+      <div style="margin-top:8px" id="traceChooser"></div>
+      <div style="margin-top:8px" class="canvasWrap"><canvas id="traceCanvas"></canvas></div>
+      <div style="margin-top:8px"><button class="tiny-btn" id="clearTrace">Clear</button></div>
+    </div>
+  </section>
+
+  <!-- Crystal / Breathing -->
+  <section class="module" id="crystal">
+    <div class="title"><div class="emoji">🔮</div>Calming Crystal</div>
+    <div class="body crystal">
+      <div class="orb" id="orb">🌬️</div>
+      <div style="font-size:0.95rem;color:var(--muted)">Breathe with the crystal</div>
+      <div style="margin-top:6px"><button class="tiny-btn" id="startBreath">Start</button></div>
+    </div>
+  </section>
+
+  <!-- Easel / Drawing -->
+  <section class="module" id="easel">
+    <div class="title"><div class="emoji">🎨</div>Easel — Free Drawing</div>
+    <div class="body">
+      <div class="canvasWrap"><canvas id="drawCanvas"></canvas></div>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <input type="color" id="colorPicker" value="#5A2E5D" />
+        <button class="tiny-btn" id="clearDraw">Clear</button>
+        <button class="tiny-btn" id="saveDraw">Save</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Music Box -->
+  <section class="module" id="musicBox">
+    <div class="title"><div class="emoji">🎵</div>Musical Box</div>
+    <div class="body">
+      <div><small>Tap notes to play</small></div>
+      <div style="margin-top:8px;display:flex;gap:8px" id="noteRow"></div>
+    </div>
+  </section>
+
+  <!-- Treasure Chest -->
+  <section class="module" id="treasure">
+    <div class="title"><div class="emoji">🧰</div>Treasure Chest</div>
+    <div class="body">
+      <div><small>Your private stickers & rewards</small></div>
+      <div style="margin-top:10px" class="badges" id="badgeArea"></div>
+      <div style="margin-top:10px"><small>Progress is stored locally. Export to back up.</small></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>Made with care — private, ad-free, and offline by Khaemenes Academy</div>
+</footer>
+
+<script>
+/* -------------------------
+  Minimal Wondercabinet Shell
+  - localStorage "sovereign cloud"
+  - small sample data
+  - modular UI hooks
+--------------------------*/
+
+const STORAGE_KEY = 'wondercabinet:v1';
+let STATE = loadState();
+
+const SAMPLE_WORDS = ["apple","ball","cat","dog","star","sun","tree","book","moon","fish","hat","shoe","bird","cup","flower","bread","milk","car","bus","bed","chair"];
+const JOKES = [
+  "How do you make a tissue dance?<br><b>Put a little boogie in it.</b>",
+  "Why was the computer cold?<br><b>It left its Windows open!</b>",
+  "What do you call a mermaid who writes code?<br><b>A shell script-er!</b>",
+  "Why did Jenny build a city for rescued AIs?<br><b>Because even robots need “byte-sized” condos!</b>",
+  "Why did the painter go to jail?<br><b>Because she had a brush with the law.</b>",
+  "Why did the weather portal get a promotion?<br><b>Because it always brought a positive outlook!</b>"
+];
+
+const STORY_PROMPTS = [
+  "A tiny dragon discovers a paintbrush that sings...",
+  "A lost cloud wants to find its color...",
+  "A pencil that can draw doors to other places...",
+  "A day when all the toys decide to paint shadows..."
+];
+
+/* ----- Storage ----- */
+function loadState(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {users:{default:{words:[],badges:[],stories:[],drawings:[]}}}; }
+  catch(e){ return {users:{default:{words:[],badges:[],stories:[],drawings:[]}}}; }
+}
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); updateBadgesUI(); }
+
+/* ----- Export / Import ----- */
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const data = JSON.stringify(STATE,null,2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'wondercabinet-progress.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
+  inp.onchange = e => {
+    const f = e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        STATE = parsed; saveState(); alert('Imported progress.');
+      } catch(err){ alert('Invalid file.'); }
+    };
+    reader.readAsText(f);
+  };
+  inp.click();
+});
+
+/* ----- Kids selector (simple single profile demo) ----- */
+const kidSelect = document.getElementById('kidSelect');
+kidSelect.addEventListener('change', e => { /* placeholder: support multiple kids later */ });
+
+/* ----- Sight Words: pick 5 ----- */
+const pickBtn = document.getElementById('pickWordsBtn');
+const wordsPicked = document.getElementById('wordsPicked');
+pickBtn.addEventListener('click', ()=>{
+  const shuffled = SAMPLE_WORDS.slice().sort(()=>Math.random()-0.5);
+  const five = shuffled.slice(0,5);
+  STATE.users.default.words = five;
+  saveState(); renderPickedWords();
+  alert('Five words selected — try tracing or spelling them!');
+});
+function renderPickedWords(){
+  const arr = STATE.users.default.words || [];
+  wordsPicked.innerHTML = '';
+  if(arr.length===0) { wordsPicked.innerHTML = '<small>No words chosen yet.</small>'; return; }
+  const row = document.createElement('div'); row.className='wordGrid';
+  arr.forEach(w=>{
+    const el = document.createElement('span'); el.className='word-pill'; el.textContent=w;
+    el.onclick = ()=> { selectTraceWord(w); highlightWordPill(w); };
+    row.appendChild(el);
+  });
+  wordsPicked.appendChild(row);
+  populateTraceChooser();
+}
+
+/* ----- Jokes Drawer ----- */
+const jokesDrawer = document.getElementById('jokesDrawer');
+const openJokeBtn = document.getElementById('openJokeBtn');
+const jokePanel = document.getElementById('jokePanel');
+openJokeBtn.addEventListener('click', ()=>{
+  jokesDrawer.classList.toggle('open');
+  jokePanel.setAttribute('aria-hidden', String(!jokesDrawer.classList.contains('open')));
+  if(jokesDrawer.classList.contains('open')){
+    const j = JOKES[Math.floor(Math.random()*JOKES.length)];
+    jokePanel.innerHTML = '<div style="font-weight:700;color:var(--accent);margin-bottom:8px">Giggle!</div><div style="font-size:0.95rem">'+j+'</div>';
+    // tiny giggle animation
+    jokePanel.animate([{transform:'translateY(8px)'},{transform:'translateY(0)'}],{duration:360,iterations:1});
+  } else jokePanel.innerHTML = '';
+});
+
+/* ----- Story Starters ----- */
+const newStoryBtn = document.getElementById('newStoryBtn');
+const storyList = document.getElementById('storyList');
+newStoryBtn.addEventListener('click', ()=>{
+  const p = STORY_PROMPTS[Math.floor(Math.random()*STORY_PROMPTS.length)];
+  STATE.users.default.stories.unshift({text:p,ts:Date.now()});
+  if(STATE.users.default.stories.length>30) STATE.users.default.stories.pop();
+  saveState(); renderStories();
+});
+function renderStories(){
+  storyList.innerHTML = '';
+  const list = STATE.users.default.stories || [];
+  if(list.length===0) { storyList.innerHTML = '<small>No prompts yet.</small>'; return; }
+  list.forEach(s=>{
+    const d = document.createElement('div'); d.style.padding='6px 8px'; d.style.borderBottom='1px dashed #fdecec';
+    d.innerHTML = '<div style="font-weight:700;color:var(--accent)">'+s.text+'</div><div style="font-size:0.8rem;color:var(--muted)">'+new Date(s.ts).toLocaleString()+'</div>';
+    storyList.appendChild(d);
+  });
+}
+
+/* ----- Shapes & Letters ----- */
+const shapes = ['🔺','🔵','⬛','⭐','❤️'];
+const shapeRow = document.getElementById('shapeRow');
+const letterRow = document.getElementById('letterRow');
+const synth = window.speechSynthesis;
+function initShapesLetters(){
+  shapeRow.innerHTML=''; letterRow.innerHTML='';
+  shapes.forEach(s=>{
+    const b = document.createElement('button'); b.className='tiny-btn'; b.textContent=s; b.onclick = ()=> speakText(s);
+    shapeRow.appendChild(b);
+  });
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').slice(0,12);
+  letters.forEach(l=>{
+    const b = document.createElement('button'); b.className='word-pill'; b.textContent=l; b.onclick = ()=> speakText(l);
+    letterRow.appendChild(b);
+  });
+}
+function speakText(t){
+  if(!synth) return;
+  const u = new SpeechSynthesisUtterance(t);
+  u.rate = 0.9; synth.speak(u);
+}
+
+/* ----- Tracing Wand (canvas) ----- */
+const traceCanvas = document.getElementById('traceCanvas');
+const tctx = traceCanvas.getContext('2d');
+let traceWord = null;
+function setupTraceCanvas(){
+  resizeCanvasToDisplaySize(traceCanvas, 600, 180);
+  tctx.clearRect(0,0,traceCanvas.width,traceCanvas.height);
+  tctx.fillStyle='#f7f4f7'; tctx.fillRect(0,0,traceCanvas.width,traceCanvas.height);
+}
+function populateTraceChooser(){
+  const el = document.getElementById('traceChooser'); el.innerHTML='';
+  const arr = STATE.users.default.words || [];
+  arr.forEach(w=>{
+    const b = document.createElement('button'); b.className='tiny-btn'; b.textContent=w; b.onclick=()=>selectTraceWord(w);
+    el.appendChild(b);
+  });
+}
+function selectTraceWord(w){
+  traceWord = w; drawTraceOutline(w);
+}
+function drawTraceOutline(w){
+  setupTraceCanvas();
+  if(!w) return;
+  tctx.save();
+  tctx.globalAlpha = 0.12; tctx.fillStyle='#5A2E5D'; tctx.font = 'bold 96px serif';
+  tctx.fillText(w, 12, 120);
+  tctx.restore();
+}
+// simple pointer drawing for tracing
+let tracing=false, lastPos={x:0,y:0};
+traceCanvas.addEventListener('pointerdown',(e)=>{ tracing=true; lastPos=getPos(e,traceCanvas);});
+traceCanvas.addEventListener('pointerup',()=>{ tracing=false; });
+traceCanvas.addEventListener('pointermove',(e)=>{ if(!tracing) return; const p=getPos(e,traceCanvas); tctx.strokeStyle='#C58FA0'; tctx.lineWidth=10; tctx.lineCap='round'; tctx.beginPath(); tctx.moveTo(lastPos.x,lastPos.y); tctx.lineTo(p.x,p.y); tctx.stroke(); lastPos=p; });
+document.getElementById('clearTrace').addEventListener('click',()=>drawTraceOutline(traceWord));
+
+/* ----- Breathing Crystal ----- */
+const orb = document.getElementById('orb'); let breathingInterval = null;
+document.getElementById('startBreath').addEventListener('click',()=>{
+  if(breathingInterval){ clearInterval(breathingInterval); breathingInterval=null; orb.style.transform='scale(1)'; return; }
+  let t=0;
+  breathingInterval = setInterval(()=>{ t++; const s = 1 + 0.08 * Math.sin(t/10); orb.style.transform = 'scale('+s+')'; }, 80);
+});
+
+/* ----- Easel / Drawing Canvas ----- */
+const drawCanvas = document.getElementById('drawCanvas');
+const dctx = drawCanvas.getContext('2d');
+const colorPicker = document.getElementById('colorPicker');
+function setupDraw(){ resizeCanvasToDisplaySize(drawCanvas,600,240); dctx.fillStyle='#fff'; dctx.fillRect(0,0,drawCanvas.width,drawCanvas.height); dctx.lineWidth=6; dctx.lineCap='round'; }
+let drawing=false, dlast={x:0,y:0};
+drawCanvas.addEventListener('pointerdown',(e)=>{ drawing=true; dlast=getPos(e,drawCanvas); });
+drawCanvas.addEventListener('pointerup',()=>{ drawing=false; });
+drawCanvas.addEventListener('pointermove',(e)=>{ if(!drawing) return; const p=getPos(e,drawCanvas); dctx.strokeStyle = colorPicker.value; dctx.beginPath(); dctx.moveTo(dlast.x,dlast.y); dctx.lineTo(p.x,p.y); dctx.stroke(); dlast=p; });
+document.getElementById('clearDraw').addEventListener('click', ()=> { setupDraw(); });
+document.getElementById('saveDraw').addEventListener('click', ()=> {
+  const data = drawCanvas.toDataURL('image/png');
+  STATE.users.default.drawings = STATE.users.default.drawings || [];
+  STATE.users.default.drawings.unshift({data,ts:Date.now()});
+  if(STATE.users.default.drawings.length>24) STATE.users.default.drawings.pop();
+  saveState(); alert('Saved to your private cabinet.');
+});
+
+/* ----- Music Box (WebAudio simple notes) ----- */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const audio = new AudioCtx();
+const noteRow = document.getElementById('noteRow');
+const NOTES = [261.6, 293.7, 329.6, 349.2, 392.0]; // C D E F G
+NOTES.forEach((f,i)=>{
+  const b = document.createElement('button'); b.className='tiny-btn'; b.textContent='♪'; b.onclick = ()=> playTone(f);
+  noteRow.appendChild(b);
+});
+function playTone(freq){
+  const o = audio.createOscillator(); const g = audio.createGain();
+  o.type='sine'; o.frequency.value = freq; g.gain.value = 0.0001;
+  o.connect(g); g.connect(audio.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.12, audio.currentTime + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.6);
+  setTimeout(()=>o.stop(),700);
+}
+
+/* ----- Treasure Chest / Badges UI ----- */
+function awardBadge(name){
+  STATE.users.default.badges = STATE.users.default.badges || [];
+  if(!STATE.users.default.badges.includes(name)){
+    STATE.users.default.badges.push(name); saveState(); animateBadge(name);
+  }
+}
+function animateBadge(name){
+  const el = document.createElement('div'); el.className='badge'; el.textContent = name;
+  const area = document.getElementById('badgeArea'); area.appendChild(el);
+  el.animate([{transform:'translateY(-8px)',opacity:0},{transform:'translateY(0)',opacity:1}],{duration:480,easing:'ease'});
+}
+function updateBadgesUI(){
+  const area = document.getElementById('badgeArea'); area.innerHTML='';
+  (STATE.users.default.badges || []).forEach(b=>{
+    const el = document.createElement('div'); el.className='badge'; el.textContent=b; area.appendChild(el);
+  });
+}
+
+/* ----- small utilities ----- */
+function resizeCanvasToDisplaySize(canvas, w = 600, h = 240){
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = w * ratio;
+  canvas.height = h * ratio;
+  canvas.style.height = (h) + 'px';
+  canvas.style.width = (w) + 'px';
+  const ctx = canvas.getContext('2d'); ctx.setTransform(ratio,0,0,ratio,0,0);
+}
+function getPos(e, canvas){
+  const rect = canvas.getBoundingClientRect();
+  const ratio = canvas.width / rect.width;
+  return { x: (e.clientX - rect.left) * ratio / (window.devicePixelRatio || 1), y: (e.clientY - rect.top) * ratio / (window.devicePixelRatio || 1) };
+}
+
+/* ----- Init UI ----- */
+function init(){
+  renderPickedWords(); renderStories(); initShapesLetters(); setupTraceCanvas(); populateTraceChooser(); setupDraw(); updateBadgesUI();
+}
+init();
+
+/* ----- Extras: simple "mastery" logic: if trace saved, award badge ----- */
+document.getElementById('saveDraw').addEventListener('click', ()=> awardBadge('Artist Sticker ✨'));
+document.getElementById('pickWordsBtn').addEventListener('click', ()=> awardBadge('Word Finder 🌟'));
+
+</script>
+</body>
+</html>
