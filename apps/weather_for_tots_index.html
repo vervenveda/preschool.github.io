@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Weather Wizard v2.1 — Kindergarten Science Lab</title>
+<style>
+  :root{
+    --sky-blue:#87ceeb;
+    --sky-soft:#bde6ff;
+    --sky-storm:#3b4c6b;
+    --sky-rain:#4f7fbf;
+    --sky-cloud:#d7ecff;
+    --sky-snow:#e8f6ff;
+    --ground:#fbe4b2;
+    --text:#4a371f;
+    --card:#fff7e6;
+    --accent:#ffb44c;
+    --accent-2:#ff6f61;
+    --accent-3:#5cc9ff;
+    --shadow:0 6px 18px rgba(0,0,0,0.12);
+    --r7:7px;
+    --r14:14px;
+  }
+
+  /* Center the app nicely inside the Wix frame */
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:"Comic Sans MS","Comic Sans",system-ui,sans-serif;
+    background:var(--sky-blue);
+    color:var(--text);
+    display:flex;
+    justify-content:center;    /* center horizontally */
+    align-items:flex-start;    /* stick to top; use center if you want vertical centering too */
+  }
+
+  /* MAIN APP CONTAINER — responsive to frame */
+  .app{
+    width:100%;
+    max-width:420px;           /* nice phone/tablet width */
+    min-height:100%;           /* match frame height */
+    box-sizing:border-box;
+    margin:0 auto;
+    padding:16px 14px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  header{
+    text-align:center;
+  }
+  header h1{
+    font-size:24px;
+    margin:0 0 4px;
+    letter-spacing:1px;
+  }
+  .tagline{
+    margin:0;
+    font-size:14px;
+  }
+
+  /* SKY PANEL */
+  .sky{
+    position:relative;
+    width:100%;
+    aspect-ratio:4 / 3;           /* keeps nice proportions */
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    transition:background 0.5s ease;
+  }
+  .sky-ground{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:30%;
+    background:linear-gradient(#f9d26c,var(--ground));
+    border-top-left-radius:45% 60%;
+    border-top-right-radius:45% 60%;
+  }
+
+  /* Weather states */
+  .sky--sunny{
+    background:linear-gradient(#ffe278,#fffbde);
+  }
+  .sky--cloudy{
+    background:linear-gradient(#c6dfff,var(--sky-cloud));
+  }
+  .sky--rainy{
+    background:linear-gradient(#3c6fb4,var(--sky-rain));
+  }
+  .sky--stormy{
+    background:linear-gradient(#273348,var(--sky-storm));
+  }
+  .sky--snowy{
+    background:linear-gradient(#e6f6ff,#ffffff);
+  }
+
+  /* Sun */
+  .sun{
+    position:absolute;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, #fff9c4, #ffb732);
+    top:12%;
+    right:14%;
+    box-shadow:0 0 26px rgba(255,255,255,0.8);
+    transition:opacity .4s, transform .4s;
+  }
+
+  /* Clouds */
+  .cloud{
+    position:absolute;
+    background:#ffffff;
+    border-radius:40px;
+    width:120px;
+    height:38px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.15);
+  }
+  .cloud::before,
+  .cloud::after{
+    content:"";
+    position:absolute;
+    background:#ffffff;
+    border-radius:50%;
+  }
+  .cloud::before{
+    width:50px;height:50px;
+    top:-24px;left:8px;
+  }
+  .cloud::after{
+    width:60px;height:60px;
+    top:-30px;right:5px;
+  }
+  .cloud-1{ top:18%; left:10%; }
+  .cloud-2{ top:32%; right:8%; }
+
+  /* Rain drops */
+  .rain-drop{
+    position:absolute;
+    width:6px;
+    height:14px;
+    border-radius:50px;
+    background:var(--accent-3);
+    bottom:26%;
+    animation:fall 0.9s linear infinite;
+  }
+  @keyframes fall{
+    from{ transform:translateY(0); opacity:1; }
+    to{ transform:translateY(26px); opacity:0; }
+  }
+
+  /* Snowflakes */
+  .snowflake{
+    position:absolute;
+    color:#ffffff;
+    font-size:14px;
+    bottom:30%;
+    animation:drift 2.4s linear infinite;
+  }
+  @keyframes drift{
+    from{ transform:translateY(0) translateX(0); opacity:1; }
+    to{ transform:translateY(30px) translateX(-10px); opacity:0; }
+  }
+
+  /* Lightning bolt */
+  .bolt{
+    position:absolute;
+    width:0;
+    height:0;
+    border-left:12px solid transparent;
+    border-right:12px solid transparent;
+    border-bottom:26px solid #ffe066;
+    left:55%;
+    top:38%;
+    transform:skewX(-16deg);
+    filter:drop-shadow(0 0 12px rgba(255,255,255,0.9));
+    animation:flash 1.3s infinite;
+  }
+  @keyframes flash{
+    0%, 70%, 100%{ opacity:0.15; }
+    40%{ opacity:1; }
+  }
+
+  /* INFO CARD */
+  .card{
+    background:var(--card);
+    border-radius:var(--r14);
+    padding:12px 13px 14px;
+    box-shadow:var(--shadow);
+  }
+  .card h2{
+    margin:0 0 4px;
+    font-size:18px;
+  }
+  .card p{
+    margin:3px 0;
+    font-size:14px;
+  }
+  .hint-row{
+    margin-top:7px;
+    font-size:13px;
+  }
+  .hint-label{
+    font-weight:bold;
+  }
+  .fun-fact{
+    margin-top:6px;
+    font-size:13px;
+    color:#8b5d29;
+  }
+
+  /* BUTTONS */
+  .buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:2px;
+  }
+  .weather-btn{
+    flex:1 1 calc(50% - 8px);
+    min-width:90px;
+    border:none;
+    border-radius:999px;
+    padding:9px 10px;
+    font-size:14px;
+    cursor:pointer;
+    background:#ffffff;
+    color:var(--text);
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+    transition:transform .1s, box-shadow .1s, background .1s;
+  }
+  .weather-btn:active{
+    transform:translateY(1px);
+    box-shadow:0 1px 4px rgba(0,0,0,0.18);
+  }
+  .weather-btn.is-active{
+    background:var(--accent);
+    color:#3d230a;
+  }
+
+  /* FOOTER */
+  .footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:6px;
+    font-size:12px;
+  }
+  .tiny-btn{
+    border:none;
+    border-radius:999px;
+    padding:6px 10px;
+    background:#ffffff;
+    box-shadow:0 2px 6px rgba(0,0,0,0.16);
+    cursor:pointer;
+    font-size:12px;
+  }
+  .saved-label{
+    opacity:0;
+    transition:opacity .4s;
+  }
+  .saved-label.visible{
+    opacity:1;
+  }
+
+  @media (max-width:480px){
+    header h1{ font-size:22px; }
+    .card h2{ font-size:17px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Weather Wizard</h1>
+    <p class="tagline">Tap a button to change the weather!</p>
+  </header>
+
+  <!-- SKY PANEL -->
+  <section id="sky" class="sky sky--sunny" aria-label="Weather scene">
+    <div class="sun" id="sun"></div>
+    <div class="cloud cloud-1" id="cloud1"></div>
+    <div class="cloud cloud-2" id="cloud2"></div>
+    <!-- dynamic rain / snow / storm elements are added by JS -->
+    <div class="sky-ground"></div>
+  </section>
+
+  <!-- INFO CARD -->
+  <section class="card" aria-live="polite">
+    <h2 id="weatherTitle">It is sunny!</h2>
+    <p id="weatherDescription">The sun keeps us warm and helps plants grow.</p>
+    <div class="hint-row">
+      <span class="hint-label">What to wear: </span>
+      <span id="wearText">T-shirt, shorts, hat, and sunscreen.</span>
+    </div>
+    <p id="funFact" class="fun-fact">Fun fact: The sun is actually a star in space.</p>
+  </section>
+
+  <!-- BUTTONS -->
+  <section class="buttons">
+    <button class="weather-btn is-active" data-weather="sunny">☀️ Sunny</button>
+    <button class="weather-btn" data-weather="cloudy">☁️ Cloudy</button>
+    <button class="weather-btn" data-weather="rainy">🌧 Rainy</button>
+    <button class="weather-btn" data-weather="stormy">⛈ Stormy</button>
+    <button class="weather-btn" data-weather="snowy">❄️ Snowy</button>
+  </section>
+
+  <footer class="footer">
+    <button id="randomBtn" class="tiny-btn">🎲 Surprise weather</button>
+    <span id="savedLabel" class="saved-label">Saved for later ✔</span>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Weather Wizard v2.1 — Clean Pre-K Edition
+   - Fully responsive to iframe/frame width
+   - LocalStorage remembers last weather
+   - Simple, kid-friendly interactions
+   ============================================================ */
+
+const $  = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+const sky         = $("#sky");
+const savedLabel  = $("#savedLabel");
+const sunEl       = $("#sun");
+const cloud1      = $("#cloud1");
+const cloud2      = $("#cloud2");
+const randomBtn   = $("#randomBtn");
+
+const titleEl   = $("#weatherTitle");
+const descEl    = $("#weatherDescription");
+const wearEl    = $("#wearText");
+const factEl    = $("#funFact");
+const buttons   = $$(".weather-btn");
+
+const STORAGE_KEY = "weatherWizardState_v21";
+
+const WEATHER_DATA = {
+  sunny:{
+    title: "It is sunny!",
+    desc:  "The sun keeps us warm and helps plants grow.",
+    wear:  "T-shirt, shorts, hat, and sunscreen.",
+    fact:  "Fun fact: The sun is actually a star in space.",
+    className: "sky--sunny",
+    extras: "sun"
+  },
+  cloudy:{
+    title: "It is cloudy.",
+    desc:  "Clouds float in the sky and can bring shade.",
+    wear:  "Light jacket or hoodie, just in case.",
+    fact:  "Fun fact: Some clouds are taller than mountains!",
+    className: "sky--cloudy",
+    extras: "clouds"
+  },
+  rainy:{
+    title: "It is rainy.",
+    desc:  "Raindrops water the plants and fill our rivers.",
+    wear:  "Raincoat, boots, and an umbrella.",
+    fact:  "Fun fact: Rain comes from clouds full of tiny water drops.",
+    className: "sky--rainy",
+    extras: "rain"
+  },
+  stormy:{
+    title: "It is stormy.",
+    desc:  "Lightning and thunder mean strong clouds are nearby.",
+    wear:  "Stay inside, cozy and safe.",
+    fact:  "Fun fact: Lightning heats the air so fast it makes thunder.",
+    className: "sky--stormy",
+    extras: "storm"
+  },
+  snowy:{
+    title: "It is snowy!",
+    desc:  "Snowflakes fall softly and cover the ground in white.",
+    wear:  "Coat, hat, gloves, boots, and warm pants.",
+    fact:  "Fun fact: Every snowflake has its own special pattern.",
+    className: "sky--snowy",
+    extras: "snow"
+  }
+};
+
+/* ---------- Helpers ---------- */
+
+function clearExtras(){
+  sky.querySelectorAll(".rain-drop,.snowflake,.bolt").forEach(el => el.remove());
+}
+
+function createRain(){
+  clearExtras();
+  for(let i=0;i<18;i++){
+    const drop=document.createElement("div");
+    drop.className="rain-drop";
+    drop.style.left = (8 + Math.random()*84) + "%";
+    drop.style.animationDelay = (Math.random()*0.7).toFixed(2) + "s";
+    sky.appendChild(drop);
+  }
+}
+
+function createSnow(){
+  clearExtras();
+  for(let i=0;i<14;i++){
+    const flake=document.createElement("div");
+    flake.className="snowflake";
+    flake.textContent="❄";
+    flake.style.left = (5 + Math.random()*90) + "%";
+    flake.style.animationDelay = (Math.random()*1.4).toFixed(2) + "s";
+    sky.appendChild(flake);
+  }
+}
+
+function createStorm(){
+  clearExtras();
+  // a few raindrops
+  createRain();
+  // add lightning bolt
+  const bolt=document.createElement("div");
+  bolt.className="bolt";
+  sky.appendChild(bolt);
+}
+
+function updateSkyExtras(mode){
+  sunEl.style.opacity   = (mode === "sun"   || mode === "clouds") ? 1 : 0.3;
+  cloud1.style.opacity  = (mode === "clouds"|| mode === "rain" || mode === "storm" || mode === "snow") ? 1 : 0.6;
+  cloud2.style.opacity  = cloud1.style.opacity;
+
+  if(mode === "rain"){
+    createRain();
+  } else if(mode === "snow"){
+    createSnow();
+  } else if(mode === "storm"){
+    createStorm();
+  } else {
+    clearExtras();
+  }
+}
+
+/* ---------- UI + State ---------- */
+
+function setActiveButton(key){
+  buttons.forEach(btn=>{
+    btn.classList.toggle("is-active", btn.dataset.weather === key);
+  });
+}
+
+function setWeather(key, opts={}){
+  const info = WEATHER_DATA[key];
+  if(!info) return;
+
+  // text
+  titleEl.textContent = info.title;
+  descEl.textContent  = info.desc;
+  wearEl.textContent  = info.wear;
+  factEl.textContent  = info.fact;
+
+  // sky class
+  sky.className = "sky " + info.className;
+
+  // extras
+  updateSkyExtras(info.extras);
+
+  // button highlight
+  setActiveButton(key);
+
+  // save
+  if(opts.save !== false){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({weather:key}));
+      savedLabel.classList.add("visible");
+      setTimeout(()=>savedLabel.classList.remove("visible"), 1200);
+    }catch(e){
+      /* sandbox might block but that's okay */
+    }
+  }
+}
+
+/* ---------- Button wiring ---------- */
+
+buttons.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const key=btn.dataset.weather;
+    setWeather(key);
+  });
+});
+
+randomBtn.addEventListener("click", ()=>{
+  const keys = Object.keys(WEATHER_DATA);
+  const current = buttons.find(b => b.classList.contains("is-active"))?.dataset.weather;
+  let choice = current;
+  while(choice === current){
+    choice = keys[Math.floor(Math.random()*keys.length)];
+  }
+  setWeather(choice);
+});
+
+/* ---------- Restore last state ---------- */
+
+(function restoreState(){
+  let start = "sunny";
+  try{
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if(saved && WEATHER_DATA[saved.weather]) start = saved.weather;
+  }catch(e){}
+  setWeather(start,{save:false});
+})();
+</script>
+</body>
+</html>
