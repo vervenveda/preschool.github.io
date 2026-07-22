@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sunny ABCs & 123s — Storytime</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-gradient: linear-gradient(135deg,#fff7df,#ffe9c9);
+      --accent:#ffb347;
+      --accent-soft:#ffe0b5;
+      --accent-deep:#f7941d;
+      --card-bg:#ffffff;
+      --text-main:#3b3429;
+      --pill-bg:#fff7e8;
+      --pill-border:#ffd49a;
+      --shadow-soft:0 16px 40px rgba(0,0,0,0.10);
+    }
+    /* Color Day themes */
+    body.theme-sunny{
+      --bg-gradient: linear-gradient(135deg,#fff7df,#ffe9c9);
+      --accent:#ffb347;
+      --accent-soft:#ffe0b5;
+      --accent-deep:#f7941d;
+    }
+    body.theme-sky{
+      --bg-gradient: linear-gradient(135deg,#e3f2ff,#c5e3ff);
+      --accent:#3da9ff;
+      --accent-soft:#d3e9ff;
+      --accent-deep:#1b78d1;
+    }
+    body.theme-berry{
+      --bg-gradient: linear-gradient(135deg,#ffe6f0,#ffd3dd);
+      --accent:#ff6b9c;
+      --accent-soft:#ffd1e0;
+      --accent-deep:#e04478;
+    }
+
+    *{box-sizing:border-box;}
+
+    html,body{
+      margin:0;
+      min-height:100vh;
+      font-family:'Nunito',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:var(--bg-gradient);
+      color:var(--text-main);
+    }
+
+    .page-wrap{
+      max-width:1040px;
+      margin:0 auto;
+      padding:40px 16px 60px;
+    }
+
+    .title-area{
+      text-align:center;
+      margin-bottom:18px;
+    }
+    .title-area h1{
+      margin:0 0 4px;
+      font-family:'Baloo 2',cursive;
+      font-size:42px;
+      color:#ff9a1f;
+      letter-spacing:1px;
+    }
+    .title-area p{
+      margin:0;
+      font-size:14px;
+      opacity:0.85;
+    }
+
+    .app-shell{
+      margin-top:22px;
+      background:rgba(255,255,255,0.65);
+      border-radius:21px;
+      padding:18px 18px 22px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .app-header{
+      text-align:center;
+      margin-bottom:14px;
+    }
+    .app-header h2{
+      font-family:'Baloo 2',cursive;
+      font-size:22px;
+      margin:0 0 4px;
+    }
+    .app-header span{
+      font-size:12px;
+      opacity:0.8;
+    }
+
+    .top-controls{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .pill-btn{
+      border-radius:999px;
+      border:1px solid var(--pill-border);
+      background:var(--pill-bg);
+      font-size:12px;
+      padding:4px 12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      transition:background 0.2s,box-shadow 0.2s,transform 0.1s,color 0.2s,border-color 0.2s;
+      color:var(--text-main);
+    }
+    .pill-btn span.label{
+      font-weight:600;
+    }
+    .pill-btn.active{
+      background:var(--accent);
+      color:#fff;
+      border-color:var(--accent-deep);
+      box-shadow:0 0 0 1px rgba(255,255,255,0.6);
+    }
+    .pill-btn:active{
+      transform:translateY(1px);
+    }
+
+    .book-row{
+      margin-top:22px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .book-card{
+      width:100%;
+      max-width:620px;
+      background:var(--card-bg);
+      border-radius:21px;
+      display:flex;
+      padding:14px;
+      box-shadow:var(--shadow-soft);
+      position:relative;
+      overflow:hidden;
+      transform-origin:center center;
+      transition:box-shadow 0.25s;
+    }
+    .book-card.flip{
+      animation:pageFlip 0.45s ease;
+    }
+    @keyframes pageFlip{
+      0%{transform:perspective(1000px) rotateY(0deg);}
+      45%{transform:perspective(1000px) rotateY(-10deg);}
+      100%{transform:perspective(1000px) rotateY(0deg);}
+    }
+
+    .book-page{
+      flex:1;
+      padding:14px 16px;
+      border-radius:15px;
+      background:#fffaf2;
+      position:relative;
+    }
+    .book-page + .book-page{
+      margin-left:10px;
+    }
+
+    .page-label{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:rgba(0,0,0,0.45);
+      margin-bottom:4px;
+    }
+    .page-main-symbol{
+      font-family:'Baloo 2',cursive;
+      font-size:64px;
+      margin:10px 0 4px;
+      text-align:center;
+      color:var(--accent-deep);
+    }
+    .page-word{
+      text-align:center;
+      font-size:14px;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+    .letter-prompt{
+      margin-top:16px;
+      font-size:13px;
+      padding:10px 10px;
+      border-radius:12px;
+      background:var(--accent-soft);
+      text-align:center;
+    }
+
+    .story-title{
+      font-size:14px;
+      font-weight:700;
+      text-align:center;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      margin-bottom:8px;
+      color:var(--accent-deep);
+    }
+    .story-subtitle{
+      font-size:11px;
+      text-align:center;
+      opacity:0.7;
+      margin-bottom:8px;
+    }
+    .rhyme-lines{
+      font-size:13px;
+      line-height:1.55;
+      margin:0;
+      padding:0;
+      list-style:none;
+    }
+    .rhyme-line{
+      padding:2px 0;
+      transition:background 0.25s,color 0.25s;
+      border-radius:6px;
+    }
+    .rhyme-line.active{
+      background:var(--accent-soft);
+      color:#2f2411;
+    }
+
+    .nav-row{
+      margin-top:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:12px;
+    }
+    .nav-buttons{
+      display:flex;
+      gap:8px;
+    }
+    .nav-btn{
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,0.1);
+      padding:4px 10px;
+      font-size:12px;
+      cursor:pointer;
+      background:#fffdf8;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
+    .nav-btn:disabled{
+      opacity:0.4;
+      cursor:default;
+    }
+    .nav-btn span.arrow{
+      font-size:10px;
+    }
+
+    .page-indicator{
+      text-align:center;
+      font-size:11px;
+      opacity:0.7;
+      flex:1;
+    }
+
+    .dot-row{
+      text-align:center;
+      margin-top:6px;
+    }
+    .dot-row button{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      border:none;
+      margin:0 2px;
+      background:rgba(0,0,0,0.12);
+      cursor:pointer;
+      padding:0;
+    }
+    .dot-row button.active{
+      background:var(--accent-deep);
+    }
+
+    .instructions{
+      margin-top:18px;
+      text-align:center;
+      font-size:12px;
+      max-width:540px;
+      margin-left:auto;
+      margin-right:auto;
+      opacity:0.9;
+    }
+
+    .footer-note{
+      margin-top:8px;
+      text-align:center;
+      font-size:11px;
+      opacity:0.75;
+    }
+
+    @media (max-width:720px){
+      .book-card{
+        flex-direction:column;
+      }
+      .book-page + .book-page{
+        margin-left:0;
+        margin-top:8px;
+      }
+    }
+  </style>
+</head>
+<body class="theme-sunny">
+  <div class="page-wrap">
+    <div class="title-area">
+      <h1>Storytime</h1>
+      <p>Sunny ABCs &amp; 123s — tap, rhyme, and smile your way through letters and numbers.</p>
+    </div>
+
+    <div class="app-shell">
+      <div class="app-header">
+        <h2>Sunny ABCs &amp; 123s</h2>
+        <span id="modeLabel">Alphabet Book</span>
+        <div class="top-controls">
+          <button class="pill-btn active" id="alphabetModeBtn"><span class="label">Alphabet</span></button>
+          <button class="pill-btn" id="numberModeBtn"><span class="label">Numbers</span></button>
+
+          <button class="pill-btn" id="songModeBtn">
+            <span class="label">Song Mode</span>
+            <span id="songModeState">Off</span>
+          </button>
+          <button class="pill-btn active" id="soundModeBtn">
+            <span class="label">Sound</span>
+            <span id="soundModeState">On</span>
+          </button>
+
+          <button class="pill-btn" id="colorDayBtn">
+            <span class="label">Color Day</span>
+            <span id="colorDayLabel">Sunny</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="book-row">
+        <div class="book-card" id="bookCard">
+          <div class="book-page" id="leftPage">
+            <!-- Left page content injected by JS -->
+          </div>
+          <div class="book-page" id="rightPage">
+            <!-- Right page content injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="dot-row" id="dotRow"></div>
+
+      <div class="instructions">
+        How to play: Use the arrows or little dots to turn the pages. Turn on
+        <strong>Song Mode</strong> to highlight each rhyme line (and hear it read aloud if
+        <strong>Sound</strong> is on). Try different <strong>Color Day</strong> themes for sunny yellow,
+        sky blue, or berry red fun.
+      </div>
+      <div class="footer-note">
+        Designed for quiet play &amp; gentle learning. Sound can be turned off at any time.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -------- Data: Alphabet & Numbers --------
+    const alphabetPages = [
+      {
+        letter: 'A',
+        word: 'Apple',
+        prompt: 'Can you pretend to crunch a shiny apple?',
+        title: 'A is for Apple',
+        subtitle: 'Tap to read about “Apple.”',
+        rhyme: [
+          'A is for apple, shiny and sweet,',
+          'Crunchy and crisp, a tasty treat.',
+          'Red, green, or yellow on the tree,',
+          'A little gift for you and me.'
+        ]
+      },
+      {
+        letter: 'B',
+        word: 'Balloon',
+        prompt: 'Stretch your arms up high like a big balloon.',
+        title: 'B is for Balloon',
+        subtitle: 'Tap to read about “Balloon.”',
+        rhyme: [
+          'B is for balloon, floating so high,',
+          'Drifting and dancing across the sky.',
+          'Hold on tight so it won’t fly away,',
+          'Wave to your balloon and say, “Have a happy day!”'
+        ]
+      },
+      {
+        letter: 'C',
+        word: 'Cat',
+        prompt: 'Can you curl up and pretend to purr?',
+        title: 'C is for Cat',
+        subtitle: 'Tap to read about “Cat.”',
+        rhyme: [
+          'C is for cat with soft, gentle paws,',
+          'Whiskers that twitch and tiny sharp claws.',
+          'Curled in the sunlight, cozy and warm,',
+          'A purring friend in every storm.'
+        ]
+      },
+      {
+        letter: 'D',
+        word: 'Duck',
+        prompt: 'Waddle like a duck and say “quack, quack!”',
+        title: 'D is for Duck',
+        subtitle: 'Tap to read about “Duck.”',
+        rhyme: [
+          'D is for duck who splashes all day,',
+          'Kicking up ripples in a watery way.',
+          'Fluffy little feathers, bright yellow beak,',
+          'Quacking and paddling, so busy and unique!'
+        ]
+      },
+      {
+        letter: 'E',
+        word: 'Elephant',
+        prompt: 'Can you stomp your feet like an elephant?',
+        title: 'E is for Elephant',
+        subtitle: 'Tap to read about “Elephant.”',
+        rhyme: [
+          'E is for elephant, big, brave, and kind,',
+          'With a swishy tail and a curious mind.',
+          'A long grey trunk that sprays cool rain,',
+          'Stomp, stomp, stomp on the grassy plain.'
+        ]
+      },
+      {
+        letter: 'F',
+        word: 'Firefly',
+        prompt: 'Wiggle your fingers like twinkling lights.',
+        title: 'F is for Firefly',
+        subtitle: 'Tap to read about “Firefly.”',
+        rhyme: [
+          'F is for firefly glowing at night,',
+          'Tiny little lantern of golden light.',
+          'Blink in the bushes, shimmer in the air,',
+          'A sparkle of magic dancing everywhere.'
+        ]
+      },
+      {
+        letter: 'G',
+        word: 'Garden',
+        prompt: 'Pretend to plant a tiny seed in the ground.',
+        title: 'G is for Garden',
+        subtitle: 'Tap to read about “Garden.”',
+        rhyme: [
+          'G is for garden where green things grow,',
+          'Carrots below and flowers in a row.',
+          'Water and sunshine helping them rise,',
+          'A rainbow of colors right before your eyes.'
+        ]
+      },
+      {
+        letter: 'H',
+        word: 'Honeybee',
+        prompt: 'Buzz like a little bee and wiggle around.',
+        title: 'H is for Honeybee',
+        subtitle: 'Tap to read about “Honeybee.”',
+        rhyme: [
+          'H is for honeybee busy all day,',
+          'Buzzing through blossoms along the way.',
+          'Gathering nectar with gentle care,',
+          'Sharing sweet honey for everyone to share.'
+        ]
+      },
+      {
+        letter: 'I',
+        word: 'Igloo',
+        prompt: 'Can you make a tiny “igloo” shape with your hands?',
+        title: 'I is for Igloo',
+        subtitle: 'Tap to read about “Igloo.”',
+        rhyme: [
+          'I is for igloo, snowy and round,',
+          'Built from ice blocks stacked on the ground.',
+          'Cozy and snug when the cold winds blow,',
+          'A bright little home in the shining snow.'
+        ]
+      },
+      {
+        letter: 'J',
+        word: 'Jellyfish',
+        prompt: 'Float like a jellyfish with wiggly arms.',
+        title: 'J is for Jellyfish',
+        subtitle: 'Tap to read about “Jellyfish.”',
+        rhyme: [
+          'J is for jellyfish deep in the sea,',
+          'Gliding so gently, peaceful and free.',
+          'Swish of its tentacles, shimmer of light,',
+          'Drifting like a dream in the ocean night.'
+        ]
+      },
+      {
+        letter: 'K',
+        word: 'Kite',
+        prompt: 'Reach up and pretend to fly a kite in the wind.',
+        title: 'K is for Kite',
+        subtitle: 'Tap to read about “Kite.”',
+        rhyme: [
+          'K is for kite with a ribbon tail,',
+          'Soaring and dipping in the windy gale.',
+          'Up, up, up, through the clouds you go,',
+          'Dancing with the breezes that whoosh and blow.'
+        ]
+      },
+      {
+        letter: 'L',
+        word: 'Ladybug',
+        prompt: 'Hold out your finger for a tiny ladybug friend.',
+        title: 'L is for Ladybug',
+        subtitle: 'Tap to read about “Ladybug.”',
+        rhyme: [
+          'L is for ladybug, red with spots,',
+          'Tiptoeing gently on leaves and pots.',
+          'Tiny little friend in a polka-dot coat,',
+          'Whisper your wish to her, soft as a note.'
+        ]
+      },
+      {
+        letter: 'M',
+        word: 'Moon',
+        prompt: 'Make a crescent moon shape with your hands.',
+        title: 'M is for Moon',
+        subtitle: 'Tap to read about “Moon.”',
+        rhyme: [
+          'M is for moon in the velvety sky,',
+          'Watching the world as the stars drift by.',
+          'Glowing so softly while dreamers sleep,',
+          'Keeping night secrets that the fireflies keep.'
+        ]
+      },
+      {
+        letter: 'N',
+        word: 'Nest',
+        prompt: 'Cuddle your hands like a cozy nest.',
+        title: 'N is for Nest',
+        subtitle: 'Tap to read about “Nest.”',
+        rhyme: [
+          'N is for nest in the branches high,',
+          'Safe little bowl reaching up to the sky.',
+          'Feathers and twigs tucked snug and tight,',
+          'Holding small eggs in the soft morning light.'
+        ]
+      },
+      {
+        letter: 'O',
+        word: 'Ocean',
+        prompt: 'Sway side to side like gentle ocean waves.',
+        title: 'O is for Ocean',
+        subtitle: 'Tap to read about “Ocean.”',
+        rhyme: [
+          'O is for ocean, rolling and wide,',
+          'Carrying secrets on every tide.',
+          'Shells on the shoreline, gulls in the air,',
+          'Whispers of saltwater everywhere.'
+        ]
+      },
+      {
+        letter: 'P',
+        word: 'Pancake',
+        prompt: 'Flip an invisible pancake high in the sky!',
+        title: 'P is for Pancake',
+        subtitle: 'Tap to read about “Pancake.”',
+        rhyme: [
+          'P is for pancake, fluffy and round,',
+          'Golden and warm when it first hits the ground.',
+          'Drizzle a little syrup on top,',
+          'Stack them up high and never let them drop!'
+        ]
+      },
+      {
+        letter: 'Q',
+        word: 'Queen',
+        prompt: 'Sit up tall and wear an imaginary crown.',
+        title: 'Q is for Queen',
+        subtitle: 'Tap to read about “Queen.”',
+        rhyme: [
+          'Q is for queen with a sparkling crown,',
+          'Kind to her people in every town.',
+          'She listens with care and speaks with grace,',
+          'Keeping warm welcome in every place.'
+        ]
+      },
+      {
+        letter: 'R',
+        word: 'Rainbow',
+        prompt: 'Trace a rainbow arc across the sky with your hand.',
+        title: 'R is for Rainbow',
+        subtitle: 'Tap to read about “Rainbow.”',
+        rhyme: [
+          'R is for rainbow after the rain,',
+          'Colors like music across the plain.',
+          'Red, orange, yellow, green and blue,',
+          'Indigo, violet, smiling at you.'
+        ]
+      },
+      {
+        letter: 'S',
+        word: 'Star',
+        prompt: 'Open and close your fingers like twinkling stars.',
+        title: 'S is for Star',
+        subtitle: 'Tap to read about “Star.”',
+        rhyme: [
+          'S is for star in the midnight sky,',
+          'Tiny bright lanterns hanging up high.',
+          'Make a wish softly, brave and true,',
+          'Maybe a star is wishing for you.'
+        ]
+      },
+      {
+        letter: 'T',
+        word: 'Turtle',
+        prompt: 'Move slowly like a turtle taking a stroll.',
+        title: 'T is for Turtle',
+        subtitle: 'Tap to read about “Turtle.”',
+        rhyme: [
+          'T is for turtle with a hard, round shell,',
+          'Carrying his house where he likes to dwell.',
+          'Slow little footsteps along the shore,',
+          'No need to hurry, he has time for more.'
+        ]
+      },
+      {
+        letter: 'U',
+        word: 'Umbrella',
+        prompt: 'Hold an invisible umbrella over your head.',
+        title: 'U is for Umbrella',
+        subtitle: 'Tap to read about “Umbrella.”',
+        rhyme: [
+          'U is for umbrella on a rainy day,',
+          'Keeping you dry as you splash and play.',
+          'Raindrops patter with a gentle beat,',
+          'Puddles like mirrors under your feet.'
+        ]
+      },
+      {
+        letter: 'V',
+        word: 'Violin',
+        prompt: 'Pretend to play a violin under your chin.',
+        title: 'V is for Violin',
+        subtitle: 'Tap to read about “Violin.”',
+        rhyme: [
+          'V is for violin singing so clear,',
+          'Music like stories you can almost hear.',
+          'Slow flowing notes or a quick, happy dance,',
+          'Strings full of magic whenever you chance.'
+        ]
+      },
+      {
+        letter: 'W',
+        word: 'Wind',
+        prompt: 'Sway like trees in a soft, breezy wind.',
+        title: 'W is for Wind',
+        subtitle: 'Tap to read about “Wind.”',
+        rhyme: [
+          'W is for wind whistling through trees,',
+          'Tickling the leaves with a giggly breeze.',
+          'It rustles the grasses and flutters your hair,',
+          'Invisible fingers dancing everywhere.'
+        ]
+      },
+      {
+        letter: 'X',
+        word: 'Xylophone',
+        prompt: 'Tap your lap like playing colorful xylophone keys.',
+        title: 'X is for Xylophone',
+        subtitle: 'Tap to read about “Xylophone.”',
+        rhyme: [
+          'X is for xylophone, bright rows of bars,',
+          'Ringing like raindrops or tinkling stars.',
+          'Tap each color with a gentle beat,',
+          'Making a melody shiny and sweet.'
+        ]
+      },
+      {
+        letter: 'Y',
+        word: 'Yawn',
+        prompt: 'Stretch your arms wide and give a big pretend yawn.',
+        title: 'Y is for Yawn',
+        subtitle: 'Tap to read about “Yawn.”',
+        rhyme: [
+          'Y is for yawn at the end of the day,',
+          'Sleepy eyes blinking the sunshine away.',
+          'Snuggle in blankets, cozy and tight,',
+          'Whisper goodnight to the soft, silver night.'
+        ]
+      },
+      {
+        letter: 'Z',
+        word: 'Zoo',
+        prompt: 'Roar like a lion or trumpet like an elephant at the zoo!',
+        title: 'Z is for Zoo',
+        subtitle: 'Tap to read about “Zoo.”',
+        rhyme: [
+          'Z is for zoo with creatures galore,',
+          'Penguins and parrots and lions that roar.',
+          'Walk through the pathways, smile as you see,',
+          'A whole world of wonder for you and for me.'
+        ]
+      }
+    ];
+
+    const numberPages = [
+      {
+        number: 1,
+        word: 'One',
+        prompt: 'Hold up one finger high in the air.',
+        title: 'Number 1 — One Bright Sun',
+        subtitle: 'Tap to read about “One.”',
+        rhyme: [
+          'One bright sun in the sky so blue,',
+          'Shining its warmth on me and you.',
+          'Close your eyes, take one deep breath in,',
+          'Let your new counting day begin.'
+        ]
+      },
+      {
+        number: 2,
+        word: 'Two',
+        prompt: 'Clap your hands two times: clap, clap!',
+        title: 'Number 2 — Two Little Shoes',
+        subtitle: 'Tap to read about “Two.”',
+        rhyme: [
+          'Two little shoes on dancing feet,',
+          'Skip down the sidewalk to a bouncy beat.',
+          'Left foot, right foot, step and sway,',
+          'Two happy feet on their way.'
+        ]
+      },
+      {
+        number: 3,
+        word: 'Three',
+        prompt: 'Can you hop three times in a row?',
+        title: 'Number 3 — Three Green Trees',
+        subtitle: 'Tap to read about “Three.”',
+        rhyme: [
+          'Three green trees in a gentle row,',
+          'Leaves that rustle when soft winds blow.',
+          'Birds build nests where branches bend,',
+          'Three cozy homes for a feathered friend.'
+        ]
+      },
+      {
+        number: 4,
+        word: 'Four',
+        prompt: 'Tap your knees four times: 1, 2, 3, 4!',
+        title: 'Number 4 — Four Friendly Frogs',
+        subtitle: 'Tap to read about “Four.”',
+        rhyme: [
+          'Four friendly frogs on a lily-pad floor,',
+          'Plip, plop, splash, now there are more!',
+          'They jump and giggle in the cool, clear stream,',
+          'Four froggy friends in a splashy dream.'
+        ]
+      },
+      {
+        number: 5,
+        word: 'Five',
+        prompt: 'Wiggle the five fingers on one hand.',
+        title: 'Number 5 — Five Bright Stars',
+        subtitle: 'Tap to read about “Five.”',
+        rhyme: [
+          'Five bright stars in a velvet sky,',
+          'Twinkling softly way up high.',
+          'Count them slowly, one to five,',
+          'Wishing good dreams to every hive.'
+        ]
+      },
+      {
+        number: 6,
+        word: 'Six',
+        prompt: 'Can you take six tiny tiptoe steps?',
+        title: 'Number 6 — Six Silver Coins',
+        subtitle: 'Tap to read about “Six.”',
+        rhyme: [
+          'Six silver coins in a jingly jar,',
+          'Saving them up can take you far.',
+          'Drop them in gently, hear the song,',
+          'Six tiny rings that don’t last long.'
+        ]
+      },
+      {
+        number: 7,
+        word: 'Seven',
+        prompt: 'Stretch to the sky and count to seven.',
+        title: 'Number 7 — Seven Rainbow Drops',
+        subtitle: 'Tap to read about “Seven.”',
+        rhyme: [
+          'Seven raindrops fall, then stop,',
+          'Dripping softly, plip and plop.',
+          'Sun peeks out and clouds all part,',
+          'Seven colors paint a rainbow heart.'
+        ]
+      },
+      {
+        number: 8,
+        word: 'Eight',
+        prompt: 'Draw an eight in the air like a sideways loop.',
+        title: 'Number 8 — Eight Tiny Ants',
+        subtitle: 'Tap to read about “Eight.”',
+        rhyme: [
+          'Eight tiny ants in a marching line,',
+          'Carrying crumbs that sparkle and shine.',
+          'Step by step they work and share,',
+          'Building a picnic for everyone there.'
+        ]
+      },
+      {
+        number: 9,
+        word: 'Nine',
+        prompt: 'Spin around slowly and count to nine.',
+        title: 'Number 9 — Nine New Balloons',
+        subtitle: 'Tap to read about “Nine.”',
+        rhyme: [
+          'Nine new balloons in colors so bright,',
+          'Floating and bobbing in the morning light.',
+          'Tie them together so none drift away,',
+          'Nine little rainbows for your day.'
+        ]
+      },
+      {
+        number: 10,
+        word: 'Ten',
+        prompt: 'Show all ten fingers and give them a wiggle!',
+        title: 'Number 10 — Ten Goodnight Wishes',
+        subtitle: 'Tap to read about “Ten.”',
+        rhyme: [
+          'Ten goodnight wishes whispered slow,',
+          'For friends and family before you go.',
+          'Count your blessings one to ten,',
+          'Tomorrow you’ll start all over again.'
+        ]
+      }
+    ];
+
+    // -------- State --------
+    let currentBook = 'alphabet'; // 'alphabet' or 'numbers'
+    let currentIndex = 0;
+    let songMode = false;
+    let soundOn = true;
+    let colorDayIndex = 0;
+    const colorDayNames = ['Sunny','Sky','Berry'];
+    const colorDayClasses = ['theme-sunny','theme-sky','theme-berry'];
+
+    let songTimer = null;
+    let currentLineIndex = 0;
+
+    // -------- Helpers --------
+    function getCurrentPages(){
+      return currentBook === 'alphabet' ? alphabetPages : numberPages;
+    }
+
+    function speak(text){
+      if(!soundOn || !('speechSynthesis' in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 1.0;
+      utter.pitch = 1.1;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+
+    function stopSong(){
+      if(songTimer) clearTimeout(songTimer);
+      songTimer = null;
+      if('speechSynthesis' in window) window.speechSynthesis.cancel();
+      const lines = document.querySelectorAll('.rhyme-line');
+      lines.forEach(l => l.classList.remove('active'));
+    }
+
+    function startSong(){
+      stopSong();
+      const lines = document.querySelectorAll('.rhyme-line');
+      if(!lines.length) return;
+      currentLineIndex = 0;
+
+      const step = () => {
+        const all = document.querySelectorAll('.rhyme-line');
+        all.forEach(l => l.classList.remove('active'));
+        const line = all[currentLineIndex];
+        if(!line){
+          stopSong();
+          return;
+        }
+        line.classList.add('active');
+        speak(line.textContent);
+        currentLineIndex++;
+        songTimer = setTimeout(step, 1900);
+      };
+
+      step();
+    }
+
+    // -------- Render --------
+    function renderDots(){
+      const pages = getCurrentPages();
+      const dotRow = document.getElementById('dotRow');
+      dotRow.innerHTML = '';
+      pages.forEach((_,idx)=>{
+        const btn = document.createElement('button');
+        if(idx === currentIndex) btn.classList.add('active');
+        btn.addEventListener('click',()=>{
+          currentIndex = idx;
+          renderPage(true);
+        });
+        dotRow.appendChild(btn);
+      });
+    }
+
+    function renderPage(withFlip){
+      const pages = getCurrentPages();
+      const page = pages[currentIndex];
+      if(!page) return;
+
+      const left = document.getElementById('leftPage');
+      const right = document.getElementById('rightPage');
+      const bookCard = document.getElementById('bookCard');
+
+      if(withFlip){
+        bookCard.classList.remove('flip');
+        void bookCard.offsetWidth; // reflow
+        bookCard.classList.add('flip');
+      }
+
+      stopSong();
+
+      if(currentBook === 'alphabet'){
+        left.innerHTML = `
+          <div class="page-label">Letter ${currentIndex+1} of ${pages.length}</div>
+          <div class="page-main-symbol">${page.letter}</div>
+          <div class="page-word">${page.word.toUpperCase()}</div>
+          <div class="letter-prompt">${page.prompt}</div>
+        `;
+      } else {
+        left.innerHTML = `
+          <div class="page-label">Number ${currentIndex+1} of ${pages.length}</div>
+          <div class="page-main-symbol">${page.number}</div>
+          <div class="page-word">${page.word.toUpperCase()}</div>
+          <div class="letter-prompt">${page.prompt}</div>
+        `;
+      }
+
+      const linesHTML = page.rhyme.map(line => `<li class="rhyme-line">${line}</li>`).join('');
+      right.innerHTML = `
+        <div class="page-label">Story Rhyme</div>
+        <div class="story-title">${page.title}</div>
+        <div class="story-subtitle">${page.subtitle}</div>
+        <ul class="rhyme-lines">
+          ${linesHTML}
+        </ul>
+        <div class="nav-row">
+          <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn" ${currentIndex===0?'disabled':''}>
+              <span class="arrow">◀</span><span>Back</span>
+            </button>
+            <button class="nav-btn" id="nextBtn" ${currentIndex===pages.length-1?'disabled':''}>
+              <span>Next</span><span class="arrow">▶</span>
+            </button>
+          </div>
+          <div class="page-indicator">
+            ${currentBook === 'alphabet'
+              ? `Letter ${page.letter} · Page ${currentIndex+1} of ${pages.length}`
+              : `Number ${page.number} · Page ${currentIndex+1} of ${pages.length}`}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('prevBtn').onclick = () => {
+        if(currentIndex>0){
+          currentIndex--;
+          renderPage(true);
+        }
+      };
+      document.getElementById('nextBtn').onclick = () => {
+        if(currentIndex<pages.length-1){
+          currentIndex++;
+          renderPage(true);
+        }
+      };
+
+      renderDots();
+
+      if(songMode){
+        setTimeout(startSong, 250);
+      }
+    }
+
+    // -------- Controls --------
+    const alphabetModeBtn = document.getElementById('alphabetModeBtn');
+    const numberModeBtn = document.getElementById('numberModeBtn');
+    const songModeBtn = document.getElementById('songModeBtn');
+    const soundModeBtn = document.getElementById('soundModeBtn');
+    const colorDayBtn = document.getElementById('colorDayBtn');
+
+    alphabetModeBtn.addEventListener('click',()=>{
+      currentBook = 'alphabet';
+      currentIndex = 0;
+      document.getElementById('modeLabel').textContent = 'Alphabet Book';
+      alphabetModeBtn.classList.add('active');
+      numberModeBtn.classList.remove('active');
+      renderPage(true);
+    });
+
+    numberModeBtn.addEventListener('click',()=>{
+      currentBook = 'numbers';
+      currentIndex = 0;
+      document.getElementById('modeLabel').textContent = 'Numbers Book';
+      numberModeBtn.classList.add('active');
+      alphabetModeBtn.classList.remove('active');
+      renderPage(true);
+    });
+
+    songModeBtn.addEventListener('click',()=>{
+      songMode = !songMode;
+      document.getElementById('songModeState').textContent = songMode ? 'On' : 'Off';
+      songModeBtn.classList.toggle('active',songMode);
+      if(songMode){
+        startSong();
+      } else {
+        stopSong();
+      }
+    });
+
+    soundModeBtn.addEventListener('click',()=>{
+      soundOn = !soundOn;
+      document.getElementById('soundModeState').textContent = soundOn ? 'On' : 'Off';
+      soundModeBtn.classList.toggle('active',soundOn);
+      if(!soundOn && 'speechSynthesis' in window){
+        window.speechSynthesis.cancel();
+      }
+    });
+
+    colorDayBtn.addEventListener('click',()=>{
+      colorDayIndex = (colorDayIndex+1) % colorDayNames.length;
+      const name = colorDayNames[colorDayIndex];
+      document.getElementById('colorDayLabel').textContent = name;
+      document.body.className = colorDayClasses[colorDayIndex];
+    });
+
+    // -------- Init --------
+    renderPage(false);
+  </script>
+</body>
+</html>
