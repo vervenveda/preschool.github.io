@@ -3,134 +3,198 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>A is for Alligator – Mini Book</title>
+<title>The ABC Story Time</title>
 
 <style>
-  body {
-    margin: 0;
-    background: #f2f7ff;
-    font-family: "Comic Sans MS", "Poppins", sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+body{
+  font-family:"Comic Sans MS",system-ui,sans-serif;
+  background:linear-gradient(180deg,#aef1ff,#fff9e8);
+  text-align:center;
+  margin:0;
+}
 
-  #book {
-    width: 90%;
-    max-width: 600px;
-    height: 420px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    overflow: hidden;
-    position: relative;
-  }
+.book{
+  width:90%;
+  max-width:700px;
+  margin:40px auto;
+  background:#fff;
+  border-radius:24px;
+  box-shadow:0 8px 20px rgba(0,0,0,.12);
+  padding:28px;
+}
 
-  .page {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 25px;
-    box-sizing: border-box;
-    text-align: center;
-    background: #fff;
-    transition: transform 0.8s ease, opacity 0.8s ease;
-  }
+h1{font-size:2.2em;color:#3b7e41;margin-top:0;}
+h2{font-size:1.6em;color:#d24b4b;margin-bottom:8px;}
+p{font-size:1.3em;color:#444;line-height:1.6;}
 
-  h1 {
-    font-size: 2.7rem;
-    color: #2a7f2a;
-  }
+.controls{
+  margin-top:26px;
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
 
-  p {
-    font-size: 1.3rem;
-    color: #444;
-  }
+button{
+  font-size:1.05em;
+  background:#59b360;
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  padding:10px 22px;
+  cursor:pointer;
+  transition:transform .15s,background .2s;
+}
+button:hover{background:#4aa454;transform:scale(1.05);}
+button.active{background:#f39c12;}
 
-  img {
-    max-width: 80%;
-    height: auto;
-    margin-top: 15px;
-    border-radius: 16px;
-  }
+.volume-control{
+  margin:20px auto 0;
+  width:60%;
+}
 
-  /* Navigation arrows */
-  .arrowBtn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #5ac85a;
-    padding: 15px 20px;
-    border-radius: 50%;
-    font-size: 1.6rem;
-    cursor: pointer;
-    color: white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    border: none;
-    z-index: 10;
-  }
+select{
+  padding:10px 14px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:1em;
+  margin-bottom:16px;
+}
 
-  #prevBtn { left: 10px; }
-  #nextBtn { right: 10px; }
-
-  .arrowBtn:hover {
-    background: #4ab14a;
-  }
+#pageIndicator{
+  margin-top:10px;
+  font-size:1em;
+  color:#666;
+}
 </style>
 </head>
 
 <body>
-<div id="book">
 
-  <!-- PAGE 1 -->
-  <div class="page" id="page1" style="z-index:3;">
-    <h1>A is for Alligator!</h1>
-    <p>Meet your new ABC friend.</p>
-    <img src="data:image/png;base64,{{ALLIGATOR_HAPPY}}" alt="Alligator Happy" />
+<div class="book">
+  <h1>The ABC Story Time</h1>
+
+  <select id="storySelect">
+    <option value="A">A — The Alligator</option>
+    <!-- Add B–Z easily -->
+  </select>
+
+  <h2 id="storyTitle"></h2>
+  <p id="pageText"></p>
+  <div id="pageIndicator"></div>
+
+  <div class="controls">
+    <button id="prevBtn">⬅️ Back</button>
+    <button id="readBtn">🔈 Read Aloud</button>
+    <button id="nextBtn">Next ➡️</button>
   </div>
 
-  <!-- PAGE 2 -->
-  <div class="page" id="page2" style="z-index:2; opacity:0;">
-    <h1>A is for Apple!</h1>
-    <p>Alligators love crunchy apples!</p>
-    <img src="data:image/png;base64,{{APPLE_IMAGE}}" alt="Apple" />
+  <div class="volume-control">
+    <label>Volume</label>
+    <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
   </div>
-
-  <!-- PAGE 3 -->
-  <div class="page" id="page3" style="z-index:1; opacity:0;">
-    <h1>Alligator Eats ABC!</h1>
-    <p>He's learning letters too!</p>
-    <img src="data:image/png;base64,{{ALLIGATOR_ABC}}" alt="Alligator eating ABC" />
-  </div>
-
-  <button id="prevBtn" class="arrowBtn">⟵</button>
-  <button id="nextBtn" class="arrowBtn">⟶</button>
 </div>
 
 <script>
-let current = 1;
-
-const pages = {
-  1: document.getElementById("page1"),
-  2: document.getElementById("page2"),
-  3: document.getElementById("page3")
+/* =====================
+   STORY DATA
+===================== */
+const STORIES = {
+  A:{
+    title:"A — The Alligator",
+    pages:[
+      "The alligator loves to eat his Alphabets for breakfast!",
+      "The A is so good because it stands for Apples — and apples are crunchy and sweet!",
+      "The alligator is full of apples and smiles happily. What a yummy day!"
+    ]
+  }
 };
 
-document.getElementById("nextBtn").onclick = () => flip(1);
-document.getElementById("prevBtn").onclick = () => flip(-1);
+/* =====================
+   STATE
+===================== */
+let currentStory="A";
+let pageIndex=0;
+let reading=false;
 
-function flip(dir) {
-  let newPage = current + dir;
-  if (newPage < 1 || newPage > 3) return;
+/* =====================
+   ELEMENTS
+===================== */
+const storySelect=document.getElementById("storySelect");
+const titleEl=document.getElementById("storyTitle");
+const textEl=document.getElementById("pageText");
+const indicatorEl=document.getElementById("pageIndicator");
+const readBtn=document.getElementById("readBtn");
+const volumeSlider=document.getElementById("volume");
 
-  pages[current].style.opacity = 0;
-  pages[newPage].style.opacity = 1;
+/* =====================
+   SPEECH
+===================== */
+const utterance=new SpeechSynthesisUtterance();
+utterance.lang="en-US";
+utterance.rate=1;
+utterance.volume=1;
 
-  current = newPage;
+/* =====================
+   RENDER
+===================== */
+function renderPage(){
+  const story=STORIES[currentStory];
+  titleEl.textContent=story.title;
+  textEl.textContent=story.pages[pageIndex];
+  indicatorEl.textContent=`Page ${pageIndex+1} of ${story.pages.length}`;
+
+  speechSynthesis.cancel();
+  if(reading) speak();
 }
+
+function speak(){
+  const story=STORIES[currentStory];
+  utterance.text=story.pages[pageIndex];
+  speechSynthesis.speak(utterance);
+}
+
+/* =====================
+   CONTROLS
+===================== */
+document.getElementById("nextBtn").addEventListener("click",()=>{
+  const story=STORIES[currentStory];
+  if(pageIndex<story.pages.length-1){
+    pageIndex++;
+    renderPage();
+  }
+});
+
+document.getElementById("prevBtn").addEventListener("click",()=>{
+  if(pageIndex>0){
+    pageIndex--;
+    renderPage();
+  }
+});
+
+readBtn.addEventListener("click",()=>{
+  reading=!reading;
+  readBtn.classList.toggle("active",reading);
+  reading ? speak() : speechSynthesis.cancel();
+});
+
+storySelect.addEventListener("change",e=>{
+  currentStory=e.target.value;
+  pageIndex=0;
+  reading=false;
+  readBtn.classList.remove("active");
+  speechSynthesis.cancel();
+  renderPage();
+});
+
+volumeSlider.addEventListener("input",e=>{
+  utterance.volume=parseFloat(e.target.value);
+});
+
+/* =====================
+   INIT
+===================== */
+renderPage();
 </script>
 
 </body>
