@@ -1,562 +1,1558 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Storybird Grove — Expanded 84-Week Embed</title>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storybird Grove™ — Sovereign Monte Carlo Story Studio</title>
+<meta name="description" content="A private, offline, vanilla JavaScript story prompt studio for students. Local storage only.">
 <style>
-:root{
-  --bg:#FBF7F4; --card:#fff; --accent:#2C3E34; --moss:#A1C2A7; --petal:#FFECEC; --gold:#E5C07B; --muted:#6b5560;
-  --accent-2:#8DBF9A;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,#fffdfb,#fbf7f4);color:var(--accent)}
-.wrap{max-width:1080px;margin:16px auto;padding:16px}
-.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--moss));display:flex;align-items:center;justify-content:center;color:white;font-size:28px;box-shadow:0 10px 28px rgba(44,62,52,0.12)}
-h1{font-family:"Cinzel",serif;margin:0;font-size:1.25rem;color:var(--accent)}
-.subtitle{font-size:0.9rem;color:var(--muted)}
+  :root{
+    --bg:#fbf7f4;
+    --bg2:#fffdfb;
+    --card:#ffffff;
+    --ink:#22332b;
+    --muted:#75656c;
+    --line:rgba(34,51,43,.12);
+    --moss:#8dbf9a;
+    --moss2:#2c3e34;
+    --petal:#ffecec;
+    --gold:#e5c07b;
+    --sky:#dff3ff;
+    --good:#2f9e61;
+    --danger:#b42318;
+    --shadow:0 18px 44px rgba(44,62,52,.10);
+    --radius:18px;
+    --control-h:42px;
+  }
 
-.controls{display:flex;gap:8px;align-items:center}
-select,button,input[type="range"]{padding:8px 10px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
-select{background:var(--moss)}
-.small{padding:6px 8px;font-size:0.9rem}
-.ghost{background:transparent;border:1px solid rgba(44,62,52,0.06);color:var(--accent)}
+  *{box-sizing:border-box}
+  html{min-height:100%;}
+  body{
+    margin:0;
+    min-height:100%;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 14% 4%, rgba(229,192,123,.18), transparent 28rem),
+      radial-gradient(circle at 90% 10%, rgba(141,191,154,.20), transparent 24rem),
+      linear-gradient(180deg,var(--bg2),var(--bg));
+  }
 
-.container{display:grid;grid-template-columns:1fr 360px;gap:14px}
-.grove{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 12px 30px rgba(44,62,52,0.06);min-height:620px;position:relative;overflow:hidden}
-.side{background:linear-gradient(180deg,#fff,#fffaf7);border-radius:12px;padding:12px;box-shadow:0 8px 22px rgba(0,0,0,0.06);min-height:620px}
+  button, select, input, textarea{font:inherit}
+  button{touch-action:manipulation}
 
-.topNote{font-size:0.92rem;color:var(--muted);margin-bottom:8px}
-.clusters{display:flex;gap:10px;margin-top:6px}
-.cluster{flex:1;background:linear-gradient(180deg,#fff,#fbfaf8);border-radius:12px;padding:12px;min-height:220px;border:1px solid rgba(44,62,52,0.04);position:relative;overflow:hidden}
-.cluster .title{font-weight:800;color:var(--accent);margin-bottom:8px}
-.spirits{display:flex;flex-wrap:wrap;gap:8px}
-.spirit{min-width:90px;padding:8px;border-radius:12px;background:linear-gradient(90deg,#fff,#fffaf7);cursor:pointer;font-weight:800;color:var(--moss);display:flex;align-items:center;gap:8px;box-shadow:0 8px 18px rgba(161,194,167,0.08);transition:transform 220ms,box-shadow 220ms}
-.spirit:hover{transform:translateY(-6px);box-shadow:0 18px 36px rgba(161,194,167,0.14)}
-.spirit.selected{background:linear-gradient(90deg,var(--moss),var(--accent));color:white;box-shadow:0 20px 44px rgba(44,62,52,0.14)}
+  .sbg-app{
+    width:min(1180px,100%);
+    margin:0 auto;
+    padding:clamp(10px,2.5vw,20px);
+  }
 
-.selectionRow{display:flex;gap:8px;margin-top:12px;align-items:center}
-.slot{flex:1;padding:10px;border-radius:10px;background:var(--petal);font-weight:800;text-align:center;border:2px dashed rgba(44,62,52,0.04)}
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:calc(var(--radius) + 4px);
+    background:rgba(255,255,255,.82);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(8px);
+  }
 
-.actions{display:flex;gap:8px;margin-top:10px}
-.actionGhost{background:transparent;border:1px solid rgba(44,62,52,0.06);padding:8px 10px;border-radius:10px;color:var(--accent);cursor:pointer}
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+  }
 
-.storyPanel{margin-top:14px;background:linear-gradient(180deg,#fff,#fffaf7);padding:12px;border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
-.illustration{height:180px;border-radius:8px;background:linear-gradient(135deg,#f8f6f9,#fff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--muted);position:relative;overflow:hidden}
-.storyText{font-weight:800;color:#2f3a36;min-height:56px;margin-top:8px;font-size:1.05rem}
+  .logo{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    display:grid;
+    place-items:center;
+    flex:0 0 auto;
+    font-size:28px;
+    color:white;
+    background:linear-gradient(135deg,var(--moss2),var(--moss),var(--gold));
+    box-shadow:0 12px 28px rgba(44,62,52,.18);
+  }
 
-.groveSky{position:absolute;right:14px;top:14px;pointer-events:none}
-.firefly{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle,#fff,#ffd);box-shadow:0 0 18px 8px rgba(229,192,123,0.14);opacity:0.95;position:relative;animation:float 6s ease-in-out infinite}
-@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-18px)}100%{transform:translateY(0)}}
+  h1{
+    margin:0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size:clamp(1.2rem,3.7vw,1.8rem);
+    letter-spacing:.01em;
+  }
 
-.side .title{font-weight:900;color:var(--accent);margin-bottom:8px}
-.nestList{max-height:420px;overflow:auto;padding:6px;border-radius:8px;background:linear-gradient(180deg,#fff,#fffaf7);margin-top:10px}
-.nestItem{padding:10px;border-radius:8px;background:linear-gradient(180deg,#fff,#fffefc);margin-bottom:8px;border:1px solid rgba(0,0,0,0.03)}
-.meta{font-size:0.82rem;color:var(--muted);margin-top:6px}
-.controlsRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.progress{margin-top:8px;background:linear-gradient(180deg,#fff,#fffaf7);padding:8px;border-radius:10px}
+  .subtitle{
+    margin-top:2px;
+    color:var(--muted);
+    font-size:clamp(.82rem,2.6vw,.95rem);
+    line-height:1.35;
+  }
 
-.footerNote{margin-top:12px;color:var(--muted);font-size:0.9rem;text-align:center}
+  .privacy-pill{
+    white-space:nowrap;
+    border-radius:999px;
+    padding:8px 10px;
+    color:#244036;
+    background:linear-gradient(90deg,rgba(141,191,154,.35),rgba(229,192,123,.28));
+    border:1px solid rgba(44,62,52,.12);
+    font-weight:800;
+    font-size:.82rem;
+  }
 
-/* responsive */
-@media (max-width:980px){.container{grid-template-columns:1fr}.clusters{flex-direction:column}.spirit{min-width:unset;width:100%}}
+  .control-panel{
+    display:grid;
+    grid-template-columns:minmax(120px,190px) minmax(120px,170px) minmax(130px,170px) 1fr;
+    gap:8px;
+    align-items:end;
+    margin-top:12px;
+    padding:10px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,.72);
+    box-shadow:0 12px 34px rgba(44,62,52,.07);
+  }
+
+  .field label{
+    display:block;
+    margin:0 0 4px;
+    color:var(--muted);
+    font-size:.78rem;
+    font-weight:800;
+  }
+
+  select, input[type="range"]{
+    width:100%;
+  }
+
+  select{
+    min-height:var(--control-h);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:8px 10px;
+    color:var(--ink);
+    background:#fff;
+    font-weight:750;
+  }
+
+  .range-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-height:var(--control-h);
+    padding:0 8px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:#fff;
+  }
+
+  .range-wrap output{
+    min-width:36px;
+    text-align:right;
+    color:var(--muted);
+    font-size:.82rem;
+    font-weight:800;
+  }
+
+  .button-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:flex-end;
+  }
+
+  .btn{
+    min-height:var(--control-h);
+    border:0;
+    border-radius:999px;
+    padding:9px 14px;
+    cursor:pointer;
+    color:white;
+    font-weight:900;
+    background:linear-gradient(135deg,var(--moss2),var(--moss));
+    box-shadow:0 10px 22px rgba(44,62,52,.14);
+  }
+
+  .btn:hover{filter:brightness(1.03)}
+  .btn:active{transform:translateY(1px)}
+
+  .btn.secondary{
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--line);
+    box-shadow:none;
+  }
+
+  .btn.gold{
+    color:#2d2518;
+    background:linear-gradient(135deg,var(--gold),#f4dc9c);
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(290px,360px);
+    gap:14px;
+    margin-top:14px;
+    align-items:start;
+  }
+
+  .card{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,.88);
+    box-shadow:var(--shadow);
+  }
+
+  .grove{
+    position:relative;
+    overflow:hidden;
+    padding:14px;
+  }
+
+  .grove:before{
+    content:"";
+    position:absolute;
+    inset:auto -20% -90px -20%;
+    height:170px;
+    background:
+      radial-gradient(circle at 20% 50%,rgba(141,191,154,.26),transparent 85px),
+      radial-gradient(circle at 75% 40%,rgba(229,192,123,.23),transparent 90px);
+    pointer-events:none;
+  }
+
+  .note{
+    position:relative;
+    z-index:1;
+    color:var(--muted);
+    line-height:1.42;
+    margin:0 0 12px;
+    font-size:.92rem;
+  }
+
+  .clusters{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .cluster{
+    min-width:0;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:10px;
+    background:linear-gradient(180deg,#fff,#fffaf7);
+  }
+
+  .cluster-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    margin-bottom:8px;
+    font-weight:950;
+  }
+
+  .cluster-title span:last-child{
+    color:var(--muted);
+    font-size:.75rem;
+    font-weight:800;
+  }
+
+  .spirit-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
+    gap:8px;
+  }
+
+  .spirit{
+    min-height:54px;
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid rgba(44,62,52,.10);
+    border-radius:14px;
+    padding:8px;
+    text-align:left;
+    color:var(--ink);
+    background:#fff;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(44,62,52,.06);
+  }
+
+  .spirit:hover{transform:translateY(-1px)}
+  .spirit.selected{
+    color:#fff;
+    border-color:transparent;
+    background:linear-gradient(135deg,var(--moss2),var(--moss));
+  }
+
+  .spirit-dot{
+    flex:0 0 auto;
+    width:34px;
+    height:34px;
+    border-radius:14px;
+    display:grid;
+    place-items:center;
+    font-size:18px;
+    background:linear-gradient(135deg,rgba(229,192,123,.45),rgba(141,191,154,.45));
+    border:1px solid rgba(255,255,255,.75);
+  }
+
+  .spirit-name{
+    min-width:0;
+    font-size:.86rem;
+    font-weight:850;
+    line-height:1.15;
+  }
+
+  .slots{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+    margin-top:12px;
+  }
+
+  .slot{
+    min-height:46px;
+    display:grid;
+    place-items:center;
+    border:2px dashed rgba(44,62,52,.16);
+    border-radius:14px;
+    background:var(--petal);
+    text-align:center;
+    font-size:.85rem;
+    font-weight:900;
+    padding:8px;
+  }
+
+  .story-card{
+    position:relative;
+    z-index:1;
+    margin-top:12px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:12px;
+    background:linear-gradient(180deg,#fff,#fffaf7);
+  }
+
+  .illustration{
+    min-height:clamp(160px,28vw,240px);
+    border-radius:16px;
+    overflow:hidden;
+    display:grid;
+    place-items:center;
+    position:relative;
+    background:linear-gradient(135deg,#fff8f3,#f7fff8);
+    border:1px solid rgba(44,62,52,.08);
+  }
+
+  .story-text{
+    margin:10px 0 0;
+    color:#26352f;
+    font-size:clamp(1rem,2.4vw,1.16rem);
+    line-height:1.42;
+    font-weight:850;
+  }
+
+  .meta{
+    margin-top:8px;
+    color:var(--muted);
+    font-size:.82rem;
+    line-height:1.35;
+  }
+
+  .side{
+    padding:12px;
+  }
+
+  .side-title{
+    margin:0;
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:1.1rem;
+  }
+
+  .side-sub{
+    margin:3px 0 10px;
+    color:var(--muted);
+    font-size:.84rem;
+    line-height:1.35;
+  }
+
+  .nest-tools{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:8px 0 10px;
+  }
+
+  .growth{
+    border-radius:14px;
+    padding:10px;
+    background:linear-gradient(90deg,rgba(141,191,154,.18),rgba(229,192,123,.18));
+    border:1px solid rgba(44,62,52,.10);
+    color:var(--ink);
+    font-weight:900;
+  }
+
+  .nest-list{
+    max-height:min(520px,55vh);
+    overflow:auto;
+    margin-top:10px;
+    padding-right:3px;
+  }
+
+  .nest-item{
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:#fff;
+    padding:10px;
+    margin-bottom:8px;
+  }
+
+  .nest-text{
+    font-weight:850;
+    line-height:1.35;
+  }
+
+  .nest-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+  }
+
+  .tiny{
+    min-height:32px;
+    padding:6px 10px;
+    font-size:.78rem;
+  }
+
+  .status{
+    margin-top:10px;
+    min-height:38px;
+    padding:9px 10px;
+    border-radius:14px;
+    color:var(--muted);
+    background:#fffaf7;
+    border:1px solid rgba(44,62,52,.08);
+    font-size:.86rem;
+    line-height:1.35;
+  }
+
+  .footer{
+    margin-top:14px;
+    padding:10px 12px;
+    border-radius:16px;
+    color:var(--muted);
+    text-align:center;
+    font-size:.84rem;
+    line-height:1.35;
+    background:rgba(255,255,255,.65);
+    border:1px solid var(--line);
+  }
+
+  .hidden-file{display:none}
+
+  @media (max-width:960px){
+    .control-panel{grid-template-columns:1fr 1fr}
+    .button-row{grid-column:1/-1;justify-content:flex-start}
+    .layout{grid-template-columns:1fr}
+    .nest-list{max-height:none}
+  }
+
+  @media (max-width:720px){
+    .topbar{align-items:flex-start}
+    .privacy-pill{display:none}
+    .clusters{grid-template-columns:1fr}
+    .slots{grid-template-columns:1fr}
+    .spirit-grid{grid-template-columns:repeat(auto-fit,minmax(132px,1fr))}
+  }
+
+  @media (max-width:520px){
+    .sbg-app{padding:8px}
+    .topbar{padding:10px}
+    .logo{width:48px;height:48px;border-radius:14px}
+    .control-panel{grid-template-columns:1fr}
+    .button-row{display:grid;grid-template-columns:1fr 1fr}
+    .btn{padding:9px 10px}
+  }
+
+  @media print{
+    body{background:white;color:#111}
+    .control-panel,.clusters,.slots,.button-row,.nest-tools,.privacy-pill,.footer{display:none!important}
+    .sbg-app{width:100%;max-width:none;padding:0}
+    .topbar,.card{box-shadow:none;border:0}
+    .layout{display:block}
+    .grove{page-break-after:always}
+    .nest-list{max-height:none;overflow:visible}
+  }
 </style>
-<div class="wrap" role="application" aria-label="Storybird Grove App">
-  <div class="header">
+</head>
+<body>
+<div class="sbg-app" data-app="storybird-grove">
+  <header class="topbar">
     <div class="brand">
-      <div class="logo">🕊️</div>
+      <div class="logo" aria-hidden="true">🕊️</div>
       <div>
         <h1>Storybird Grove™</h1>
-        <div class="subtitle">A private, offline forest for tiny storytellers — 84 weeks of spirits</div>
+        <div class="subtitle">A private, offline story-weaving studio with 84 stable weeks and a Monte Carlo prompt engine.</div>
       </div>
     </div>
+    <div class="privacy-pill">Local storage only</div>
+  </header>
 
-    <div class="controls">
-      <label for="weekSelect" style="color:var(--muted);font-weight:800;margin-right:6px">Week</label>
-      <select id="weekSelect" title="Choose week"></select>
-      <button id="randomBtn" class="small">Randomize</button>
-      <button id="weaveBtn" class="small">Weave</button>
+  <section class="control-panel" aria-label="Story controls">
+    <div class="field">
+      <label for="weekSelect">Week</label>
+      <select id="weekSelect"></select>
     </div>
-  </div>
-
-  <div class="container">
-    <main class="grove" id="grove">
-      <div class="topNote">Tap one spirit from each column (Character • Setting • Verb). You can Randomize to auto-pick.</div>
-
-      <div class="clusters" id="clusters">
-        <div class="cluster" id="charsCluster">
-          <div class="title">🐦 Characters</div>
-          <div class="spirits" id="charsList"></div>
-        </div>
-
-        <div class="cluster" id="setsCluster">
-          <div class="title">🌲 Settings</div>
-          <div class="spirits" id="setsList"></div>
-        </div>
-
-        <div class="cluster" id="verbsCluster">
-          <div class="title">✨ Verbs</div>
-          <div class="spirits" id="verbsList"></div>
-        </div>
+    <div class="field">
+      <label for="toneSelect">Tone</label>
+      <select id="toneSelect">
+        <option value="gentle">Gentle</option>
+        <option value="adventure">Adventure</option>
+        <option value="mystery">Mystery</option>
+        <option value="funny">Funny</option>
+        <option value="poetic">Poetic</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="runsRange">Monte Carlo Runs</label>
+      <div class="range-wrap">
+        <input id="runsRange" type="range" min="10" max="200" step="10" value="80">
+        <output id="runsOut">80</output>
       </div>
+    </div>
+    <div class="button-row">
+      <button class="btn secondary" id="randomBtn" type="button">Randomize</button>
+      <button class="btn gold" id="monteBtn" type="button">Monte Carlo Weave</button>
+      <button class="btn" id="weaveBtn" type="button">Weave</button>
+    </div>
+  </section>
 
-      <div class="selectionRow">
+  <div class="layout">
+    <main class="card grove" id="grove">
+      <p class="note">Choose one spirit from each column, then weave a tiny story. The Monte Carlo button tests many combinations and selects the strongest prompt for the chosen tone.</p>
+
+      <section class="clusters" aria-label="Spirit choices">
+        <div class="cluster">
+          <div class="cluster-title"><span>🐦 Characters</span><span>pick 1</span></div>
+          <div class="spirit-grid" id="charsList"></div>
+        </div>
+        <div class="cluster">
+          <div class="cluster-title"><span>🌲 Settings</span><span>pick 1</span></div>
+          <div class="spirit-grid" id="setsList"></div>
+        </div>
+        <div class="cluster">
+          <div class="cluster-title"><span>✨ Actions</span><span>pick 1</span></div>
+          <div class="spirit-grid" id="verbsList"></div>
+        </div>
+      </section>
+
+      <section class="slots" aria-label="Current selection">
         <div class="slot" id="selChar">— character —</div>
         <div class="slot" id="selSet">— setting —</div>
-        <div class="slot" id="selVerb">— verb —</div>
-      </div>
+        <div class="slot" id="selVerb">— action —</div>
+      </section>
 
-      <div class="actions">
-        <button id="previewBtn" class="actionGhost">Preview</button>
-        <button id="speakBtn" class="actionGhost">Read Aloud</button>
-        <button id="saveBtn" class="actionGhost">Save to Nest</button>
-        <button id="clearBtn" class="actionGhost">Clear</button>
-      </div>
-
-      <div class="storyPanel" id="storyPanel" aria-live="polite">
+      <section class="story-card" aria-live="polite">
         <div class="illustration" id="illustrationArea">🌿 Illustration</div>
-        <div class="storyText" id="storyText">Your tiny story will appear here when you weave the spirits.</div>
+        <p class="story-text" id="storyText">Your tiny story will appear here when you weave the spirits.</p>
         <div class="meta" id="storyMeta"></div>
-      </div>
-
-      <div class="groveSky" aria-hidden="true">
-        <div style="position:relative;width:160px;height:80px">
-          <div class="firefly" style="position:absolute;left:20px;top:30px;animation-duration:5s"></div>
-          <div class="firefly" style="position:absolute;left:80px;top:40px;animation-duration:6s"></div>
-          <div class="firefly" style="position:absolute;left:130px;top:10px;animation-duration:7s"></div>
+        <div class="button-row" style="justify-content:flex-start;margin-top:10px">
+          <button class="btn secondary tiny" id="previewBtn" type="button">Preview</button>
+          <button class="btn secondary tiny" id="speakBtn" type="button">Read Aloud</button>
+          <button class="btn secondary tiny" id="copyBtn" type="button">Copy</button>
+          <button class="btn secondary tiny" id="saveBtn" type="button">Save to Nest</button>
+          <button class="btn secondary tiny" id="clearBtn" type="button">Clear</button>
         </div>
-      </div>
+        <div class="status" id="statusBox">Ready. This app makes no network calls and keeps the story nest in this browser.</div>
+      </section>
     </main>
 
-    <aside class="side" id="side">
-      <div class="title">The Story Nest (Private)</div>
+    <aside class="card side" aria-label="Private story nest">
+      <h2 class="side-title">The Story Nest</h2>
+      <p class="side-sub">Saved stories stay private on this device. Export a backup file before clearing browser storage.</p>
 
-      <div class="controlsRow" style="margin-top:8px">
-        <button id="exportNest" class="small">Export</button>
-        <button id="importNest" class="ghost">Import</button>
-        <button id="printNest" class="ghost">Print</button>
-        <button id="clearNest" class="ghost">Clear</button>
+      <div class="nest-tools">
+        <button class="btn secondary tiny" id="exportNest" type="button">Export JSON</button>
+        <button class="btn secondary tiny" id="importNest" type="button">Import JSON</button>
+        <button class="btn secondary tiny" id="printNest" type="button">Print</button>
+        <button class="btn secondary tiny" id="clearNest" type="button">Clear</button>
       </div>
 
-      <div class="progress" id="growthArea" style="margin-top:10px">Grove Growth: <span id="growthCount">0</span> saved stories</div>
-
-      <div class="nestList" id="nestList" role="list" aria-live="polite"></div>
-
-      <div class="footerNote">Made with care — private & offline by Khaemenes Academy</div>
+      <div class="growth" id="growthArea">Grove Growth: <span id="growthCount">0</span> saved stories</div>
+      <div class="nest-list" id="nestList" role="list"></div>
+      <input class="hidden-file" id="importFile" type="file" accept="application/json">
     </aside>
   </div>
+
+  <footer class="footer">
+    Sovereign single-file HTML. Vanilla JavaScript. No external fonts, no trackers, no ads, no accounts. Local storage only.
+  </footer>
 </div>
 
 <script>
-/* ============================
-  Storybird Grove — Full 84-week app
-  - expands curriculum from pools
-  - watercolor SVG spirit generation
-  - TTS, storybook, export/import, print
-  - growth system that responds to story count
-  - single-file embed for Wix
-============================ */
+(function(){
+  "use strict";
 
-/* ---------- Expanded pools (120+ each) ---------- */
-const expandedCharacters = [
-"tiny owl spirit","glowing fox","gentle river sprite","baby dragon","paintbird","moon rabbit","sun cub","pocket mouse","ember kitten","rain-soft wolf pup",
-"crystal moth","lantern fawn","whisper sparrow","starglow beetle","lichen turtle","honey-breath bear cub","dream-feather jay","glisten frog","shy vine serpent","sproutling deer",
-"candlewing firefly","puddle otter","dew-cloud calf","snowbud polar cub","moss hedgehog","pebble badger","root-gnaw squirrel","fern foxling","mist-veil ferret","ember-toe raccoon",
-"tiny thunderbird","pearl snail","bloom fox","willow lynx","plume sheep","glowtail lemur","thistle hare","solstice dog cub","twilight chickadee","marigold crow",
-"wind-fall goose","apricot bat","seedling dinosaur","hollow-wing batling","soft-stone golem sprite","moon-beam monkey","brook lion","drift-wisp porcupine","cricket engineer","star-hum turtle",
-"marble panther","ink-fawn story elk","tinder pony","rootling pony","orchid fox spirit","orchard sprite","little thunder-deer","gossamer pup","mild phoenix chick","warm-thought rat",
-"cinnamon cub","peppermint fox","soft lantern yak calf","frill-lizard poet","prism monkey","chimney bird","marshmallow bearling","bubble beetle","prickle-puff hedgehog","flicker bunny",
-"meltwater seal pup","riverglass otter","tiny cymbal turtle","berry-spoon mole","cricket painter","feather-ink jay","sapphire chick","wool cloud lamb","mist paw cougar cub","cedar wolf spirit",
-"copper mouse","firefly otter","daisy horse","pillow dog","glimmer goat kid","twist-tail cat","storybook koala","petal-wing squirrel","berry foxling","whistle whale calf",
-"moon-salt penguin","tangerine tigerlet","shimmer skunk","winter-thaw dogling","ember-wool camel calf","echo crane","hazel hawkling","cotton puff chick","shell-blush turtle","hollow-paw coyote cub",
-"opal chipmunk","candy-cane alpaca","dream-hum frog","little starguide elk","pepper puff armadillo"
+  const CHARACTERS = [
+  "tiny owl spirit",
+  "glowing fox",
+  "gentle river sprite",
+  "baby dragon",
+  "paintbird",
+  "moon rabbit",
+  "sun cub",
+  "pocket mouse",
+  "ember kitten",
+  "rain-soft wolf pup",
+  "crystal moth",
+  "lantern fawn",
+  "whisper sparrow",
+  "starglow beetle",
+  "lichen turtle",
+  "honey-breath bear cub",
+  "dream-feather jay",
+  "glisten frog",
+  "shy vine serpent",
+  "sproutling deer",
+  "candlewing firefly",
+  "puddle otter",
+  "dew-cloud calf",
+  "snowbud polar cub",
+  "moss hedgehog",
+  "pebble badger",
+  "root-gnaw squirrel",
+  "fern foxling",
+  "mist-veil ferret",
+  "ember-toe raccoon",
+  "tiny thunderbird",
+  "pearl snail",
+  "bloom fox",
+  "willow lynx",
+  "plume sheep",
+  "glowtail lemur",
+  "thistle hare",
+  "solstice dog cub",
+  "twilight chickadee",
+  "marigold crow",
+  "wind-fall goose",
+  "apricot bat",
+  "seedling dinosaur",
+  "hollow-wing batling",
+  "soft-stone golem sprite",
+  "moon-beam monkey",
+  "brook lion",
+  "drift-wisp porcupine",
+  "cricket engineer",
+  "star-hum turtle",
+  "marble panther",
+  "ink-fawn story elk",
+  "tinder pony",
+  "rootling pony",
+  "orchid fox spirit",
+  "orchard sprite",
+  "little thunder-deer",
+  "gossamer pup",
+  "mild phoenix chick",
+  "warm-thought rat",
+  "cinnamon cub",
+  "peppermint fox",
+  "soft lantern yak calf",
+  "frill-lizard poet",
+  "prism monkey",
+  "chimney bird",
+  "marshmallow bearling",
+  "bubble beetle",
+  "prickle-puff hedgehog",
+  "flicker bunny",
+  "meltwater seal pup",
+  "riverglass otter",
+  "tiny cymbal turtle",
+  "berry-spoon mole",
+  "cricket painter",
+  "feather-ink jay",
+  "sapphire chick",
+  "wool cloud lamb",
+  "mist paw cougar cub",
+  "cedar wolf spirit",
+  "copper mouse",
+  "firefly otter",
+  "daisy horse",
+  "pillow dog",
+  "glimmer goat kid",
+  "twist-tail cat",
+  "storybook koala",
+  "petal-wing squirrel",
+  "berry foxling",
+  "whistle whale calf",
+  "moon-salt penguin",
+  "tangerine tigerlet",
+  "shimmer skunk",
+  "winter-thaw dogling",
+  "ember-wool camel calf",
+  "echo crane",
+  "hazel hawkling",
+  "cotton puff chick",
+  "shell-blush turtle",
+  "hollow-paw coyote cub",
+  "opal chipmunk",
+  "candy-cane alpaca",
+  "dream-hum frog",
+  "little starguide elk",
+  "pepper puff armadillo"
+];
+  const SETTINGS = [
+  "the whispering grove",
+  "the starlit pond",
+  "the mossy hill",
+  "the crystal hollow",
+  "the lantern meadow",
+  "the rainbow nest",
+  "the silver marsh",
+  "the blossom ridge",
+  "the tiny canyon",
+  "the sapphire spring",
+  "the clover clearing",
+  "the echoing roots",
+  "the humming bridge",
+  "the feather dunes",
+  "the moonlit orchard",
+  "the ember lake",
+  "the cloud-valley bend",
+  "the prism shore",
+  "the glowing treetops",
+  "the lichen palace",
+  "the winding fern path",
+  "the amber sunpatch",
+  "the dewberry stones",
+  "the copper brook",
+  "the broomflower field",
+  "the pocket valley",
+  "the scattered star-pool",
+  "the velvet cliff",
+  "the tiny compass meadow",
+  "the warm pebble delta",
+  "the spirit-thorn archway",
+  "the secret thimble-woods",
+  "the dream-hollow spiral",
+  "the cotton-sky ridge",
+  "the lullaby meadows",
+  "the fog-soft garden",
+  "the pale honey glade",
+  "the deep lily bowl",
+  "the tidal lantern coast",
+  "the frozen bloom garden",
+  "the gentle storm plains",
+  "the willow shimmer gate",
+  "the prism-wing cliffs",
+  "the river’s turning breath",
+  "the orchard of soft bells",
+  "the evergreen pocket cave",
+  "the quartz whisper falls",
+  "the golden speckle dunes",
+  "the painted rivertrail",
+  "the quiet pomegranate grove",
+  "the drifting story bridge",
+  "the wide clover canyon",
+  "the bubble-stone tide",
+  "the tiny moss hollow",
+  "the moonspun arch",
+  "the vellum-sky ridge",
+  "the sweet mint valley",
+  "the warm spruce lanternwood",
+  "the milkglass marsh",
+  "the cinnamon summit",
+  "the violet-dream arches",
+  "the painted ash fields",
+  "the silent amber plateau",
+  "the glinting comb creek",
+  "the floating branch islands",
+  "the hollow moon-basin",
+  "the jade melody forest",
+  "the drifting pine avenues",
+  "the orchard sunbreak",
+  "the copper-snow glen",
+  "the braided willow ravine",
+  "the dotted fern lays",
+  "the murmuring kelp shore",
+  "the quilt-sky highlands",
+  "the star-murmur range",
+  "the warm mint cove",
+  "the oak-bud shore",
+  "the prism of breath hollow",
+  "the silver echo basin",
+  "the gentle lamp plateau",
+  "the tiny dusk gardens"
+];
+  const VERBS = [
+  "discover",
+  "follow",
+  "float",
+  "gather",
+  "explore",
+  "listen",
+  "sing",
+  "dream",
+  "wander",
+  "flutter",
+  "tiptoe",
+  "whisper",
+  "sparkle",
+  "shine",
+  "curious-wander",
+  "moon-dance",
+  "leaf-hop",
+  "story-seek",
+  "gentle-drift",
+  "puddle-skim",
+  "glimmer-step",
+  "tune-hum",
+  "wish-collect",
+  "breath-count",
+  "soft-bounce",
+  "sun-soak",
+  "shadow-play",
+  "rain-sip",
+  "stone-touch",
+  "cloud-gaze",
+  "hush-walk",
+  "circle-drift",
+  "echo-hop",
+  "wonder-chase",
+  "pattern-find",
+  "dream-dip",
+  "dip-and-drift",
+  "glow-smile",
+  "berry-gather",
+  "brush-nuzzle",
+  "forest-listen",
+  "tide-glide",
+  "sunbeam-follow",
+  "petal-spin",
+  "feather-roll",
+  "soft-ripple",
+  "hollow-peek",
+  "treetop-lean",
+  "sprout-step",
+  "nest-nuzzle",
+  "warm-breeze-dip",
+  "honey-sip",
+  "leaf-paint",
+  "story-trace",
+  "whistle-call",
+  "wind-dream",
+  "glow-cycle",
+  "field-sketch",
+  "marsh-tiptoe",
+  "pond-listen",
+  "wish-glide",
+  "river-ponder",
+  "drift-sing",
+  "night-soften",
+  "fog-wander",
+  "candle-stir",
+  "crystal-ponder",
+  "heart-chirp",
+  "twig-balance",
+  "seedling-roll",
+  "sky-bounce",
+  "branch-hold",
+  "glade-spin",
+  "hush-nod",
+  "tiny-dream",
+  "star-dip",
+  "flutter-glide",
+  "dew-sway",
+  "lake-think",
+  "moss-dream",
+  "ember-spin",
+  "story-hum",
+  "sunwarm-drift",
+  "shadow-hum",
+  "twilight-step"
 ];
 
-const expandedSettings = [
-"the whispering grove","the starlit pond","the mossy hill","the crystal hollow","the lantern meadow","the rainbow nest","the silver marsh","the blossom ridge",
-"the tiny canyon","the sapphire spring","the clover clearing","the echoing roots","the humming bridge","the feather dunes","the moonlit orchard","the ember lake",
-"the cloud-valley bend","the prism shore","the glowing treetops","the lichen palace","the winding fern path","the amber sunpatch","the dewberry stones","the copper brook",
-"the broomflower field","the pocket valley","the scattered star-pool","the velvet cliff","the tiny compass meadow","the warm pebble delta","the spirit-thorn archway","the secret thimble-woods",
-"the dream-hollow spiral","the cotton-sky ridge","the lullaby meadows","the fog-soft garden","the pale honey glade","the deep lily bowl","the tidal lantern coast","the frozen bloom garden",
-"the gentle storm plains","the willow shimmer gate","the prism-wing cliffs","the river’s turning breath","the orchard of soft bells","the evergreen pocket cave","the quartz whisper falls",
-"the golden speckle dunes","the painted rivertrail","the quiet pomegranate grove","the drifting story bridge","the wide clover canyon","the bubble-stone tide","the tiny moss hollow",
-"the moonspun arch","the vellum-sky ridge","the sweet mint valley","the warm spruce lanternwood","the milkglass marsh","the cinnamon summit","the violet-dream arches","the painted ash fields",
-"the silent amber plateau","the glinting comb creek","the floating branch islands","the hollow moon-basin","the jade melody forest","the drifting pine avenues","the orchard sunbreak","the copper-snow glen",
-"the braided willow ravine","the dotted fern lays","the murmuring kelp shore","the quilt-sky highlands","the star-murmur range","the warm mint cove","the oak-bud shore","the prism of breath hollow",
-"the silver echo basin","the gentle lamp plateau","the tiny dusk gardens"
-];
+  const STORAGE_KEY = "storybird_grove_sovereign_mc_v1";
+  const MAX_NEST = 400;
+  const WEEK_COUNT = 84;
 
-const expandedVerbs = [
-"discover","follow","float","gather","explore","listen","sing","dream","wander","flutter","tiptoe","whisper","sparkle","shine","curious-wander","moon-dance","leaf-hop","story-seek",
-"gentle-drift","puddle-skim","glimmer-step","tune-hum","wish-collect","breath-count","soft-bounce","sun-soak","shadow-play","rain-sip","stone-touch","cloud-gaze","hush-walk","circle-drift",
-"echo-hop","wonder-chase","pattern-find","dream-dip","dip-and-drift","glow-smile","berry-gather","brush-nuzzle","forest-listen","tide-glide","sunbeam-follow","petal-spin","feather-roll",
-"soft-ripple","hollow-peek","treetop-lean","sprout-step","nest-nuzzle","warm-breeze-dip","honey-sip","leaf-paint","story-trace","whistle-call","wind-dream","glow-cycle","field-sketch",
-"marsh-tiptoe","pond-listen","wish-glide","river-ponder","drift-sing","night-soften","fog-wander","candle-stir","crystal-ponder","heart-chirp","twig-balance","seedling-roll","sky-bounce",
-"branch-hold","glade-spin","hush-nod","tiny-dream","star-dip","flutter-glide","dew-sway","lake-think","moss-dream","ember-spin","story-hum","sunwarm-drift","shadow-hum","twilight-step"
-];
-
-/* ---------- Generate 84 weeks (each week gets 7 of each) ---------- */
-function shuffle(a){ const b = a.slice(); for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]] } return b; }
-const StorybirdWeeks = Array.from({length:84}, (_,i) => {
-  const chars = shuffle(expandedCharacters).slice(0,7);
-  const sets = shuffle(expandedSettings).slice(0,7);
-  const verbs = shuffle(expandedVerbs).slice(0,7);
-  return { week: i+1, characters: chars, settings: sets, verbs: verbs };
-});
-
-/* ---------- Storage & State ---------- */
-const STORAGE_KEY = 'storybird:grove:v2';
-let STATE = loadState();
-function loadState(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw){
-      const s = { nest: [], lastWeek:1 };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-      return s;
-    }
-    return JSON.parse(raw);
-  }catch(e){ return { nest: [], lastWeek:1 }; }
-}
-function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); renderNest(); updateGrowth(); }
-
-/* ---------- UI refs ---------- */
-const weekSelect = document.getElementById('weekSelect');
-const charsList = document.getElementById('charsList');
-const setsList = document.getElementById('setsList');
-const verbsList = document.getElementById('verbsList');
-const selChar = document.getElementById('selChar');
-const selSet = document.getElementById('selSet');
-const selVerb = document.getElementById('selVerb');
-const previewBtn = document.getElementById('previewBtn');
-const speakBtn = document.getElementById('speakBtn');
-const saveBtn = document.getElementById('saveBtn');
-const clearBtn = document.getElementById('clearBtn');
-const randomBtn = document.getElementById('randomBtn');
-const weaveBtn = document.getElementById('weaveBtn');
-
-const storyText = document.getElementById('storyText');
-const storyMeta = document.getElementById('storyMeta');
-const illustrationArea = document.getElementById('illustrationArea');
-
-const nestList = document.getElementById('nestList');
-const exportNest = document.getElementById('exportNest');
-const importNest = document.getElementById('importNest');
-const clearNest = document.getElementById('clearNest');
-const printNest = document.getElementById('printNest');
-const growthCount = document.getElementById('growthCount');
-
-/* ---------- Local selection ---------- */
-let currentWeek = STATE.lastWeek || 1;
-let selection = { character: null, setting: null, verb: null };
-
-/* ---------- Init ---------- */
-function init(){
-  // populate weeks select
-  StorybirdWeeks.forEach(w => {
-    const opt = document.createElement('option'); opt.value = w.week; opt.textContent = `Week ${w.week}`;
-    weekSelect.appendChild(opt);
-  });
-  weekSelect.value = currentWeek;
-  weekSelect.addEventListener('change', ()=> { currentWeek = Number(weekSelect.value); STATE.lastWeek = currentWeek; saveState(); renderClusters(); clearStory(); });
-
-  // buttons
-  randomBtn.addEventListener('click', randomizeSelection);
-  previewBtn.addEventListener('click', previewStory);
-  speakBtn.addEventListener('click', speakStory);
-  saveBtn.addEventListener('click', saveStory);
-  clearBtn.addEventListener('click', clearSelection);
-  weaveBtn.addEventListener('click', weaveStory);
-
-  exportNest.addEventListener('click', exportStorybook);
-  importNest.addEventListener('click', ()=> {
-    const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
-    inp.onchange = e => { const f = e.target.files[0]; if(f) importNestFile(f); }; inp.click();
-  });
-  clearNest.addEventListener('click', ()=> { if(confirm('Clear Story Nest?')){ STATE.nest=[]; saveState(); } });
-  printNest.addEventListener('click', ()=> window.print());
-
-  renderClusters();
-  renderNest();
-  updateGrowth();
-}
-init();
-
-/* ---------- Render clusters ---------- */
-function renderClusters(){
-  const weekObj = StorybirdWeeks.find(w=>w.week===currentWeek);
-  if(!weekObj) return;
-  renderList(charsList, weekObj.characters, 'character');
-  renderList(setsList, weekObj.settings, 'setting');
-  renderList(verbsList, weekObj.verbs, 'verb');
-  selection = { character:null, setting:null, verb:null };
-  updateSlots();
-}
-
-function renderList(container, items, type){
-  container.innerHTML = '';
-  items.forEach(it => {
-    const el = document.createElement('div');
-    el.className = 'spirit';
-    el.tabIndex = 0;
-    // svg icon + label
-    el.innerHTML = `${generateSpiritSVG(it,40)} <div style="font-weight:800">${it}</div>`;
-    el.addEventListener('click', ()=> pickSpirit(type, it, el));
-    el.addEventListener('keydown', (e)=> { if(e.key==='Enter') pickSpirit(type, it, el); });
-    container.appendChild(el);
-  });
-}
-
-/* ---------- pick spirit ---------- */
-function pickSpirit(type, val, elem){
-  // toggle
-  if(type==='character') selection.character = (selection.character === val ? null : val);
-  if(type==='setting') selection.setting = (selection.setting === val ? null : val);
-  if(type==='verb') selection.verb = (selection.verb === val ? null : val);
-
-  // update visuals: clear selected in this container
-  const parent = elem.parentNode;
-  Array.from(parent.children).forEach(c => c.classList.remove('selected'));
-  if( (type==='character' && selection.character===val) || (type==='setting' && selection.setting===val) || (type==='verb' && selection.verb===val) ){
-    elem.classList.add('selected');
-  }
-  updateSlots();
-}
-
-/* ---------- update slots ---------- */
-function updateSlots(){
-  selChar.textContent = selection.character || '— character —';
-  selSet.textContent = selection.setting || '— setting —';
-  selVerb.textContent = selection.verb || '— verb —';
-}
-
-/* ---------- Randomize ---------- */
-function randomizeSelection(){
-  const weekObj = StorybirdWeeks.find(w=>w.week===currentWeek);
-  if(!weekObj) return;
-  selection.character = weekObj.characters[Math.floor(Math.random()*weekObj.characters.length)];
-  selection.setting = weekObj.settings[Math.floor(Math.random()*weekObj.settings.length)];
-  selection.verb = weekObj.verbs[Math.floor(Math.random()*weekObj.verbs.length)];
-  // mark visually
-  markSelectionVisual(charsList, selection.character);
-  markSelectionVisual(setsList, selection.setting);
-  markSelectionVisual(verbsList, selection.verb);
-  updateSlots();
-  previewStory();
-}
-function markSelectionVisual(container, val){
-  Array.from(container.children).forEach(c => { if(c.textContent.trim().startsWith(val)) c.classList.add('selected'); else c.classList.remove('selected'); });
-}
-
-/* ---------- Story templates & weaving ---------- */
-const templates = [
-  (c,s,v)=>`In ${s}, the ${c} began to ${v} — and the grove listened with a soft, smiling hush.`,
-  (c,s,v)=>`Once in ${s}, a ${c} decided to ${v} and found a tiny wonder behind a leaf.`,
-  (c,s,v)=>`A small ${c} wandered into ${s} to ${v}; the light changed and a secret bloomed.`,
-  (c,s,v)=>`Every morning in ${s}, the ${c} would ${v}, and the trees would hum along.`
-];
-
-function craftStory(){
-  if(!selection.character || !selection.setting || !selection.verb) return null;
-  const t = templates[Math.floor(Math.random()*templates.length)];
-  return t(selection.character, selection.setting, selection.verb);
-}
-
-function weaveStory(){
-  if(!selection.character || !selection.setting || !selection.verb){
-    alert('Please pick one spirit from each column or press Randomize.');
-    return;
-  }
-  const text = craftStory();
-  showStory(text, {...selection});
-}
-
-/* ---------- Preview & show ---------- */
-function previewStory(){
-  const c = selection.character || 'someone';
-  const s = selection.setting || 'somewhere';
-  const v = selection.verb || 'play';
-  const t = templates[Math.floor(Math.random()*templates.length)](c,s,v);
-  showStory(t, {character:c, setting:s, verb:v});
-}
-
-function showStory(text, meta){
-  // animate illustration and text
-  storyText.style.opacity = 0;
-  storyText.textContent = text;
-  storyMeta.textContent = `Week ${currentWeek} • ${new Date().toLocaleString()}`;
-  renderIllustration(meta);
-  storyText.animate([{opacity:0, transform:'translateY(10px)'},{opacity:1, transform:'translateY(0)'}],{duration:420,easing:'ease'});
-}
-
-/* ---------- Illustration generation (watercolor-like SVG) ---------- */
-function generateSpiritSVG(label, size=40){
-  // pick deterministic color from label
-  const seed = Array.from(label).reduce((a,c)=>a + c.charCodeAt(0), 0);
-  const hues = [160, 25, 45, 210, 300, 200, 80, 330];
-  const h = hues[seed % hues.length];
-  const c1 = `hsl(${h} 60% 85%)`;
-  const c2 = `hsl(${(h+40)%360} 55% 75%)`;
-  const svg = `<svg width="${size}" height="${size}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <linearGradient id="g${seed}" x1="0" x2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
-      <filter id="b${seed}"><feGaussianBlur stdDeviation="6"/></filter>
-    </defs>
-    <g filter="url(#b${seed})">
-      <ellipse cx="32" cy="30" rx="24" ry="18" fill="url(#g${seed})" opacity="0.95"/>
-    </g>
-    <text x="32" y="38" font-family="Poppins, sans-serif" font-size="10" text-anchor="middle" fill="#2C3E34">${label.split(' ')[0].slice(0,2)}</text>
-  </svg>`;
-  return svg;
-}
-
-function renderIllustration(meta){
-  // simple SVG layout using meta labels and watercolor blobs
-  const c = meta.character || 'friend';
-  const s = meta.setting || 'place';
-  const v = meta.verb || 'move';
-  const svg = `
-    <svg width="100%" height="100%" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="bg" x1="0" x2="1"><stop offset="0" stop-color="#fff6f2"/><stop offset="1" stop-color="#f6fff8"/></linearGradient>
-        <filter id="blur2"><feGaussianBlur stdDeviation="18"/></filter>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#bg)"/>
-      <g filter="url(#blur2)" opacity="0.9">
-        <ellipse cx="120" cy="130" rx="120" ry="60" fill="#A1C2A7" opacity="0.18"/>
-        <ellipse cx="360" cy="80" rx="140" ry="70" fill="#E5C07B" opacity="0.12"/>
-        <ellipse cx="480" cy="160" rx="90" ry="45" fill="#FFDCE3" opacity="0.1"/>
-      </g>
-      <g font-family="Poppins, sans-serif" text-anchor="middle" fill="#2C3E34">
-        <text x="120" y="120" font-size="20" font-weight="700">${escapeXml(c)}</text>
-        <text x="360" y="80" font-size="18" font-weight="600">${escapeXml(s)}</text>
-        <text x="480" y="160" font-size="18" font-weight="600">${escapeXml(v)}</text>
-      </g>
-    </svg>`;
-  illustrationArea.innerHTML = svg;
-}
-
-/* ---------- Text to speech ---------- */
-function speakStory(){
-  const t = storyText.textContent;
-  if(!t) return;
-  try{
-    if('speechSynthesis' in window){
-      const u = new SpeechSynthesisUtterance(t);
-      u.lang = 'en-US';
-      u.rate = 0.95;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    }
-  } catch(e){}
-}
-
-/* ---------- Save story to nest ---------- */
-function saveStory(){
-  const text = storyText.textContent;
-  if(!text || text.includes('will appear')) { alert('Weave or Preview a story first.'); return; }
-  const entry = { text, meta: { week: currentWeek, selection: {...selection}, timestamp: Date.now(), illustration: illustrationArea.innerHTML } };
-  STATE.nest.unshift(entry);
-  if(STATE.nest.length > 400) STATE.nest.pop();
-  saveState();
-  // gentle reward animation
-  animateSaved();
-}
-
-/* ---------- preview handler ---------- */
-function clearSelection(){ selection = { character:null, setting:null, verb:null }; updateSlots(); // remove selected classes
-  [charsList,setsList,verbsList].forEach(c => Array.from(c.children).forEach(x => x.classList.remove('selected')));
-  clearStory();
-}
-function clearStory(){ storyText.textContent = 'Your tiny story will appear here when you weave the spirits.'; storyMeta.textContent=''; illustrationArea.innerHTML='🌿 Illustration'; }
-
-/* ---------- render nest ---------- */
-function renderNest(){
-  nestList.innerHTML = '';
-  if(!STATE.nest || STATE.nest.length===0){ nestList.innerHTML = '<small style="color:var(--muted)">Your Story Nest is empty. Weave a story to save it here.</small>'; return; }
-  STATE.nest.forEach((n,i) => {
-    const d = document.createElement('div'); d.className='nestItem';
-    const t = document.createElement('div'); t.style.fontWeight='800'; t.textContent = n.text;
-    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `Week ${n.meta.week} • ${new Date(n.ts||n.meta.timestamp).toLocaleString()}`;
-    const row = document.createElement('div'); row.style.marginTop='8px'; row.style.display='flex'; row.style.gap='8px';
-    const play = document.createElement('button'); play.className='ghost'; play.textContent='Play'; play.onclick = ()=> { showStory(n.text, n.meta.selection||n.meta); };
-    const exp = document.createElement('button'); exp.className='ghost'; exp.textContent='Export'; exp.onclick = ()=> { const blob = new Blob([JSON.stringify(n,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`story-${i+1}.json`; a.click(); URL.revokeObjectURL(url); };
-    const del = document.createElement('button'); del.className='ghost'; del.textContent='Delete'; del.onclick = ()=> { if(confirm('Delete story?')){ STATE.nest.splice(i,1); saveState(); } };
-    row.appendChild(play); row.appendChild(exp); row.appendChild(del);
-    d.appendChild(t); d.appendChild(meta); d.appendChild(row);
-    nestList.appendChild(d);
-  });
-}
-
-/* ---------- export/import ---------- */
-function exportStorybook(){
-  const blob = new Blob([JSON.stringify(STATE,null,2)],{type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'storybird-nest.json'; a.click(); URL.revokeObjectURL(url);
-}
-function importNestFile(file){
-  const reader = new FileReader();
-  reader.onload = e => {
-    try{
-      const parsed = JSON.parse(e.target.result);
-      if(parsed && Array.isArray(parsed.nest)){ STATE = parsed; saveState(); alert('Imported Story Nest.'); }
-      else alert('Invalid file.');
-    }catch(err){ alert('Import failed.'); }
+  const TEMPLATES = {
+    gentle: [
+      (c,s,v)=>`In ${s}, the ${c} began to ${v}, and the grove answered with a soft hush.`,
+      (c,s,v)=>`Once in ${s}, a ${c} tried to ${v} and found a tiny kindness waiting behind a leaf.`,
+      (c,s,v)=>`Every morning in ${s}, the ${c} would ${v}, and the light would grow a little warmer.`
+    ],
+    adventure: [
+      (c,s,v)=>`At the edge of ${s}, the ${c} chose to ${v} before the last golden path disappeared.`,
+      (c,s,v)=>`The map trembled in ${s} as the ${c} prepared to ${v} into the unknown.`,
+      (c,s,v)=>`With one brave breath, the ${c} entered ${s} to ${v}, carrying courage like a lantern.`
+    ],
+    mystery: [
+      (c,s,v)=>`A strange shimmer moved through ${s} when the ${c} began to ${v}.`,
+      (c,s,v)=>`No one knew why ${s} went silent until the ${c} decided to ${v} beneath the hidden moon.`,
+      (c,s,v)=>`In ${s}, the ${c} found a clue and had to ${v} before the whisper faded.`
+    ],
+    funny: [
+      (c,s,v)=>`In ${s}, the ${c} tried to ${v} and accidentally started the silliest parade in the grove.`,
+      (c,s,v)=>`The ${c} marched into ${s} to ${v}, but a leaf with big opinions kept interrupting.`,
+      (c,s,v)=>`Everyone in ${s} giggled when the ${c} learned that to ${v} requires excellent snack planning.`
+    ],
+    poetic: [
+      (c,s,v)=>`Within ${s}, the ${c} learned to ${v} where moss kept the memory of rain.`,
+      (c,s,v)=>`The ${c} moved through ${s} to ${v}, and each small step became a silver note.`,
+      (c,s,v)=>`In the breath of ${s}, the ${c} began to ${v}, soft as dawn on quiet wings.`
+    ]
   };
-  reader.readAsText(file);
-}
 
-/* ---------- growth / grove visuals ---------- */
-function updateGrowth(){
-  const count = STATE.nest.length || 0;
-  growthCount.textContent = String(count);
-  // subtle background changes:
-  const grove = document.getElementById('grove');
-  if(count >= 100) grove.style.boxShadow = '0 24px 60px rgba(44,62,52,0.14)';
-  else if(count >= 50) grove.style.boxShadow = '0 20px 50px rgba(44,62,52,0.12)';
-  else grove.style.boxShadow = '0 12px 30px rgba(44,62,52,0.06)';
-  // add small ornaments into illustration area if milestones reached
-  const ill = document.getElementById('illustrationArea');
-  if(!ill) return;
-  let extras = '';
-  if(count >= 5) extras += '<div style="position:absolute;left:12px;top:8px;font-size:18px;">🪴</div>';
-  if(count >= 12) extras += '<div style="position:absolute;right:12px;top:8px;font-size:18px;">🕊️</div>';
-  if(count >= 30) extras += '<div style="position:absolute;left:10px;bottom:8px;font-size:18px;">✨</div>';
-  if(count >= 60) extras += '<div style="position:absolute;right:10px;bottom:8px;font-size:18px;">🌈</div>';
-  // append extras visually to illustration area (without changing core SVG)
-  ill.querySelectorAll('.extra-orn').forEach(e=>e.remove());
-  const wrapper = document.createElement('div'); wrapper.className='extra-orn'; wrapper.style.position='absolute'; wrapper.style.left='0'; wrapper.style.top='0'; wrapper.style.width='100%'; wrapper.style.height='100%'; wrapper.style.pointerEvents='none'; wrapper.innerHTML = extras;
-  ill.appendChild(wrapper);
-}
+  const ICONS = {
+    character:["🦊","🦉","🐉","🐇","🐢","🦋","🐾","🕊️"],
+    setting:["🌲","🌙","🌿","🏞️","✨","🌊","🌸","⛰️"],
+    verb:["✨","🎵","🧭","🌟","🍃","💫","🖌️","🔍"]
+  };
 
-/* ---------- helper: animate saved --------- */
-function animateSaved(){
-  const el = document.createElement('div');
-  el.style.position='fixed'; el.style.left='50%'; el.style.top='18%'; el.style.transform='translateX(-50%)'; el.style.padding='12px 18px';
-  el.style.background='linear-gradient(90deg,#E5C07B,#A1C2A7)'; el.style.color='#2C3E34'; el.style.borderRadius='12px'; el.style.fontWeight='800'; el.style.zIndex=9999;
-  el.textContent = 'Saved to your Story Nest ✨';
-  document.body.appendChild(el);
-  el.animate([{opacity:0, transform:'translateY(-10px)'},{opacity:1, transform:'translateY(0)'}],{duration:360});
-  setTimeout(()=>{ el.animate([{opacity:1, transform:'translateY(0)'},{opacity:0, transform:'translateY(-10px)'}],{duration:360}); setTimeout(()=>el.remove(),380); },1400);
-}
+  const els = {
+    weekSelect: document.getElementById("weekSelect"),
+    toneSelect: document.getElementById("toneSelect"),
+    runsRange: document.getElementById("runsRange"),
+    runsOut: document.getElementById("runsOut"),
+    charsList: document.getElementById("charsList"),
+    setsList: document.getElementById("setsList"),
+    verbsList: document.getElementById("verbsList"),
+    selChar: document.getElementById("selChar"),
+    selSet: document.getElementById("selSet"),
+    selVerb: document.getElementById("selVerb"),
+    storyText: document.getElementById("storyText"),
+    storyMeta: document.getElementById("storyMeta"),
+    illustrationArea: document.getElementById("illustrationArea"),
+    statusBox: document.getElementById("statusBox"),
+    nestList: document.getElementById("nestList"),
+    growthCount: document.getElementById("growthCount"),
+    grove: document.getElementById("grove"),
+    importFile: document.getElementById("importFile")
+  };
 
-/* ---------- small util ---------- */
-function escapeXml(s){ return String(s).replace(/[&<>"']/g, (c)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;' }[c])); }
+  let state = loadState();
+  let currentWeek = clampInt(state.lastWeek || 1, 1, WEEK_COUNT);
+  let selection = { character:null, setting:null, verb:null };
+  let currentStory = null;
 
-/* ---------- initial render state ---------- */
-renderClusters();
-renderNest();
-updateGrowth();
+  function hashString(str){
+    let h = 2166136261;
+    for(let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
 
-/* Expose some functions for advanced debugging if embedded in a page */
-window._Storybird = { StorybirdWeeks, STATE, saveState, exportStorybook };
+  function mulberry32(seed){
+    return function(){
+      let t = seed += 0x6D2B79F5;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
 
+  function shuffleSeeded(list, seedText){
+    const out = list.slice();
+    const rand = mulberry32(hashString(seedText));
+    for(let i=out.length-1;i>0;i--){
+      const j = Math.floor(rand() * (i+1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }
+
+  function getWeek(week){
+    return {
+      week,
+      characters: shuffleSeeded(CHARACTERS, "characters:" + week).slice(0,7),
+      settings: shuffleSeeded(SETTINGS, "settings:" + week).slice(0,7),
+      verbs: shuffleSeeded(VERBS, "verbs:" + week).slice(0,7)
+    };
+  }
+
+  function clampInt(v,min,max){
+    v = parseInt(v,10);
+    if(Number.isNaN(v)) return min;
+    return Math.min(max, Math.max(min, v));
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return { nest:[], lastWeek:1, settings:{tone:"gentle", runs:80} };
+      return sanitizeState(JSON.parse(raw));
+    }catch(e){
+      return { nest:[], lastWeek:1, settings:{tone:"gentle", runs:80} };
+    }
+  }
+
+  function sanitizeState(input){
+    const safe = { nest:[], lastWeek:1, settings:{tone:"gentle", runs:80} };
+    if(input && typeof input === "object"){
+      safe.lastWeek = clampInt(input.lastWeek || 1, 1, WEEK_COUNT);
+      if(input.settings && typeof input.settings === "object"){
+        safe.settings.tone = TEMPLATES[input.settings.tone] ? input.settings.tone : "gentle";
+        safe.settings.runs = clampInt(input.settings.runs || 80, 10, 200);
+      }
+      if(Array.isArray(input.nest)){
+        safe.nest = input.nest.slice(0, MAX_NEST).map(sanitizeNestEntry).filter(Boolean);
+      }
+    }
+    return safe;
+  }
+
+  function sanitizeNestEntry(n){
+    if(!n || typeof n !== "object") return null;
+    const text = String(n.text || "").slice(0,800).trim();
+    if(!text) return null;
+    const meta = n.meta && typeof n.meta === "object" ? n.meta : {};
+    const sel = meta.selection && typeof meta.selection === "object" ? meta.selection : {};
+    return {
+      text,
+      meta:{
+        week: clampInt(meta.week || n.week || 1, 1, WEEK_COUNT),
+        tone: TEMPLATES[meta.tone] ? meta.tone : "gentle",
+        selection:{
+          character: String(sel.character || "").slice(0,80),
+          setting: String(sel.setting || "").slice(0,80),
+          verb: String(sel.verb || "").slice(0,80)
+        },
+        score: typeof meta.score === "number" ? Math.round(meta.score) : null
+      },
+      ts: Number(n.ts || meta.timestamp || Date.now())
+    };
+  }
+
+  function saveState(){
+    try{
+      state.lastWeek = currentWeek;
+      state.settings.tone = els.toneSelect.value;
+      state.settings.runs = clampInt(els.runsRange.value, 10, 200);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){
+      setStatus("Storage is full or unavailable. Export your nest before saving more stories.", true);
+    }
+    renderNest();
+    updateGrowth();
+  }
+
+  function setStatus(msg, isError){
+    els.statusBox.textContent = msg;
+    els.statusBox.style.color = isError ? "var(--danger)" : "var(--muted)";
+  }
+
+  function escapeHTML(str){
+    return String(str).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  }
+
+  function choose(arr){
+    return arr[Math.floor(Math.random()*arr.length)];
+  }
+
+  function iconFor(type,label){
+    const pool = ICONS[type] || ["✨"];
+    return pool[hashString(label) % pool.length];
+  }
+
+  function renderWeeks(){
+    els.weekSelect.innerHTML = "";
+    for(let i=1;i<=WEEK_COUNT;i++){
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = "Week " + i;
+      els.weekSelect.appendChild(opt);
+    }
+    els.weekSelect.value = String(currentWeek);
+  }
+
+  function renderClusters(){
+    const w = getWeek(currentWeek);
+    renderSpiritList(els.charsList, w.characters, "character");
+    renderSpiritList(els.setsList, w.settings, "setting");
+    renderSpiritList(els.verbsList, w.verbs, "verb");
+    selection = { character:null, setting:null, verb:null };
+    currentStory = null;
+    updateSlots();
+    clearStory(false);
+  }
+
+  function renderSpiritList(container, items, type){
+    container.innerHTML = "";
+    items.forEach(label => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "spirit";
+      btn.dataset.type = type;
+      btn.dataset.value = label;
+      const dot = document.createElement("span");
+      dot.className = "spirit-dot";
+      dot.textContent = iconFor(type,label);
+      const name = document.createElement("span");
+      name.className = "spirit-name";
+      name.textContent = label;
+      btn.append(dot,name);
+      btn.addEventListener("click",()=>pickSpirit(type,label));
+      container.appendChild(btn);
+    });
+  }
+
+  function pickSpirit(type,val){
+    selection[type] = selection[type] === val ? null : val;
+    currentStory = null;
+    refreshSelectionVisuals();
+    updateSlots();
+  }
+
+  function refreshSelectionVisuals(){
+    document.querySelectorAll(".spirit").forEach(btn => {
+      const type = btn.dataset.type;
+      btn.classList.toggle("selected", selection[type] === btn.dataset.value);
+    });
+  }
+
+  function updateSlots(){
+    els.selChar.textContent = selection.character || "— character —";
+    els.selSet.textContent = selection.setting || "— setting —";
+    els.selVerb.textContent = selection.verb || "— action —";
+  }
+
+  function randomizeSelection(){
+    const w = getWeek(currentWeek);
+    selection.character = choose(w.characters);
+    selection.setting = choose(w.settings);
+    selection.verb = choose(w.verbs);
+    refreshSelectionVisuals();
+    updateSlots();
+    previewStory(true);
+  }
+
+  function storyTextFor(sel,tone){
+    const bank = TEMPLATES[tone] || TEMPLATES.gentle;
+    return choose(bank)(sel.character, sel.setting, sel.verb);
+  }
+
+  function isComplete(sel=selection){
+    return !!(sel.character && sel.setting && sel.verb);
+  }
+
+  function previewStory(fromRandom){
+    const sel = {
+      character: selection.character || "a quiet little friend",
+      setting: selection.setting || "the hidden grove",
+      verb: selection.verb || "wonder"
+    };
+    const tone = els.toneSelect.value;
+    const text = storyTextFor(sel, tone);
+    showStory({ text, meta:{week:currentWeek, tone, selection:sel, score:null}, ts:Date.now() }, !isComplete());
+    setStatus(isComplete() ? "Preview ready. Save after weaving, or keep exploring." : "Preview used placeholders. Pick one spirit from each column before saving.");
+    if(fromRandom) setStatus("Random selection ready. Press Weave to make it official, or Monte Carlo Weave for the strongest prompt.");
+  }
+
+  function weaveStory(){
+    if(!isComplete()){
+      setStatus("Pick one character, one setting, and one action first — or press Randomize.", true);
+      return;
+    }
+    const tone = els.toneSelect.value;
+    const record = {
+      text: storyTextFor(selection, tone),
+      meta:{ week:currentWeek, tone, selection:{...selection}, score:null },
+      ts:Date.now()
+    };
+    currentStory = record;
+    showStory(record, false);
+    setStatus("Story woven. You can read it aloud, copy it, or save it to the private Story Nest.");
+  }
+
+  function monteCarloWeave(){
+    const w = getWeek(currentWeek);
+    const tone = els.toneSelect.value;
+    const runs = clampInt(els.runsRange.value, 10, 200);
+    let best = null;
+    for(let i=0;i<runs;i++){
+      const candidateSel = {
+        character: choose(w.characters),
+        setting: choose(w.settings),
+        verb: choose(w.verbs)
+      };
+      const text = storyTextFor(candidateSel, tone);
+      const score = scoreCandidate(candidateSel, text, tone);
+      if(!best || score > best.meta.score){
+        best = {
+          text,
+          meta:{ week:currentWeek, tone, selection:candidateSel, score },
+          ts:Date.now()
+        };
+      }
+    }
+    selection = {...best.meta.selection};
+    currentStory = best;
+    refreshSelectionVisuals();
+    updateSlots();
+    showStory(best, false);
+    setStatus(`Monte Carlo tested ${runs} combinations and chose this ${tone} story seed. Score: ${best.meta.score}.`);
+  }
+
+  function scoreCandidate(sel,text,tone){
+    let score = 50;
+    const lower = text.toLowerCase();
+    const saved = (state.nest || []).slice(0,20).map(n => [
+      n.meta?.selection?.character,
+      n.meta?.selection?.setting,
+      n.meta?.selection?.verb
+    ].join(" ").toLowerCase()).join(" ");
+
+    // Encourage freshness.
+    ["character","setting","verb"].forEach(k => {
+      if(sel[k] && !saved.includes(sel[k].toLowerCase())) score += 10;
+      else score -= 7;
+    });
+
+    // Reward vivid but readable length.
+    const len = text.length;
+    score += Math.max(0, 20 - Math.abs(145 - len) / 6);
+
+    // Tone-specific imagery bonuses.
+    const toneWords = {
+      gentle:["soft","kindness","hush","warm","leaf","light"],
+      adventure:["brave","map","edge","unknown","path","courage"],
+      mystery:["strange","silent","hidden","clue","whisper","moon"],
+      funny:["silliest","giggled","snack","opinions","parade"],
+      poetic:["memory","rain","silver","dawn","quiet","wings"]
+    }[tone] || [];
+    toneWords.forEach(w => { if(lower.includes(w)) score += 3; });
+
+    // Tiny random variation to avoid identical ties.
+    score += Math.random() * 4;
+    return Math.round(score);
+  }
+
+  function showStory(record,isPreview){
+    const sel = record.meta.selection;
+    els.storyText.textContent = record.text;
+    els.storyMeta.textContent = [
+      `Week ${record.meta.week}`,
+      record.meta.tone ? `Tone: ${record.meta.tone}` : "",
+      record.meta.score !== null ? `Monte Carlo score: ${record.meta.score}` : "",
+      isPreview ? "Preview only" : new Date(record.ts).toLocaleString()
+    ].filter(Boolean).join(" • ");
+    renderIllustration(sel, record.meta.tone || "gentle");
+    els.storyText.animate(
+      [{opacity:0, transform:"translateY(8px)"},{opacity:1, transform:"translateY(0)"}],
+      {duration:320, easing:"ease-out"}
+    );
+  }
+
+  function clearStory(resetCurrent=true){
+    if(resetCurrent) currentStory = null;
+    els.storyText.textContent = "Your tiny story will appear here when you weave the spirits.";
+    els.storyMeta.textContent = "";
+    els.illustrationArea.textContent = "🌿 Illustration";
+    setStatus("Cleared. Ready for a new story seed.");
+  }
+
+  function clearSelection(){
+    selection = { character:null, setting:null, verb:null };
+    currentStory = null;
+    refreshSelectionVisuals();
+    updateSlots();
+    clearStory();
+  }
+
+  function colorFrom(str, offset=0){
+    const h = (hashString(str) + offset) % 360;
+    return `hsl(${h} 58% 82%)`;
+  }
+
+  function renderIllustration(sel,tone){
+    const c = escapeHTML(sel.character || "friend");
+    const s = escapeHTML(sel.setting || "place");
+    const v = escapeHTML(sel.verb || "wonder");
+    const bg1 = colorFrom(sel.character || "a", 0);
+    const bg2 = colorFrom(sel.setting || "b", 70);
+    const bg3 = colorFrom(sel.verb || "c", 150);
+    const toneIcon = {gentle:"🌿",adventure:"🧭",mystery:"🌙",funny:"🍄",poetic:"✨"}[tone] || "🌿";
+
+    els.illustrationArea.innerHTML = `
+      <svg width="100%" height="100%" viewBox="0 0 700 320" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Generated watercolor story card">
+        <defs>
+          <linearGradient id="sbgBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fff8f3"/>
+            <stop offset="1" stop-color="#f4fff7"/>
+          </linearGradient>
+          <filter id="softBlur"><feGaussianBlur stdDeviation="18"/></filter>
+        </defs>
+        <rect width="700" height="320" rx="28" fill="url(#sbgBg)"/>
+        <g filter="url(#softBlur)" opacity=".92">
+          <ellipse cx="150" cy="188" rx="150" ry="82" fill="${bg1}"/>
+          <ellipse cx="370" cy="115" rx="180" ry="90" fill="${bg2}"/>
+          <ellipse cx="575" cy="222" rx="145" ry="78" fill="${bg3}"/>
+        </g>
+        <path d="M45 260 C160 220 230 280 345 242 C455 207 535 247 660 218" fill="none" stroke="rgba(44,62,52,.26)" stroke-width="7" stroke-linecap="round"/>
+        <g font-family="system-ui, -apple-system, Segoe UI, sans-serif" text-anchor="middle" fill="#2c3e34">
+          <text x="350" y="56" font-size="34">${toneIcon}</text>
+          <text x="180" y="160" font-size="24" font-weight="850">${c}</text>
+          <text x="360" y="116" font-size="21" font-weight="750">${s}</text>
+          <text x="535" y="204" font-size="22" font-weight="800">${v}</text>
+        </g>
+      </svg>`;
+  }
+
+  function saveCurrentStory(){
+    if(!currentStory || !isComplete(currentStory.meta.selection)){
+      setStatus("Weave a complete story before saving. Preview stories with placeholders are not saved.", true);
+      return;
+    }
+    const entry = sanitizeNestEntry(currentStory);
+    state.nest.unshift(entry);
+    if(state.nest.length > MAX_NEST) state.nest.length = MAX_NEST;
+    saveState();
+    animateSaved();
+    setStatus("Saved to your private Story Nest.");
+  }
+
+  function renderNest(){
+    els.nestList.innerHTML = "";
+    const nest = state.nest || [];
+    if(!nest.length){
+      const empty = document.createElement("p");
+      empty.className = "meta";
+      empty.textContent = "Your Story Nest is empty. Weave a story to save it here.";
+      els.nestList.appendChild(empty);
+      return;
+    }
+    nest.forEach((n,i) => {
+      const item = document.createElement("article");
+      item.className = "nest-item";
+      item.setAttribute("role","listitem");
+
+      const text = document.createElement("div");
+      text.className = "nest-text";
+      text.textContent = n.text;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = [
+        `Week ${n.meta.week}`,
+        n.meta.tone ? `Tone: ${n.meta.tone}` : "",
+        n.meta.score !== null ? `Score: ${n.meta.score}` : "",
+        new Date(n.ts).toLocaleString()
+      ].filter(Boolean).join(" • ");
+
+      const row = document.createElement("div");
+      row.className = "nest-actions";
+
+      const play = smallButton("Play", () => {
+        currentStory = n;
+        selection = {...n.meta.selection};
+        currentWeek = n.meta.week;
+        els.weekSelect.value = String(currentWeek);
+        renderClusters();
+        selection = {...n.meta.selection};
+        refreshSelectionVisuals();
+        updateSlots();
+        showStory(n,false);
+      });
+
+      const speak = smallButton("Read", () => speakText(n.text));
+      const exp = smallButton("Export", () => exportSingle(n,i));
+      const del = smallButton("Delete", () => {
+        if(confirm("Delete this story?")){
+          state.nest.splice(i,1);
+          saveState();
+          setStatus("Story deleted.");
+        }
+      });
+
+      row.append(play,speak,exp,del);
+      item.append(text,meta,row);
+      els.nestList.appendChild(item);
+    });
+  }
+
+  function smallButton(label, fn){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn secondary tiny";
+    b.textContent = label;
+    b.addEventListener("click", fn);
+    return b;
+  }
+
+  function updateGrowth(){
+    const count = state.nest.length || 0;
+    els.growthCount.textContent = String(count);
+    if(count >= 60) els.grove.style.boxShadow = "0 30px 70px rgba(44,62,52,.16)";
+    else if(count >= 20) els.grove.style.boxShadow = "0 24px 58px rgba(44,62,52,.13)";
+    else els.grove.style.boxShadow = "";
+  }
+
+  function speakText(text){
+    try{
+      if(!("speechSynthesis" in window)){
+        setStatus("Read aloud is not available in this browser.", true);
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-US";
+      u.rate = 0.92;
+      window.speechSynthesis.speak(u);
+    }catch(e){
+      setStatus("Read aloud could not start in this browser.", true);
+    }
+  }
+
+  function copyCurrent(){
+    const text = els.storyText.textContent || "";
+    if(!text || text.includes("will appear")){
+      setStatus("There is no finished story to copy yet.", true);
+      return;
+    }
+    navigator.clipboard?.writeText(text).then(
+      () => setStatus("Story copied."),
+      () => setStatus("Copy failed. You can select and copy the story manually.", true)
+    );
+  }
+
+  function exportJSON(obj, filename){
+    const blob = new Blob([JSON.stringify(obj,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportSingle(n,i){
+    exportJSON(n, `storybird-story-${String(i+1).padStart(2,"0")}.json`);
+  }
+
+  function exportStorybook(){
+    exportJSON({ app:"Storybird Grove", version:"sovereign-mc-v1", exportedAt:new Date().toISOString(), ...state }, "storybird-grove-nest.json");
+  }
+
+  function importStorybook(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const parsed = JSON.parse(String(reader.result || ""));
+        const next = sanitizeState(parsed);
+        if(!Array.isArray(next.nest)) throw new Error("No nest");
+        state = next;
+        currentWeek = state.lastWeek;
+        els.weekSelect.value = String(currentWeek);
+        els.toneSelect.value = state.settings.tone;
+        els.runsRange.value = String(state.settings.runs);
+        els.runsOut.textContent = String(state.settings.runs);
+        saveState();
+        renderClusters();
+        setStatus("Imported Story Nest safely.");
+      }catch(e){
+        setStatus("Import failed. Please choose a Storybird Grove JSON export.", true);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function animateSaved(){
+    const el = document.createElement("div");
+    el.textContent = "Saved to your Story Nest ✨";
+    Object.assign(el.style,{
+      position:"fixed", left:"50%", top:"18%", transform:"translateX(-50%)",
+      padding:"12px 16px", borderRadius:"16px", zIndex:"9999", fontWeight:"900",
+      color:"#22332b", background:"linear-gradient(90deg,#E5C07B,#A1C2A7)",
+      boxShadow:"0 18px 42px rgba(0,0,0,.18)"
+    });
+    document.body.appendChild(el);
+    el.animate([{opacity:0, transform:"translate(-50%,-8px)"},{opacity:1, transform:"translate(-50%,0)"}],{duration:220});
+    setTimeout(() => {
+      el.animate([{opacity:1},{opacity:0}],{duration:250});
+      setTimeout(()=>el.remove(),260);
+    },1200);
+  }
+
+  function bindEvents(){
+    els.weekSelect.addEventListener("change", () => {
+      currentWeek = clampInt(els.weekSelect.value, 1, WEEK_COUNT);
+      state.lastWeek = currentWeek;
+      saveState();
+      renderClusters();
+      setStatus("Week changed. This week will stay stable every time the app opens.");
+    });
+
+    els.toneSelect.addEventListener("change", () => {
+      saveState();
+      setStatus("Tone updated. Weave again to apply the new voice.");
+    });
+
+    els.runsRange.addEventListener("input", () => {
+      els.runsOut.textContent = els.runsRange.value;
+      state.settings.runs = clampInt(els.runsRange.value, 10, 200);
+      saveState();
+    });
+
+    document.getElementById("randomBtn").addEventListener("click", randomizeSelection);
+    document.getElementById("monteBtn").addEventListener("click", monteCarloWeave);
+    document.getElementById("weaveBtn").addEventListener("click", weaveStory);
+    document.getElementById("previewBtn").addEventListener("click", () => previewStory(false));
+    document.getElementById("speakBtn").addEventListener("click", () => speakText(els.storyText.textContent));
+    document.getElementById("copyBtn").addEventListener("click", copyCurrent);
+    document.getElementById("saveBtn").addEventListener("click", saveCurrentStory);
+    document.getElementById("clearBtn").addEventListener("click", clearSelection);
+
+    document.getElementById("exportNest").addEventListener("click", exportStorybook);
+    document.getElementById("importNest").addEventListener("click", () => els.importFile.click());
+    els.importFile.addEventListener("change", e => {
+      const file = e.target.files && e.target.files[0];
+      if(file) importStorybook(file);
+      e.target.value = "";
+    });
+    document.getElementById("printNest").addEventListener("click", () => window.print());
+    document.getElementById("clearNest").addEventListener("click", () => {
+      if(confirm("Clear the private Story Nest on this device? Export first if you want a backup.")){
+        state.nest = [];
+        saveState();
+        setStatus("Story Nest cleared on this device.");
+      }
+    });
+  }
+
+  function init(){
+    renderWeeks();
+    els.toneSelect.value = state.settings.tone || "gentle";
+    els.runsRange.value = String(state.settings.runs || 80);
+    els.runsOut.textContent = String(state.settings.runs || 80);
+    bindEvents();
+    renderClusters();
+    renderNest();
+    updateGrowth();
+  }
+
+  init();
+
+  window.StorybirdGrove = {
+    getState: () => JSON.parse(JSON.stringify(state)),
+    exportStorybook,
+    getWeek
+  };
+})();
 </script>
 </body>
 </html>
