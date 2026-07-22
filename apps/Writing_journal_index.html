@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Manifestation Journal</title>
+<style>
+  body{
+    font-family:"Poppins","Comic Sans MS",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(180deg,#fffaf3,#f3f7ff);
+    margin:0; color:#333;
+  }
+  header{
+    text-align:center; padding:20px; background:#5DD2F5;
+    box-shadow:0 2px 5px rgba(0,0,0,.1);
+  }
+  h1{margin:0;font-size:1.8em}
+  main{
+    max-width:780px; margin:20px auto; background:#fff; padding:20px;
+    border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,.1);
+  }
+  label{font-weight:600;display:block;margin:12px 0 6px}
+  textarea{
+    width:100%; min-height:72px; border:1px solid #ccc; border-radius:8px;
+    padding:10px; font:inherit; resize:vertical; box-sizing:border-box;
+  }
+  #diary{
+    min-height:120px;
+    font-size:1.05em;
+    background:#fffbe5;
+    margin-bottom:10px;
+  }
+  select{
+    padding:8px 12px; border-radius:8px; border:1px solid #ccc; font-size:1em;
+  }
+  #affirmation{
+    margin:10px 0; padding:10px 14px; background:#f2f9ff;
+    border-left:5px solid #6ea8fe; border-radius:8px; font-style:italic;
+  }
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  button{
+    background:#6ea8fe; color:#fff; border:none; padding:10px 16px;
+    border-radius:8px; font-size:1em; cursor:pointer; margin-top:10px;
+    transition:background .2s ease;
+  }
+  button:hover{background:#4a91fd}
+  .small{text-align:center;font-size:.86em;color:#777;margin-top:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌞 Daily Journal</h1>
+  <p id="todayText">Reflect, align, and grow — one day at a time.</p>
+</header>
+
+<main>
+  <section class="row">
+    <label for="entryDate">Select Date:</label>
+    <select id="entryDate" aria-label="Select journal date"></select>
+    <button id="jumpToday" type="button">Today</button>
+  </section>
+
+  <section>
+    <h2>✨ Today’s Affirmation</h2>
+    <div id="affirmation"></div>
+  </section>
+
+  <section>
+    <label for="vision">1. Vision Focus</label>
+    <textarea id="vision" placeholder="Describe what you are creating or experiencing..."></textarea>
+
+    <label for="feelings">2. Feeling Frequency</label>
+    <textarea id="feelings" placeholder="How does it feel to live this dream?"></textarea>
+
+    <label for="visuals">3. Visual Snapshot</label>
+    <textarea id="visuals" placeholder="What do you see, hear, or feel in your vision?"></textarea>
+
+    <label for="actions">4. Aligned Actions</label>
+    <textarea id="actions" placeholder="What inspired actions will you take today?"></textarea>
+
+    <label for="gratitude">5. Gratitude Seal</label>
+    <textarea id="gratitude" placeholder="List 3 things you’re grateful for..."></textarea>
+  </section>
+
+  <!-- NEW: Daily Diary Entry Area -->
+  <section>
+    <label for="diary" style="margin-top:16px;font-size:1.14em;">6. Daily Diary</label>
+    <textarea id="diary" style="min-height:120px; font-size:1.05em; background:#fffbe5;" 
+      placeholder="Write your daily story, adventure, or anything important to you. This is your special diary space!"></textarea>
+  </section>
+
+  <div class="row">
+    <button id="saveBtn" type="button">💾 Save Entry</button>
+    <button id="exportBtn" type="button" title="Download all entries as JSON">⬇️ Export</button>
+    <button id="newAffirmation" type="button" title="Shuffle another affirmation for this day">🔄 New Affirmation</button>
+  </div>
+
+  <div class="small">Entries are saved locally on this device (browser storage). <br>
+    No account or server required.</div>
+</main>
+
+<script>
+(function(){
+  // ------- Utilities -------
+  const hasLS = (()=>{ try{ const k='__ls_test'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }catch(e){ return false; } })();
+  const qs = sel => document.querySelector(sel);
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function localISO(d){
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+  function prettyDate(d){
+    return d.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
+  }
+
+  // ------- Data -------
+  const baseAffirmations = [
+  // 🌙 Week 1 – Peace & Presence
+  "Sunday 🌙 – I rest, breathe deeply, and feel thankful for the week ahead.",
+  "Monday 🌅 – I start fresh, ready to learn and share kindness.",
+  "Tuesday 🌸 – I try my best and believe in what I can do.",
+  "Wednesday 🌿 – I listen, grow, and let my heart stay calm and kind.",
+  "Thursday 🌞 – I shine bright and use my creativity to help others.",
+  "Friday 🌺 – I celebrate my effort and the good things I’ve done.",
+  "Saturday 🌻 – I play, imagine, and enjoy the beauty all around me.",
+
+  // 🌊 Week 2 – Growth & Discovery
+  "Sunday 🌙 – I am calm and open to new beginnings.",
+  "Monday 🌅 – I greet the day with curiosity and courage.",
+  "Tuesday 🌸 – I learn something new and feel proud of myself.",
+  "Wednesday 🌿 – I pause to notice nature and all its tiny wonders.",
+  "Thursday 🌞 – I grow stronger by helping others and being kind.",
+  "Friday 🌺 – I reflect on what I learned and smile at my progress.",
+  "Saturday 🌻 – I rest and dream of joyful adventures ahead.",
+
+  // 🌤️ Week 3 – Joy & Connection
+  "Sunday 🌙 – I feel thankful for my family, friends, and cozy spaces.",
+  "Monday 🌅 – I wake up smiling, ready for a happy new week.",
+  "Tuesday 🌸 – I share laughter and kindness wherever I go.",
+  "Wednesday 🌿 – I listen to others and speak with a kind heart.",
+  "Thursday 🌞 – I use my imagination to make today brighter.",
+  "Friday 🌺 – I notice something good about myself and say, ‘Thank you, me!’",
+  "Saturday 🌻 – I dance, sing, and play — joy makes me glow inside.",
+
+  // 🌈 Week 4 – Gratitude & Hope
+  "Sunday 🌙 – I give thanks for another week to learn and grow.",
+  "Monday 🌅 – I begin again with peace, patience, and a smile.",
+  "Tuesday 🌸 – I am thankful for my teachers and all I discover each day.",
+  "Wednesday 🌿 – I care for my space and show love in small ways.",
+  "Thursday 🌞 – I trust myself to do my best, one step at a time.",
+  "Friday 🌺 – I look back at my week with pride and gratitude.",
+  "Saturday 🌻 – I rest my mind, open my heart, and dream bright dreams."
+];
+  // Add the new "diary" field
+  const fields = ["vision","feelings","visuals","actions","gratitude","diary"];
+
+  // ------- Elements -------
+  const dateSelect = qs("#entryDate");
+  const affirmationEl = qs("#affirmation");
+
+  function fillDates(){
+    dateSelect.innerHTML = ""; 
+    const now = new Date();
+    for(let i=-3;i<=3;i++){
+      const d = new Date(now);
+      d.setDate(now.getDate()+i);
+      const opt = document.createElement("option");
+      opt.value = localISO(d);
+      opt.textContent = prettyDate(d);
+      if(i===0) opt.selected = true;
+      dateSelect.appendChild(opt);
+    }
+    qs("#todayText").textContent = now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  }
+
+  function affirmationFor(dateStr){
+    const d = new Date(dateStr+"T00:00");
+    const idx = d.getDay();
+    const override = hasLS && localStorage.getItem("journal_"+dateStr+"_affirmation");
+    return override || baseAffirmations[idx];
+  }
+  function setAffirmation(dateStr){
+    affirmationEl.textContent = affirmationFor(dateStr);
+  }
+
+  function loadEntry(dateStr){
+    setAffirmation(dateStr);
+    fields.forEach(f=>{
+      const el = qs("#"+f);
+      const val = hasLS ? (localStorage.getItem("journal_"+dateStr+"_"+f) || "") : "";
+      el.value = val;
+    });
+  }
+
+  function saveEntry(dateStr){
+    if(!hasLS){ alert("Saving isn't available in this browser (localStorage blocked)."); return; }
+    fields.forEach(f=>{
+      const el = qs("#"+f);
+      localStorage.setItem("journal_"+dateStr+"_"+f, el.value);
+    });
+    alert("✨ Entry for "+dateStr+" saved locally!");
+  }
+
+  function exportAll(){
+    if(!hasLS){ alert("Export requires localStorage access."); return; }
+    const dump = {};
+    for(let i=0;i<localStorage.length;i++){
+      const key = localStorage.key(i);
+      if(!key || !key.startsWith("journal_")) continue;
+      const [, rest] = key.split("journal_");
+      const parts = rest.split("_");
+      const date = parts[0];
+      const field = parts.slice(1).join("_");
+      dump[date] = dump[date] || {};
+      dump[date][field] = localStorage.getItem(key);
+    }
+    const blob = new Blob([JSON.stringify(dump,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "manifestation_journal_export.json";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+  }
+
+  dateSelect.addEventListener("change", ()=>{
+    loadEntry(dateSelect.value);
+  });
+
+  fields.forEach(f=>{
+    qs("#"+f).addEventListener("input", ()=>{
+      if(!hasLS) return;
+      localStorage.setItem("journal_"+dateSelect.value+"_"+f, qs("#"+f).value);
+    });
+  });
+
+  qs("#saveBtn").addEventListener("click", ()=> saveEntry(dateSelect.value));
+  qs("#exportBtn").addEventListener("click", exportAll);
+
+  qs("#jumpToday").addEventListener("click", ()=>{
+    const today = localISO(new Date());
+    const found = Array.from(dateSelect.options).find(o=>o.value===today);
+    if(found){ dateSelect.value = today; loadEntry(today); }
+    else { fillDates(); loadEntry(dateSelect.value); }
+  });
+
+  qs("#newAffirmation").addEventListener("click", ()=>{
+    if(!hasLS){ alert("LocalStorage is required to pin a custom affirmation for this date."); return; }
+    const dateStr = dateSelect.value;
+    const current = affirmationFor(dateStr);
+    let next = current;
+    let safety = 20;
+    while(next === current && safety--){
+      next = baseAffirmations[Math.floor(Math.random()*baseAffirmations.length)];
+    }
+    localStorage.setItem("journal_"+dateStr+"_affirmation", next);
+    setAffirmation(dateStr);
+  });
+
+  fillDates();
+  loadEntry(dateSelect.value);
+})();
+</script>
+</body>
+</html>
