@@ -1,0 +1,409 @@
+<!-- Little Tikes Storybook – How to Brush Your Teeth -->
+<section id="little-tikes-storytime">
+  <div class="lt-wrapper">
+    <div class="lt-header">
+      <div class="lt-series">Khaemenes Academy · Little Tikes Library</div>
+      <h2 class="lt-title">How to Brush Your Teeth</h2>
+      <p class="lt-subtitle">A tiny step-by-step story for morning & bedtime routines.</p>
+    </div>
+
+    <div class="lt-book-shell">
+      <div class="lt-book lt-glow">
+        <!-- Left page: image + prompt -->
+        <div class="lt-page lt-left">
+          <div class="lt-step-label">
+            Step <span id="lt-step-number">1</span> of <span id="lt-step-total">1</span>
+          </div>
+          <div class="lt-illustration" id="lt-emoji">🪥</div>
+          <div class="lt-prompt-label">Try this:</div>
+          <p class="lt-prompt-text" id="lt-prompt-text"></p>
+        </div>
+
+        <!-- Right page: story text -->
+        <div class="lt-page lt-right">
+          <div class="lt-page-heading" id="lt-page-heading">Step title</div>
+          <p class="lt-story-text" id="lt-story-text"></p>
+
+          <div class="lt-controls">
+            <button class="lt-btn lt-btn-ghost" id="lt-prev-btn">← Back</button>
+            <div class="lt-dots" id="lt-dots"></div>
+            <button class="lt-btn lt-btn-main" id="lt-next-btn">Next →</button>
+          </div>
+
+          <button class="lt-btn lt-btn-small" id="lt-read-btn">
+            📖 Read Aloud
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p class="lt-footnote">
+      How to play: Read each step together, tap <strong>Read Aloud</strong> if sound is on, 
+      then let your child act it out with a real toothbrush at the sink.
+    </p>
+  </div>
+</section>
+
+<style>
+  /* --------- Layout shell --------- */
+  #little-tikes-storytime {
+    padding: 40px 12px 60px;
+    background: radial-gradient(circle at top, #fffbe8, #ffe9c9);
+    display: flex;
+    justify-content: center;
+  }
+  #little-tikes-storytime * {
+    box-sizing: border-box;
+  }
+  .lt-wrapper {
+    max-width: 960px;
+    width: 100%;
+    text-align: center;
+    font-family: "Quicksand","Nunito","Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+    color: #3f3526;
+  }
+
+  .lt-header {
+    margin-bottom: 24px;
+  }
+  .lt-series {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-bottom: 7px;
+  }
+  .lt-title {
+    margin: 0;
+    font-size: 27px;
+    letter-spacing: 0.04em;
+    color: #f68a1f;
+  }
+  .lt-subtitle {
+    margin: 6px 0 0;
+    font-size: 14px;
+    opacity: 0.8;
+  }
+
+  .lt-book-shell {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  .lt-book {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: #141824;
+    padding: 18px;
+    border-radius: 21px;
+    box-shadow: 0 21px 40px rgba(0,0,0,0.18);
+    max-width: 720px;
+    width: 100%;
+  }
+
+  .lt-page {
+    background: #fffdf6;
+    border-radius: 18px;
+    padding: 18px 18px 20px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+    text-align: left;
+  }
+  .lt-left {
+    margin-right: 8px;
+  }
+  .lt-right {
+    margin-left: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* --------- Left page --------- */
+  .lt-step-label {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-bottom: 8px;
+  }
+  .lt-illustration {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 4px auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    background: radial-gradient(circle at 30% 20%, #fff9d1, #ffd9b7);
+    box-shadow: 0 9px 18px rgba(0,0,0,0.12);
+  }
+  .lt-prompt-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 6px;
+    margin-bottom: 4px;
+    color: #c26c1d;
+  }
+  .lt-prompt-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* --------- Right page --------- */
+  .lt-page-heading {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: #a55a13;
+  }
+  .lt-story-text {
+    font-size: 15px;
+    line-height: 1.7;
+    margin: 0 0 16px;
+  }
+
+  .lt-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    margin-top: 8px;
+    gap: 8px;
+  }
+  .lt-btn {
+    border-radius: 21px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 7px 16px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .lt-btn-main {
+    background: linear-gradient(135deg,#f8a93a,#f26b21);
+    color: #fffdf6;
+    box-shadow: 0 7px 14px rgba(255,126,46,0.35);
+  }
+  .lt-btn-main:disabled {
+    opacity: 0.4;
+    cursor: default;
+    box-shadow: none;
+  }
+  .lt-btn-ghost {
+    background: #fff9f0;
+    color: #a55a13;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+  }
+  .lt-btn-small {
+    align-self: flex-start;
+    margin-top: 4px;
+    background: #ffe8c3;
+    color: #7a4a1a;
+    font-size: 13px;
+    padding: 6px 14px;
+  }
+
+  .lt-dots {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+  .lt-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: #e3d4c0;
+    cursor: pointer;
+  }
+  .lt-dot.lt-active {
+    background: #f68a1f;
+  }
+
+  .lt-footnote {
+    font-size: 13px;
+    margin-top: 18px;
+    opacity: 0.8;
+  }
+
+  /* --------- Flip animation --------- */
+  .lt-book.lt-flip {
+    animation: ltPageFlip 420ms ease-out;
+  }
+  @keyframes ltPageFlip {
+    0%   { transform: perspective(900px) rotateY(0deg); box-shadow: 0 21px 40px rgba(0,0,0,0.18);}
+    50%  { transform: perspective(900px) rotateY(-8deg); box-shadow: 0 27px 52px rgba(0,0,0,0.25);}
+    100% { transform: perspective(900px) rotateY(0deg); box-shadow: 0 21px 40px rgba(0,0,0,0.18);}
+  }
+
+  /* --------- Responsive --------- */
+  @media (max-width: 768px) {
+    .lt-book {
+      grid-template-columns: 1fr;
+      row-gap: 12px;
+      max-width: 480px;
+    }
+    .lt-left { margin-right: 0; }
+    .lt-right { margin-left: 0; }
+  }
+</style>
+
+<script>
+(function(){
+  // --------- Story data ---------
+  const ltSteps = [
+    {
+      title: "Step 1 · Get Ready",
+      emoji: "🪥",
+      prompt: "Can you find your toothbrush, toothpaste, and a little cup of water?",
+      text: "First we get ready. Walk to the sink and stand safely on your stool. Find your favorite toothbrush and your toothpaste. Put them next to the sink so they are easy to reach."
+    },
+    {
+      title: "Step 2 · Water & Paste",
+      emoji: "💧",
+      prompt: "Turn the water on just a tiny bit. Can you count to three while you wet your brush?",
+      text: "Turn the water on so it is gentle, not splashy. Hold your toothbrush under the water for a quick rinse. Then squeeze a pea-sized dot of toothpaste onto the bristles. Just a tiny pea, not a whole worm."
+    },
+    {
+      title: "Step 3 · Top Teeth",
+      emoji: "😁",
+      prompt: "Can you draw tiny circles on your top teeth with the brush?",
+      text: "Now brush the outside of your top teeth. Close your lips a little and move the brush in slow, gentle circles. Start at the back and travel all the way to your front teeth. Take your time—no rushing."
+    },
+    {
+      title: "Step 4 · Bottom Teeth",
+      emoji: "🙂",
+      prompt: "Can you brush your bottom teeth while you hum your favorite song?",
+      text: "Next, brush the outside of your bottom teeth. Keep using tiny circles, nice and soft. Imagine you are polishing little white stones until they sparkle."
+    },
+    {
+      title: "Step 5 · Inside Teeth",
+      emoji: "🦷",
+      prompt: "Can you open big like a lion and brush the inside parts too?",
+      text: "Open your mouth a little wider. Turn the brush so it can reach the inside of your teeth—the parts that face your tongue. Brush up and down on the inside of the top and bottom teeth so every side gets attention."
+    },
+    {
+      title: "Step 6 · Chewing Teeth",
+      emoji: "🍎",
+      prompt: "Pretend you are brushing away cookie crumbs from the very back teeth.",
+      text: "Now visit your chewing teeth—the back teeth that work hard on crunchy snacks. Move the brush back and forth gently on the tops of those teeth. Imagine you are sweeping away crumbs and sugar."
+    },
+    {
+      title: "Step 7 · Tongue & Rinse",
+      emoji: "👅",
+      prompt: "Can you gently tickle your tongue with the toothbrush, then swish and spit?",
+      text: "Very gently, brush your tongue to sweep away leftover taste and germs. Then take a little sip of water, swish it around like a tiny washing machine, and spit it carefully into the sink."
+    },
+    {
+      title: "Step 8 · All Done & Smile",
+      emoji: "🌈",
+      prompt: "Look in the mirror and show your biggest, brightest clean-teeth smile!",
+      text: "Turn off the water and set your toothbrush where it can dry. Wipe your mouth, stand up straight, and look in the mirror. Take a deep breath and give yourself a big, proud smile. You did it—your teeth are fresh, clean, and ready for a brand-new day or cozy bedtime."
+    }
+  ];
+
+  // --------- Element hooks ---------
+  const bookEl      = document.querySelector("#little-tikes-storytime .lt-book");
+  const stepNumber  = document.getElementById("lt-step-number");
+  const stepTotal   = document.getElementById("lt-step-total");
+  const emojiEl     = document.getElementById("lt-emoji");
+  const promptEl    = document.getElementById("lt-prompt-text");
+  const headingEl   = document.getElementById("lt-page-heading");
+  const storyEl     = document.getElementById("lt-story-text");
+  const prevBtn     = document.getElementById("lt-prev-btn");
+  const nextBtn     = document.getElementById("lt-next-btn");
+  const readBtn     = document.getElementById("lt-read-btn");
+  const dotsWrap    = document.getElementById("lt-dots");
+
+  let currentIndex = 0;
+  const totalSteps = ltSteps.length;
+  stepTotal.textContent = totalSteps;
+
+  // Build dots
+  ltSteps.forEach((_, idx) => {
+    const d = document.createElement("button");
+    d.className = "lt-dot";
+    d.setAttribute("type","button");
+    d.addEventListener("click", () => goToStep(idx, true));
+    dotsWrap.appendChild(d);
+  });
+
+  function renderStep(animate){
+    const step = ltSteps[currentIndex];
+    stepNumber.textContent = currentIndex + 1;
+    emojiEl.textContent = step.emoji;
+    promptEl.textContent = step.prompt;
+    headingEl.textContent = step.title;
+    storyEl.textContent = step.text;
+
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.textContent = currentIndex === totalSteps - 1 ? "All done ✔" : "Next →";
+
+    // dots
+    Array.from(dotsWrap.children).forEach((dot, idx) => {
+      dot.classList.toggle("lt-active", idx === currentIndex);
+    });
+
+    if (animate) {
+      bookEl.classList.remove("lt-flip");
+      // trigger reflow
+      void bookEl.offsetWidth;
+      bookEl.classList.add("lt-flip");
+    }
+  }
+
+  function goToStep(idx, animate){
+    if (idx < 0 || idx >= totalSteps) return;
+    currentIndex = idx;
+    renderStep(animate);
+  }
+
+  prevBtn.addEventListener("click", () => {
+    if (currentIndex > 0) goToStep(currentIndex - 1, true);
+  });
+  nextBtn.addEventListener("click", () => {
+    if (currentIndex < totalSteps - 1) {
+      goToStep(currentIndex + 1, true);
+    }
+  });
+
+  // Optional keyboard left/right
+  document.addEventListener("keydown", (e) => {
+    if (!document.getElementById("little-tikes-storytime")) return;
+    if (e.key === "ArrowRight") {
+      if (currentIndex < totalSteps - 1) goToStep(currentIndex + 1, true);
+    } else if (e.key === "ArrowLeft") {
+      if (currentIndex > 0) goToStep(currentIndex - 1, true);
+    }
+  });
+
+  // --------- Read aloud (browser TTS) ---------
+  function readCurrentStep(){
+    if (!("speechSynthesis" in window)) {
+      alert("Read Aloud is not available in this browser, but you can read the story together out loud. 😊");
+      return;
+    }
+    const step = ltSteps[currentIndex];
+    const text = step.title + ". " + step.text;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 0.95;
+    utter.pitch = 1.1;
+    window.speechSynthesis.speak(utter);
+  }
+  readBtn.addEventListener("click", readCurrentStep);
+
+  // Initial render
+  renderStep(false);
+})();
+</script>
