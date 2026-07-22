@@ -1,199 +1,838 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>A is for Alligator 🐊</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>🌈 Alphabet Adventure Book</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(180deg, #b9e8ff, #fff9d6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
-  overflow: hidden;
+
+*{
+box-sizing:border-box;
 }
 
-#book {
-  width: 90%;
-  max-width: 800px;
-  height: 500px;
-  perspective: 1500px;
-  position: relative;
-  margin-top: 40px;
+body{
+
+margin:0;
+
+height:100vh;
+
+font-family:'Comic Sans MS','Poppins',sans-serif;
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+background:
+
+linear-gradient(
+180deg,
+#8ed8ff,
+#c9f7d8,
+#fff1b8
+);
+
+overflow:hidden;
+
 }
 
-/* Each page */
-.page {
-  width: 100%;
-  height: 100%;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-  position: absolute;
-  backface-visibility: hidden;
-  transform-origin: left;
-  transition: transform 1s;
-  overflow: hidden;
+
+/* HEADER */
+
+header{
+
+text-align:center;
+
+padding:10px;
+
 }
 
-.page-content {
-  padding: 40px 30px 100px;
-  text-align: center;
+header h1{
+
+margin:0;
+
+font-size:34px;
+
+color:#ff5f6d;
+
+text-shadow:
+
+3px 3px white;
+
 }
 
-/* Images */
-.page img {
-  max-width: 60%;
-  height: auto;
-  margin: 10px auto;
-  display: block;
-  transition: transform 1s;
+
+
+/* MODE BUTTONS */
+
+
+.mode-buttons button{
+
+margin:8px;
+
+padding:12px 22px;
+
+border:none;
+
+border-radius:30px;
+
+font-size:18px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+background:
+
+linear-gradient(
+135deg,
+#ff9a9e,
+#fad0c4
+);
+
+color:white;
+
+box-shadow:
+0 5px 15px #999;
+
 }
 
-/* Flipped page */
-.page.flipped {
-  transform: rotateY(-180deg);
+
+
+/* BOOK */
+
+
+#book{
+
+width:90%;
+
+max-width:850px;
+
+height:520px;
+
+perspective:1500px;
+
+position:relative;
+
 }
 
-/* Navigation buttons - moved BELOW the book */
-.nav-buttons {
-  margin-top: 20px;
-  text-align: center;
+
+
+.page{
+
+position:absolute;
+
+width:100%;
+
+height:100%;
+
+background:white;
+
+border-radius:30px;
+
+padding:35px;
+
+text-align:center;
+
+box-shadow:
+
+0 15px 35px rgba(0,0,0,.25);
+
+border:
+
+8px solid #ffd166;
+
 }
 
-button {
-  background-color: #69c57e;
-  border: none;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-size: 18px;
-  margin: 0 15px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-button:hover {
-  background-color: #4aa460;
+
+
+.page h2{
+
+font-size:34px;
+
+color:#5b4bdb;
+
 }
 
-/* Simple animations */
-@keyframes bounce {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+
+
+.page p{
+
+font-size:22px;
+
+line-height:1.5;
+
+color:#555;
+
 }
 
-@keyframes floatLetters {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(-200px) rotate(360deg); opacity: 0; }
+
+
+.letter{
+
+font-size:150px;
+
+font-weight:bold;
+
+color:#ff5757;
+
+animation:bounce 2s infinite;
+
+text-shadow:
+
+5px 5px #ffd166;
+
 }
 
-/* Letter A animation */
-.letterA {
-  font-size: 120px;
-  color: #ff5757;
-  animation: bounce 2s infinite;
+
+
+.character{
+
+font-size:100px;
+
 }
 
-/* Floating letters at the end */
-.floating-letters span {
-  display: inline-block;
-  font-size: 40px;
-  animation: floatLetters 4s ease-in infinite;
+
+
+.object{
+
+font-size:80px;
+
 }
+
+
+
+@keyframes bounce{
+
+50%{
+
+transform:translateY(-20px);
+
+}
+
+}
+
+
+
+
+/* CONTROLS */
+
+
+.controls{
+
+margin-top:20px;
+
+}
+
+
+
+.controls button{
+
+padding:14px 25px;
+
+margin:5px;
+
+border:none;
+
+border-radius:30px;
+
+background:#69c57e;
+
+color:white;
+
+font-size:18px;
+
+cursor:pointer;
+
+}
+
+
+
+/* PARTICLES */
+
+
+.sparkle{
+
+position:absolute;
+
+font-size:30px;
+
+animation:float 3s infinite;
+
+}
+
+
+
+@keyframes float{
+
+100%{
+
+transform:
+
+translateY(-300px)
+rotate(360deg);
+
+opacity:0;
+
+}
+
+}
+
+
+
+@media(max-width:600px){
+
+#book{
+
+height:450px;
+
+}
+
+.page p{
+
+font-size:17px;
+
+}
+
+}
+
+
+
 </style>
+
 </head>
 
+
 <body>
-  <h1 style="text-align:center;color:#2e8b57;font-size:28px;margin-top:10px;">📘 A is for Alligator</h1>
-  <div id="book">
-    <!-- Page 1 -->
-    <div class="page" id="page1">
-      <div class="page-content">
-        <h1 class="letterA">A</h1>
-        <h2>A is for Alligator!</h2>
-        <p>The Alligator lives by the Alphabet River.<br>He loves to learn his letters every day!</p>
-        <img id="gator" src="ALLIGATOR_IMAGE_URL_HERE" alt="Alligator">
-      </div>
-    </div>
 
-    <!-- Page 2 -->
-    <div class="page" id="page2" style="transform: rotateY(180deg);">
-      <div class="page-content">
-        <h2>The Adventure</h2>
-        <p>One morning, Alligator found an Apple!<br>
-           The red Apple looked like a round circle.<br>
-           “A is for Apple!” said the Alligator.</p>
-        <img id="apple" src="https://cdn.pixabay.com/photo/2016/03/05/19/02/apple-1239423_1280.png" alt="Apple">
-      </div>
-    </div>
 
-    <!-- Page 3 -->
-    <div class="page" id="page3" style="transform: rotateY(180deg);">
-      <div class="page-content">
-        <h2>Alligator’s Song</h2>
-        <p>After snack time, Alligator sang his ABCs.<br>
-           “A, A, A!” he cheered with joy.<br>
-           Learning letters is awesome!</p>
-        <div class="floating-letters">
-          <span style="animation-delay:0s;">A</span>
-          <span style="animation-delay:0.5s;">B</span>
-          <span style="animation-delay:1s;">C</span>
-          <span style="animation-delay:1.5s;">D</span>
-          <span style="animation-delay:2s;">E</span>
-        </div>
-      </div>
-    </div>
-  </div>
+<header>
 
-  <!-- Navigation below the book -->
-  <div class="nav-buttons">
-    <button id="prevBtn">⬅️ Back</button>
-    <button id="nextBtn">Next ➡️</button>
-  </div>
+<h1>
+🌈 Alphabet Adventure Book
+</h1>
+
+
+<div class="mode-buttons">
+
+<button onclick="learnMode()">
+📘 Learn Letters
+</button>
+
+<button onclick="adventureMode()">
+✨ Create Adventure
+</button>
+
+
+</div>
+
+</header>
+
+
+
+<div id="book">
+
+
+<div class="page">
+
+
+<div id="content">
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<div class="controls">
+
+<button onclick="previousLetter()">
+⬅ Back
+</button>
+
+
+<button onclick="readStory()">
+🔊 Read
+</button>
+
+
+<button onclick="nextLetter()">
+Next ➡
+</button>
+
+
+</div>
+
+
+
+
 
 <script>
-const pages = document.querySelectorAll('.page');
-let current = 0;
 
-document.getElementById('nextBtn').addEventListener('click', () => {
-  if (current < pages.length - 1) {
-    pages[current].classList.add('flipped');
-    current++;
-    playSound('pageFlip');
-  }
-});
 
-document.getElementById('prevBtn').addEventListener('click', () => {
-  if (current > 0) {
-    current--;
-    pages[current].classList.remove('flipped');
-    playSound('pageFlip');
-  }
-});
+const alphabet=[
 
-const sounds = {
-  pageFlip: new Audio('page-flip.mp3'),
-  chomp: new Audio('chomp.mp3'),
-  abcSong: new Audio('abc-song.mp3')
-};
+{
+letter:"A",
+character:"Alligator",
+emoji:"🐊",
+object:"Apple",
+objectEmoji:"🍎",
+setting:"Alphabet River",
+fact:"Alligators are reptiles that love water."
+},
 
-function playSound(name) {
-  const sound = sounds[name];
-  if (sound) sound.play().catch(()=>{});
+{
+letter:"B",
+character:"Bear",
+emoji:"🐻",
+object:"Ball",
+objectEmoji:"⚽",
+setting:"Bluebell Forest",
+fact:"Bears have an excellent sense of smell."
+},
+
+{
+letter:"C",
+character:"Cat",
+emoji:"🐱",
+object:"Cookie",
+objectEmoji:"🍪",
+setting:"Crystal Cave",
+fact:"Cats use whiskers to explore."
+},
+
+{
+letter:"D",
+character:"Duck",
+emoji:"🦆",
+object:"Drum",
+objectEmoji:"🥁",
+setting:"Dewdrop Pond",
+fact:"Ducks have waterproof feathers."
+},
+
+{
+letter:"E",
+character:"Elephant",
+emoji:"🐘",
+object:"Egg",
+objectEmoji:"🥚",
+setting:"Emerald Meadow",
+fact:"Elephants remember many things."
+},
+
+{
+letter:"F",
+character:"Fox",
+emoji:"🦊",
+object:"Flower",
+objectEmoji:"🌸",
+setting:"Firefly Forest",
+fact:"Foxes have excellent hearing."
+},
+
+{
+letter:"G",
+character:"Giraffe",
+emoji:"🦒",
+object:"Grapes",
+objectEmoji:"🍇",
+setting:"Golden Grasslands",
+fact:"Giraffes have very long necks."
+},
+
+{
+letter:"H",
+character:"Hedgehog",
+emoji:"🦔",
+object:"Honey",
+objectEmoji:"🍯",
+setting:"Honey Grove",
+fact:"Hedgehogs have protective spines."
+},
+
+{
+letter:"I",
+character:"Iguana",
+emoji:"🦎",
+object:"Island",
+objectEmoji:"🏝️",
+setting:"Ivy Island",
+fact:"Iguanas enjoy warm sunshine."
+},
+
+{
+letter:"J",
+character:"Jellyfish",
+emoji:"🪼",
+object:"Jewel",
+objectEmoji:"💎",
+setting:"Jade Ocean",
+fact:"Jellyfish have lived for millions of years."
+},
+
+{
+letter:"K",
+character:"Kangaroo",
+emoji:"🦘",
+object:"Kite",
+objectEmoji:"🪁",
+setting:"Kite Valley",
+fact:"Kangaroos hop using powerful legs."
+},
+
+{
+letter:"L",
+character:"Lion",
+emoji:"🦁",
+object:"Leaf",
+objectEmoji:"🍃",
+setting:"Lantern Meadow",
+fact:"Lions live together in groups."
+},
+
+{
+letter:"M",
+character:"Monkey",
+emoji:"🐒",
+object:"Mango",
+objectEmoji:"🥭",
+setting:"Moonlit Forest",
+fact:"Monkeys are clever explorers."
+},
+
+{
+letter:"N",
+character:"Narwhal",
+emoji:"🐋",
+object:"Nest",
+objectEmoji:"🪺",
+setting:"Northern Sea",
+fact:"Narwhals are ocean unicorns."
+},
+
+{
+letter:"O",
+character:"Owl",
+emoji:"🦉",
+object:"Orange",
+objectEmoji:"🍊",
+setting:"Oak Forest",
+fact:"Owls can see well at night."
+},
+
+{
+letter:"P",
+character:"Penguin",
+emoji:"🐧",
+object:"Pearl",
+objectEmoji:"🦪",
+setting:"Polar Valley",
+fact:"Penguins are excellent swimmers."
+},
+
+{
+letter:"Q",
+character:"Quail",
+emoji:"🐦",
+object:"Quilt",
+objectEmoji:"🧵",
+setting:"Quiet Meadow",
+fact:"Quails are small friendly birds."
+},
+
+{
+letter:"R",
+character:"Rabbit",
+emoji:"🐇",
+object:"Rainbow",
+objectEmoji:"🌈",
+setting:"Rainbow Garden",
+fact:"Rabbits can hop very quickly."
+},
+
+{
+letter:"S",
+character:"Squirrel",
+emoji:"🐿️",
+object:"Star",
+objectEmoji:"⭐",
+setting:"Secret Grove",
+fact:"Squirrels save food for later."
+},
+
+{
+letter:"T",
+character:"Turtle",
+emoji:"🐢",
+object:"Tree",
+objectEmoji:"🌳",
+setting:"Tiny Island",
+fact:"Turtles carry protective shells."
+},
+
+{
+letter:"U",
+character:"Unicorn",
+emoji:"🦄",
+object:"Umbrella",
+objectEmoji:"☂️",
+setting:"Unicorn Valley",
+fact:"Unicorns are magical story creatures."
+},
+
+{
+letter:"V",
+character:"Vulture",
+emoji:"🦅",
+object:"Vine",
+objectEmoji:"🌿",
+setting:"Violet Valley",
+fact:"Vultures help clean nature."
+},
+
+{
+letter:"W",
+character:"Wolf",
+emoji:"🐺",
+object:"Wing",
+objectEmoji:"🪽",
+setting:"Whispering Woods",
+fact:"Wolves are social animals."
+},
+
+{
+letter:"X",
+character:"X-Ray Fish",
+emoji:"🐟",
+object:"Xylophone",
+objectEmoji:"🎵",
+setting:"Xenon Ocean",
+fact:"X-ray fish have see-through bodies."
+},
+
+{
+letter:"Y",
+character:"Yak",
+emoji:"🐂",
+object:"Yarn",
+objectEmoji:"🧶",
+setting:"Yellow Valley",
+fact:"Yaks have thick warm fur."
+},
+
+{
+letter:"Z",
+character:"Zebra",
+emoji:"🦓",
+object:"Zinnia",
+objectEmoji:"🌺",
+setting:"Zebra Plains",
+fact:"Every zebra has unique stripes."
 }
 
-/* 🍎 Click animation */
-const apple = document.getElementById('apple');
-apple.addEventListener('click', () => {
-  apple.style.transform = 'scale(1.3)';
-  playSound('chomp');
-  setTimeout(() => apple.style.transform = 'scale(1)', 500);
-});
+];
+
+
+
+let current=0;
+
+
+let mode="learn";
+
+
+
+function showLetter(data){
+
+
+document.getElementById("content").innerHTML=`
+
+<div class="letter">
+${data.letter}
+</div>
+
+
+<div class="character">
+${data.emoji}
+</div>
+
+
+<h2>
+${data.letter} is for ${data.character}
+</h2>
+
+
+<p>
+The ${data.character} explored 
+<b>${data.setting}</b>
+and discovered a magical ${data.object}.
+</p>
+
+
+<div class="object">
+${data.objectEmoji}
+</div>
+
+
+<p>
+${data.fact}
+</p>
+
+`;
+
+
+createSparkles();
+
+
+}
+
+
+
+function learnMode(){
+
+mode="learn";
+
+showLetter(alphabet[current]);
+
+}
+
+
+
+function adventureMode(){
+
+
+const data=
+alphabet[Math.floor(Math.random()*alphabet.length)];
+
+
+document.getElementById("content").innerHTML=`
+
+<div class="character">
+${data.emoji}
+</div>
+
+
+<h2>
+✨ ${data.character}'s Adventure
+</h2>
+
+
+<p>
+
+The ${data.character}
+wandered through
+<b>${data.setting}</b>
+
+and discovered a magical
+${data.object}.
+
+</p>
+
+
+<div class="object">
+${data.objectEmoji}
+</div>
+
+
+<p>
+${data.letter} is for ${data.character}!
+</p>
+
+`;
+
+
+createSparkles();
+
+}
+
+
+
+function nextLetter(){
+
+if(current<25){
+
+current++;
+
+}
+
+showLetter(alphabet[current]);
+
+}
+
+
+
+function previousLetter(){
+
+if(current>0){
+
+current--;
+
+}
+
+showLetter(alphabet[current]);
+
+}
+
+
+
+
+function readStory(){
+
+let text=
+document.getElementById("content")
+.innerText;
+
+
+speechSynthesis.speak(
+
+new SpeechSynthesisUtterance(text)
+
+);
+
+}
+
+
+
+function createSparkles(){
+
+for(let i=0;i<8;i++){
+
+let s=document.createElement("div");
+
+s.className="sparkle";
+
+s.innerHTML="✨";
+
+s.style.left=Math.random()*90+"%";
+
+s.style.bottom="0";
+
+document.body.appendChild(s);
+
+
+setTimeout(()=>s.remove(),3000);
+
+}
+
+}
+
+
+
+showLetter(alphabet[0]);
+
+
 </script>
+
+
 </body>
 </html>
+}
