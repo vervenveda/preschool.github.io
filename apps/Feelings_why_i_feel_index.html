@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Little Tikes Life Skills — When My Feelings Get Big</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <style>
+    :root{
+      --bg:#fefaf3;
+      --ink:#2c2430;
+      --accent:#ff9fb8;
+      --accent-soft:#ffe3ec;
+      --soft-blue:#d7ecff;
+      --soft-lilac:#e4dcff;
+      --radius:21px;
+      --shadow:0 14px 33px rgba(0,0,0,0.12);
+    }
+
+    *{box-sizing:border-box;}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#fffdf8 0%,#fbeff7 40%,#f3def1 100%);
+      color:var(--ink);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:24px 12px 40px;
+    }
+
+    .app-shell{
+      width:100%;
+      max-width:980px;
+      text-align:center;
+    }
+
+    .lt-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 16px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:#8c365a;
+      font-size:13px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    h1.app-title{
+      margin:4px 0 2px;
+      font-size:27px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+    }
+
+    .app-subtitle{
+      margin:0 0 18px;
+      font-size:15px;
+      color:#6c5c6f;
+    }
+
+    /* Book layout */
+
+    .book-wrap{
+      margin:0 auto;
+      margin-top:10px;
+      max-width:920px;
+      background:#fffdf8;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px 18px 22px;
+      border:1px solid rgba(255,159,184,0.5);
+    }
+
+    .book-inner{
+      display:flex;
+      gap:18px;
+      align-items:stretch;
+      justify-content:center;
+      transition:transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .book-inner.page-turn{
+      transform:scale(0.99) rotateY(2deg);
+      box-shadow:0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    .page{
+      flex:1 1 0;
+      background:#fffcf5;
+      border-radius:16px;
+      padding:18px 16px 20px;
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,0.04);
+    }
+
+    .page-left{
+      background:linear-gradient(145deg,#ffeaf6,#fff7fd);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      align-items:center;
+      text-align:center;
+    }
+
+    .page-right{
+      background:#fffcf5;
+      text-align:left;
+    }
+
+    .page-label{
+      font-size:11px;
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+      color:#a05a7a;
+      margin-bottom:6px;
+    }
+
+    .page-title{
+      font-size:20px;
+      font-weight:700;
+      margin:4px 0 8px;
+    }
+
+    /* Feelings graphic */
+
+    .feelings-graphic{
+      margin-top:8px;
+      width:100%;
+      max-width:220px;
+      aspect-ratio:4/3;
+      border-radius:18px;
+      background:radial-gradient(circle at 20% 20%,#ffd1e3 0,#ffd1e3 22%,transparent 40%),
+                 radial-gradient(circle at 70% 30%,#d7ecff 0,#d7ecff 25%,transparent 45%),
+                 radial-gradient(circle at 50% 70%,#e4dcff 0,#e4dcff 30%,transparent 52%),
+                 linear-gradient(145deg,#ffb9d3,#ffe6f2);
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .feeling-face{
+      width:90px;
+      height:90px;
+      border-radius:50%;
+      background:#fffdf8;
+      border:3px solid rgba(214,116,140,0.9);
+      box-shadow:0 6px 16px rgba(0,0,0,0.12);
+      position:relative;
+    }
+
+    .face-eye{
+      width:11px;
+      height:15px;
+      border-radius:999px;
+      border:3px solid #4c3044;
+      border-top:none;
+      position:absolute;
+      top:28px;
+    }
+
+    .face-eye.left{left:26px;}
+    .face-eye.right{right:26px;}
+
+    .face-mouth{
+      position:absolute;
+      left:50%;
+      top:56px;
+      width:42px;
+      height:22px;
+      border-radius:0 0 42px 42px;
+      border:3px solid #4c3044;
+      border-top:none;
+      transform:translateX(-50%);
+    }
+
+    .calm-cloud{
+      position:absolute;
+      bottom:-10px;
+      right:-4px;
+      width:70px;
+      height:40px;
+      background:#ffffff;
+      border-radius:50px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:10px;
+      font-weight:600;
+      color:#a05a7a;
+      padding:6px;
+    }
+
+    .step-tag{
+      font-size:11px;
+      color:#9b8a9e;
+      margin-bottom:6px;
+    }
+
+    .story-text{
+      font-size:17px;
+      line-height:1.7;
+      margin:2px 0 12px;
+    }
+
+    .story-tip{
+      font-size:14px;
+      color:#7b6b7c;
+    }
+
+    .page-counter{
+      font-size:12px;
+      color:#a38f9e;
+      position:absolute;
+      bottom:8px;
+      right:14px;
+    }
+
+    /* Controls + instructions */
+
+    .controls-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:16px;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .nav-buttons{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+    }
+
+    button.nav-btn{
+      border:none;
+      border-radius:999px;
+      padding:8px 18px;
+      font-size:14px;
+      font-weight:600;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      cursor:pointer;
+      background:linear-gradient(135deg,#ff9fb8,#ff729c);
+      color:#3b1830;
+      box-shadow:0 10px 20px rgba(0,0,0,0.18);
+      transition:transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+    }
+
+    button.nav-btn:disabled{
+      opacity:0.4;
+      cursor:default;
+      box-shadow:none;
+      transform:none;
+    }
+
+    button.nav-btn:not(:disabled):hover{
+      transform:translateY(-1px);
+      box-shadow:0 13px 26px rgba(0,0,0,0.22);
+    }
+
+    .instructions{
+      flex:1 1 200px;
+      font-size:14px;
+      color:#6e5c72;
+      text-align:center;
+    }
+
+    .instructions strong{
+      font-weight:600;
+    }
+
+    .mode-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 11px;
+      border-radius:999px;
+      background:#f6e5f1;
+      font-size:12px;
+      color:#675268;
+    }
+
+    .mode-pill input{
+      accent-color:#ff729c;
+    }
+
+    @media (max-width:800px){
+      .book-inner{
+        flex-direction:column;
+      }
+    }
+
+    @media (max-width:520px){
+      h1.app-title{font-size:22px;}
+      .story-text{font-size:16px;}
+      button.nav-btn{font-size:12px;padding:7px 14px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="lt-badge">Little Tikes Life Skills</div>
+    <h1 class="app-title">When My Feelings Get Big</h1>
+    <p class="app-subtitle">
+      A calm-down story to help little hearts notice, name, and gently shrink big feelings.
+    </p>
+
+    <div class="book-wrap">
+      <div id="feelBookInner" class="book-inner">
+        <!-- Left page (scene) -->
+        <div class="page page-left">
+          <div>
+            <div class="page-label">Feelings Story</div>
+            <h2 id="feelLeftTitle" class="page-title">Sometimes feelings get big…</h2>
+          </div>
+
+          <div class="feelings-graphic">
+            <div class="feeling-face">
+              <div class="face-eye left"></div>
+              <div class="face-eye right"></div>
+              <div class="face-mouth"></div>
+            </div>
+            <div class="calm-cloud">We can calm down.</div>
+          </div>
+
+          <div class="page-counter" id="feelPageCounterLeft">Page 1 of 7</div>
+        </div>
+
+        <!-- Right page (text) -->
+        <div class="page page-right">
+          <div class="step-tag" id="feelStepTag">Step 1 · Notice the big feeling</div>
+          <div class="page-title" id="feelRightTitle">Big feelings live in small bodies.</div>
+          <div class="story-text" id="feelStoryText">
+            Sometimes my feelings get <strong>very big</strong> inside my small body.  
+            My tummy wiggles, my face feels warm, or my hands make tight fists.  
+            Big feelings are not bad — they are just loud and need a little help.
+          </div>
+          <div class="story-tip" id="feelStoryTip">
+            Grown-up note: Invite your child to point to where they feel big feelings — tummy, chest, face, hands.
+          </div>
+          <div class="page-counter" id="feelPageCounterRight">Page 1 of 7</div>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <div class="nav-buttons">
+          <button id="feelPrevBtn" class="nav-btn" type="button" disabled>&larr; Back</button>
+          <button id="feelNextBtn" class="nav-btn" type="button">Next &rarr;</button>
+        </div>
+        <div class="instructions">
+          <strong>How to read:</strong> Tap <em>Next</em> to turn the pages,  
+          pause to breathe together, and let your child share what they feel.
+        </div>
+        <div class="mode-pill">
+          <input type="checkbox" id="feelQuietMode" />
+          <label for="feelQuietMode">Quiet Mode (no page sounds)</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Story data: 7 gentle steps
+    const feelPages = [
+      {
+        leftTitle: "Sometimes feelings get big…",
+        stepTag: "Step 1 · Notice the big feeling",
+        rightTitle: "Big feelings live in small bodies.",
+        text: "Sometimes my feelings get very big inside my small body. My tummy wiggles, my face feels warm, or my hands make tight fists. Big feelings are not bad — they are just loud and need a little help.",
+        tip: "Grown-up note: Invite your child to point to where they feel big feelings — tummy, chest, face, hands."
+      },
+      {
+        leftTitle: "Give it a name",
+        stepTag: "Step 2 · Name the feeling",
+        rightTitle: "Is it mad, sad, or scared?",
+        text: "When my feelings get big, I can give them a name. I might say, “I feel mad,” “I feel sad,” or “I feel scared.” Naming my feeling helps it feel seen, like a friend you call by name.",
+        tip: "Offer choices: “Does it feel more like mad, sad, or worried today?” Honor whatever they choose."
+      },
+      {
+        leftTitle: "Pause like a statue",
+        stepTag: "Step 3 · Stop and freeze",
+        rightTitle: "We pause our body.",
+        text: "When my feeling is very loud, I can pause like a statue. I keep my feet on the ground and my hands by my sides. I take a little still moment so my body can listen.",
+        tip: "Practice a silly “freeze” game during calm times so this step feels familiar when feelings grow."
+      },
+      {
+        leftTitle: "Balloon breaths",
+        stepTag: "Step 4 · Breathe in and out",
+        rightTitle: "We help our body with breaths.",
+        text: "I can take slow balloon breaths. I breathe in through my nose while my belly gets big like a balloon. Then I breathe out through my mouth and let the balloon get soft again.",
+        tip: "Count together: “Smell the flower — 1, 2, 3. Blow the bubble — 1, 2, 3.”"
+      },
+      {
+        leftTitle: "Look around",
+        stepTag: "Step 5 · Find something safe",
+        rightTitle: "We remember where we are.",
+        text: "I look around the room and find three safe things I see. Maybe a pillow, a window, or my favorite toy. I remember: I am here, I am safe, I am not alone.",
+        tip: "Guide them: “Can you find 3 soft things? 2 round things? 1 thing you love?”"
+      },
+      {
+        leftTitle: "Ask for a helper",
+        stepTag: "Step 6 · Use your words",
+        rightTitle: "We can ask for help.",
+        text: "If my feeling is still big, I can use my words to ask for help. I can say, “My feelings are big,” or “Can you help me calm down?” Grown-ups are here to listen.",
+        tip: "Create a simple phrase they can remember, like “Big feelings, please help,” and practice it together."
+      },
+      {
+        leftTitle: "Feelings can shrink",
+        stepTag: "Step 7 · Feel proud",
+        rightTitle: "I took care of my big feeling.",
+        text: "Little by little, my big feeling gets smaller. My shoulders relax, my breath feels softer, and my heart feels lighter. I can feel proud — I took care of my big feeling in a kind way.",
+        tip: "Reflect: “You noticed your feeling, breathed, and asked for help. That was very brave.”"
+      }
+    ];
+
+    const feelBookInner = document.getElementById('feelBookInner');
+    const feelLeftTitleEl = document.getElementById('feelLeftTitle');
+    const feelStepTagEl = document.getElementById('feelStepTag');
+    const feelRightTitleEl = document.getElementById('feelRightTitle');
+    const feelStoryTextEl = document.getElementById('feelStoryText');
+    const feelStoryTipEl = document.getElementById('feelStoryTip');
+    const feelPageCounterLeftEl = document.getElementById('feelPageCounterLeft');
+    const feelPageCounterRightEl = document.getElementById('feelPageCounterRight');
+    const feelPrevBtn = document.getElementById('feelPrevBtn');
+    const feelNextBtn = document.getElementById('feelNextBtn');
+    const feelQuietModeEl = document.getElementById('feelQuietMode');
+
+    let feelCurrentPage = 0;
+    let feelPageTurnSound = null;
+
+    function feelInitSound(){
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      feelPageTurnSound = () => {
+        if(feelQuietModeEl.checked) return;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.03, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + 0.16);
+      };
+    }
+
+    function feelRenderPage(){
+      const total = feelPages.length;
+      const p = feelPages[feelCurrentPage];
+      feelLeftTitleEl.textContent = p.leftTitle;
+      feelStepTagEl.textContent = p.stepTag;
+      feelRightTitleEl.textContent = p.rightTitle;
+      feelStoryTextEl.textContent = p.text;
+      feelStoryTipEl.textContent = p.tip;
+      feelPageCounterLeftEl.textContent = `Page ${feelCurrentPage+1} of ${total}`;
+      feelPageCounterRightEl.textContent = `Page ${feelCurrentPage+1} of ${total}`;
+      feelPrevBtn.disabled = feelCurrentPage === 0;
+      feelNextBtn.disabled = feelCurrentPage === total - 1;
+    }
+
+    function feelTurnPage(direction){
+      const total = feelPages.length;
+      let newPage = feelCurrentPage + direction;
+      if(newPage < 0 || newPage >= total) return;
+      feelCurrentPage = newPage;
+
+      feelBookInner.classList.add('page-turn');
+      setTimeout(() => {
+        feelBookInner.classList.remove('page-turn');
+      }, 260);
+
+      if(feelPageTurnSound){
+        feelPageTurnSound();
+      }
+
+      feelRenderPage();
+    }
+
+    feelPrevBtn.addEventListener('click', () => feelTurnPage(-1));
+    feelNextBtn.addEventListener('click', () => feelTurnPage(1));
+
+    document.addEventListener('keydown',(e)=>{
+      if(e.key === 'ArrowRight') feelTurnPage(1);
+      if(e.key === 'ArrowLeft') feelTurnPage(-1);
+    });
+
+    feelRenderPage();
+    setTimeout(feelInitSound, 400);
+  </script>
+</body>
+</html>
+2️⃣ “Little Acts of Friendship” – Friendship Flip Book
+html
+Copy code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Little Tikes Life Skills — Little Acts of Friendship</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <style>
+    :root{
+      --bg:#fefaf3;
+      --ink:#243036;
+      --accent:#7fd3ff;
+      --accent-soft:#d9f1ff;
+      --soft-green:#dff7d7;
+      --soft-gold:#ffeab5;
+      --radius:21px;
+      --shadow:0 14px 33px rgba(0,0,0,0.12);
+    }
+
+    *{box-sizing:border-box;}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#ffffff 0%,#e9f7ff 40%,#dbf4e0 100%);
+      color:var(--ink);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:24px 12px 40px;
+    }
+
+    .app-shell{
+      width:100%;
+      max-width:980px;
+      text-align:center;
+    }
+
+    .lt-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 16px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:#135779;
+      font-size:13px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    h1.app-title{
+      margin:4px 0 2px;
+      font-size:27px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+    }
+
+    .app-subtitle{
+      margin:0 0 18px;
+      font-size:15px;
+      color:#4e5c63;
+    }
+
+    .book-wrap{
+      margin:0 auto;
+      margin-top:10px;
+      max-width:920px;
+      background:#fdfdfb;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px 18px 22px;
+      border:1px solid rgba(127,211,255,0.5);
+    }
+
+    .book-inner-friend{
+      display:flex;
+      gap:18px;
+      align-items:stretch;
+      justify-content:center;
+      transition:transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .book-inner-friend.page-turn{
+      transform:scale(0.99) rotateY(2deg);
+      box-shadow:0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    .page{
+      flex:1 1 0;
+      background:#fffcf5;
+      border-radius:16px;
+      padding:18px 16px 20px;
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,0.04);
+    }
+
+    .page-left{
+      background:linear-gradient(145deg,#dff7d7,#f8ffe6);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      align-items:center;
+      text-align:center;
+    }
+
+    .page-right{
+      background:#fffcf5;
+      text-align:left;
+    }
+
+    .page-label{
+      font-size:11px;
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+      color:#2b7a53;
+      margin-bottom:6px;
+    }
+
+    .page-title{
+      font-size:20px;
+      font-weight:700;
+      margin:4px 0 8px;
+    }
+
+    /* Friendship graphic */
+
+    .friend-graphic{
+      margin-top:8px;
+      width:100%;
+      max-width:220px;
+      aspect-ratio:4/3;
+      border-radius:18px;
+      background:linear-gradient(135deg,#7fd3ff,#ffeab5);
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .friend-char{
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      background:#fffcf5;
+      border:3px solid rgba(26,117,159,0.9);
+      box-shadow:0 6px 16px rgba(0,0,0,0.12);
+      position:absolute;
+      top:26px;
+    }
+
+    .friend-char.left{left:30px;}
+    .friend-char.right{right:30px;}
+
+    .friend-char::before{
+      content:"";
+      position:absolute;
+      bottom:-8px;
+      left:50%;
+      transform:translateX(-50%);
+      width:46px;
+      height:22px;
+      border-radius:999px;
+      background:#7fd3ff;
+      opacity:0.8;
+    }
+
+    .friend-eye{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:#28323b;
+      position:absolute;
+      top:26px;
+    }
+
+    .friend-char.left .friend-eye:nth-child(1){left:20px;}
+    .friend-char.left .friend-eye:nth-child(2){right:20px;}
+
+    .friend-char.right .friend-eye:nth-child(1){left:20px;}
+    .friend-char.right .friend-eye:nth-child(2){right:20px;}
+
+    .friend-smile{
+      position:absolute;
+      left:50%;
+      top:40px;
+      width:32px;
+      height:18px;
+      border-radius:0 0 32px 32px;
+      border:3px solid #28323b;
+      border-top:none;
+      transform:translateX(-50%);
+    }
+
+    .friend-heart{
+      position:absolute;
+      bottom:12px;
+      left:50%;
+      transform:translateX(-50%);
+      width:26px;
+      height:22px;
+      background:#ff7da5;
+      transform-origin:center center;
+      clip-path:polygon(50% 82%, 0 35%, 13% 0, 50% 22%, 87% 0, 100% 35%);
+      animation:pulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse{
+      0%{transform:translateX(-50%) scale(1);}
+      50%{transform:translateX(-50%) scale(1.08);}
+      100%{transform:translateX(-50%) scale(1);}
+    }
+
+    .step-tag{
+      font-size:11px;
+      color:#5b6c60;
+      margin-bottom:6px;
+    }
+
+    .story-text{
+      font-size:17px;
+      line-height:1.7;
+      margin:2px 0 12px;
+    }
+
+    .story-tip{
+      font-size:14px;
+      color:#6b756b;
+    }
+
+    .page-counter{
+      font-size:12px;
+      color:#76847a;
+      position:absolute;
+      bottom:8px;
+      right:14px;
+    }
+
+    .controls-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:16px;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .nav-buttons{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+    }
+
+    button.nav-btn{
+      border:none;
+      border-radius:999px;
+      padding:8px 18px;
+      font-size:14px;
+      font-weight:600;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      cursor:pointer;
+      background:linear-gradient(135deg,#7fd3ff,#1c94d4);
+      color:#0f2733;
+      box-shadow:0 10px 20px rgba(0,0,0,0.18);
+      transition:transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+    }
+
+    button.nav-btn:disabled{
+      opacity:0.4;
+      cursor:default;
+      box-shadow:none;
+      transform:none;
+    }
+
+    button.nav-btn:not(:disabled):hover{
+      transform:translateY(-1px);
+      box-shadow:0 13px 26px rgba(0,0,0,0.22);
+    }
+
+    .instructions{
+      flex:1 1 200px;
+      font-size:14px;
+      color:#516169;
+      text-align:center;
+    }
+
+    .instructions strong{
+      font-weight:600;
+    }
+
+    .mode-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 11px;
+      border-radius:999px;
+      background:#e1f5ff;
+      font-size:12px;
+      color:#365566;
+    }
+
+    .mode-pill input{
+      accent-color:#1c94d4;
+    }
+
+    @media (max-width:800px){
+      .book-inner-friend{
+        flex-direction:column;
+      }
+    }
+
+    @media (max-width:520px){
+      h1.app-title{font-size:22px;}
+      .story-text{font-size:16px;}
+      button.nav-btn{font-size:12px;padding:7px 14px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="lt-badge">Little Tikes Life Skills</div>
+    <h1 class="app-title">Little Acts of Friendship</h1>
+    <p class="app-subtitle">
+      A gentle story about saying hello, sharing, listening, and being there for the friends we love.
+    </p>
+
+    <div class="book-wrap">
+      <div id="friendBookInner" class="book-inner-friend">
+        <!-- Left page (scene) -->
+        <div class="page page-left">
+          <div>
+            <div class="page-label">Friendship Story</div>
+            <h2 id="friendLeftTitle" class="page-title">What is a friend?</h2>
+          </div>
+
+          <div class="friend-graphic">
+            <div class="friend-char left">
+              <div class="friend-eye"></div>
+              <div class="friend-eye"></div>
+              <div class="friend-smile"></div>
+            </div>
+            <div class="friend-char right">
+              <div class="friend-eye"></div>
+              <div class="friend-eye"></div>
+              <div class="friend-smile"></div>
+            </div>
+            <div class="friend-heart"></div>
+          </div>
+
+          <div class="page-counter" id="friendPageCounterLeft">Page 1 of 7</div>
+        </div>
+
+        <!-- Right page (text) -->
+        <div class="page page-right">
+          <div class="step-tag" id="friendStepTag">Step 1 · Meet a friend</div>
+          <div class="page-title" id="friendRightTitle">Friends are people we care about.</div>
+          <div class="story-text" id="friendStoryText">
+            A friend is someone we like to be with. We feel safe, silly, or cozy near them.  
+            Friends can be kids, grown-ups, or even pets — anyone we care about and who cares about us.
+          </div>
+          <div class="story-tip" id="friendStoryTip">
+            Grown-up note: Ask your child, “Who feels like a friend to you?” and let them name people, pets, or even stuffed animals.
+          </div>
+          <div class="page-counter" id="friendPageCounterRight">Page 1 of 7</div>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <div class="nav-buttons">
+          <button id="friendPrevBtn" class="nav-btn" type="button" disabled>&larr; Back</button>
+          <button id="friendNextBtn" class="nav-btn" type="button">Next &rarr;</button>
+        </div>
+        <div class="instructions">
+          <strong>How to read:</strong> Tap <em>Next</em> to turn pages and pause to share  
+          real-life examples of kindness and friendship.
+        </div>
+        <div class="mode-pill">
+          <input type="checkbox" id="friendQuietMode" />
+          <label for="friendQuietMode">Quiet Mode (no page sounds)</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const friendPages = [
+      {
+        leftTitle: "What is a friend?",
+        stepTag: "Step 1 · Meet a friend",
+        rightTitle: "Friends are people we care about.",
+        text: "A friend is someone we like to be with. We feel safe, silly, or cozy near them. Friends can be kids, grown-ups, or even pets — anyone we care about and who cares about us.",
+        tip: "Grown-up note: Ask your child, “Who feels like a friend to you?” and let them name people, pets, or even stuffed animals."
+      },
+      {
+        leftTitle: "Saying hello",
+        stepTag: "Step 2 · Start with a hello",
+        rightTitle: "We can invite someone in.",
+        text: "Friendship can start with a simple hello. We can wave, smile, or say, “Hi, do you want to play?” Even a small hello can make someone feel less alone.",
+        tip: "Practice different friendly greetings together in a mirror or with stuffed animals."
+      },
+      {
+        leftTitle: "Sharing our space",
+        stepTag: "Step 3 · Share and take turns",
+        rightTitle: "We make room for others.",
+        text: "Friends share toys, games, and space. We might say, “You can have a turn,” or “Let’s build together.” Sharing doesn’t mean giving things away forever — it means letting someone enjoy them with us.",
+        tip: "Create a “turn-taking” phrase your child can use, like “Your turn, my turn.”"
+      },
+      {
+        leftTitle: "Kind words",
+        stepTag: "Step 4 · Use gentle words",
+        rightTitle: "Words can be hugs.",
+        text: "Kind words help friendships grow. We can say, “Thank you,” “I like playing with you,” or “Good job!” Our words can feel like little hugs for someone’s heart.",
+        tip: "Invite your child to think of one kind thing to say to a friend or sibling today."
+      },
+      {
+        leftTitle: "Listening ears",
+        stepTag: "Step 5 · Listen and look",
+        rightTitle: "We listen with our whole body.",
+        text: "Being a friend means listening. We can look at their face, keep our body calm, and let them finish their words. Listening says, “You matter to me.”",
+        tip: "Model it by kneeling to their level, making eye contact, and reflecting back their words."
+      },
+      {
+        leftTitle: "When we make mistakes",
+        stepTag: "Step 6 · Fixing hurt feelings",
+        rightTitle: "We can say sorry and try again.",
+        text: "Sometimes we bump, grab, or say something unkind. That happens to everyone. A good friend can say, “I’m sorry,” give space if needed, and try again with gentler hands and words.",
+        tip: "Practice simple repair phrases like “I’m sorry I grabbed. Can we try again?”"
+      },
+      {
+        leftTitle: "Being there",
+        stepTag: "Step 7 · Staying kind",
+        rightTitle: "Little acts make big friendship.",
+        text: "Friendship grows from many little acts: sharing a toy, sitting nearby, giving a hug, drawing a picture, or just staying close when someone feels sad. Small kindnesses can make a big, big difference.",
+        tip: "Ask, “What is one small kind thing you could do for a friend today?” and help them carry it out."
+      }
+    ];
+
+    const friendBookInner = document.getElementById('friendBookInner');
+    const friendLeftTitleEl = document.getElementById('friendLeftTitle');
+    const friendStepTagEl = document.getElementById('friendStepTag');
+    const friendRightTitleEl = document.getElementById('friendRightTitle');
+    const friendStoryTextEl = document.getElementById('friendStoryText');
+    const friendStoryTipEl = document.getElementById('friendStoryTip');
+    const friendPageCounterLeftEl = document.getElementById('friendPageCounterLeft');
+    const friendPageCounterRightEl = document.getElementById('friendPageCounterRight');
+    const friendPrevBtn = document.getElementById('friendPrevBtn');
+    const friendNextBtn = document.getElementById('friendNextBtn');
+    const friendQuietModeEl = document.getElementById('friendQuietMode');
+
+    let friendCurrentPage = 0;
+    let friendPageTurnSound = null;
+
+    function friendInitSound(){
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      friendPageTurnSound = () => {
+        if(friendQuietModeEl.checked) return;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.03, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + 0.16);
+      };
+    }
+
+    function friendRenderPage(){
+      const total = friendPages.length;
+      const p = friendPages[friendCurrentPage];
+      friendLeftTitleEl.textContent = p.leftTitle;
+      friendStepTagEl.textContent = p.stepTag;
+      friendRightTitleEl.textContent = p.rightTitle;
+      friendStoryTextEl.textContent = p.text;
+      friendStoryTipEl.textContent = p.tip;
+      friendPageCounterLeftEl.textContent = `Page ${friendCurrentPage+1} of ${total}`;
+      friendPageCounterRightEl.textContent = `Page ${friendCurrentPage+1} of ${total}`;
+      friendPrevBtn.disabled = friendCurrentPage === 0;
+      friendNextBtn.disabled = friendCurrentPage === total - 1;
+    }
+
+    function friendTurnPage(direction){
+      const total = friendPages.length;
+      let newPage = friendCurrentPage + direction;
+      if(newPage < 0 || newPage >= total) return;
+      friendCurrentPage = newPage;
+
+      friendBookInner.classList.add('page-turn');
+      setTimeout(() => {
+        friendBookInner.classList.remove('page-turn');
+      }, 260);
+
+      if(friendPageTurnSound){
+        friendPageTurnSound();
+      }
+
+      friendRenderPage();
+    }
+
+    friendPrevBtn.addEventListener('click', () => friendTurnPage(-1));
+    friendNextBtn.addEventListener('click', () => friendTurnPage(1));
+
+    document.addEventListener('keydown',(e)=>{
+      if(e.key === 'ArrowRight') friendTurnPage(1);
+      if(e.key === 'ArrowLeft') friendTurnPage(-1);
+    });
+
+    friendRenderPage();
+    setTimeout(friendInitSound, 400);
+  </script>
+</body>
+</html>
