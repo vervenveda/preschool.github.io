@@ -375,10 +375,16 @@
 
   .word-title{
     color:#5c3d8e;
-    font-family:Georgia,"Times New Roman",serif;
-    font-size:clamp(2.25rem,7vw,4.3rem);
-    font-weight:800;
-    overflow-wrap:anywhere;
+    font-family:"Comic Sans MS","Trebuchet MS","Segoe Print",system-ui,sans-serif;
+    font-size:clamp(1.55rem,5.2vw,3.35rem);
+    font-weight:900;
+    line-height:1.05;
+    letter-spacing:-.025em;
+    white-space:nowrap;
+    overflow:visible;
+    overflow-wrap:normal;
+    word-break:normal;
+    max-width:100%;
   }
 
   .pron{
@@ -937,6 +943,24 @@ const WORD_EMOJIS = {
   twinkle:"⭐", cosmic:"🪐", buoyant:"🎈", hush:"🤫", glimmer:"💫"
 };
 
+function fitWordOnOneLine(){
+  const el = document.getElementById("wordText");
+  if(!el) return;
+
+  el.style.fontSize = "";
+  const container = el.parentElement;
+  if(!container) return;
+
+  const available = Math.max(120, container.clientWidth - 4);
+  let size = parseFloat(getComputedStyle(el).fontSize);
+  const minimum = window.innerWidth < 480 ? 18 : 22;
+
+  while(el.scrollWidth > available && size > minimum){
+    size -= 1;
+    el.style.fontSize = size + "px";
+  }
+}
+
 function emojiForWord(item){
   if(WORD_EMOJIS[item.word]) return WORD_EMOJIS[item.word];
   const tags=(item.tags||[]).join(" ").toLowerCase();
@@ -1091,6 +1115,7 @@ function renderWord(idx){
 
   wordEmoji.textContent = emojiForWord(w);
   wordText.textContent = w.word || "—";
+  requestAnimationFrame(fitWordOnOneLine);
   pronText.textContent = w.pronunciation ? "/"+w.pronunciation+"/" : "";
   wordIdLine.textContent = w.id ? "Word ID: "+w.id : "";
   const tags = (w.tags||[]).join(", ");
@@ -1326,6 +1351,7 @@ function init(){
 }
 init();
 setTimeout(setupVoices, 600);
+window.addEventListener("resize", ()=>requestAnimationFrame(fitWordOnOneLine));
 </script>
 </body>
 </html>
