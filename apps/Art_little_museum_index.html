@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Little Tykes World Art Museum — a colorful child-friendly portal to free online art museum resources around the world.">
+<title>Little Tykes World Art Museum</title>
+<style>
+:root{
+  --plum:#654ba6;
+  --violet:#8e6bd6;
+  --rose:#e978aa;
+  --coral:#ff8d74;
+  --sun:#ffd166;
+  --mint:#70d0ad;
+  --aqua:#63c9ca;
+  --sky:#68b5e4;
+  --ink:#332d43;
+  --muted:#71697c;
+  --good:#3caf72;
+  --panel:rgba(255,255,255,.92);
+  --shadow:0 22px 58px rgba(68,45,88,.16);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--ink);
+  font-family:"Comic Sans MS","Trebuchet MS",system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 10% 10%,rgba(255,255,255,.92) 0 5%,transparent 6%),
+    radial-gradient(circle at 90% 14%,rgba(255,255,255,.72) 0 4%,transparent 5%),
+    linear-gradient(145deg,#fff0c7 0%,#f6e7ff 42%,#dff6ff 100%);
+  overflow-x:hidden;
+}
+button,input,select,textarea{font:inherit}
+button{touch-action:manipulation}
+a{text-decoration:none;color:inherit}
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.sky span{
+  position:absolute;
+  font-size:clamp(1.2rem,3vw,2.2rem);
+  opacity:.32;
+  animation:float 12s ease-in-out infinite;
+}
+.sky span:nth-child(1){left:4%;top:12%}
+.sky span:nth-child(2){left:18%;top:76%;animation-delay:-3s}
+.sky span:nth-child(3){left:43%;top:7%;animation-delay:-5s}
+.sky span:nth-child(4){left:72%;top:80%;animation-delay:-8s}
+.sky span:nth-child(5){left:90%;top:18%;animation-delay:-10s}
+@keyframes float{50%{transform:translateY(-24px) rotate(7deg) scale(1.08)}}
+
+.app{
+  position:relative;z-index:1;
+  width:min(1200px,calc(100% - 22px));
+  margin:0 auto;
+  padding:22px 0 48px;
+}
+.hero{
+  color:white;
+  text-align:center;
+  padding:31px 20px 27px;
+  border-radius:34px;
+  background:
+    radial-gradient(circle at 18% 20%,rgba(255,255,255,.18),transparent 22%),
+    linear-gradient(135deg,var(--plum),var(--violet),var(--rose),var(--coral));
+  box-shadow:var(--shadow);
+}
+.hero h1{
+  margin:0;
+  font-size:clamp(2.2rem,7vw,4.9rem);
+  line-height:.97;
+  letter-spacing:-.05em;
+}
+.hero p{
+  margin:9px auto 0;
+  max-width:860px;
+  color:#fff4fb;
+  line-height:1.6;
+}
+.hero-icons{
+  display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;
+}
+.hero-icons span{
+  width:50px;height:50px;display:grid;place-items:center;
+  border-radius:18px;background:rgba(255,255,255,.16);font-size:1.9rem;
+}
+.notice{
+  display:inline-block;
+  margin-top:13px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.15);
+  font-size:.86rem;
+  font-weight:850;
+}
+.toolbar{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:15px 0;
+}
+button,.pill,select,input[type="search"]{
+  border-radius:999px;padding:10px 14px;font-weight:850;
+}
+button{
+  border:0;cursor:pointer;
+  background:linear-gradient(135deg,var(--sun),var(--coral));
+  color:#3c2a16;
+  box-shadow:0 7px 18px rgba(94,56,24,.13);
+  transition:.18s ease;
+}
+button:hover{transform:translateY(-2px)}
+button.secondary{background:white;color:var(--plum);border:1px solid #dfd7e8}
+button.active{color:white;background:linear-gradient(135deg,var(--violet),var(--rose))}
+button.good{background:linear-gradient(135deg,#79dc9f,var(--good));color:#123621}
+.pill,select,input[type="search"]{background:white;border:1px solid #ded7e6;color:var(--plum)}
+input[type="search"]{min-width:min(310px,90vw)}
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px;
+}
+.stat{
+  background:rgba(255,255,255,.9);border-radius:18px;padding:11px;text-align:center;
+  box-shadow:0 8px 20px rgba(62,42,81,.08);
+}
+.stat strong{display:block;font-size:1.24rem;color:var(--violet)}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.18fr) minmax(320px,.82fr);
+  gap:16px;
+}
+.panel{
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.96);
+  border-radius:28px;padding:18px;box-shadow:var(--shadow);
+}
+.section-title{margin:0 0 5px;color:var(--plum);font-size:1.45rem}
+.section-sub{color:var(--muted);margin:0 0 14px;line-height:1.5}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(235px,1fr));
+  gap:12px;
+}
+.card{
+  min-height:265px;
+  border-radius:22px;
+  padding:15px;
+  background:
+    radial-gradient(circle at 85% 14%,rgba(255,255,255,.9),transparent 24%),
+    linear-gradient(145deg,#fff,#fff8ec,#f7f1ff);
+  border:1px solid #e8dfea;
+  box-shadow:0 10px 24px rgba(64,42,84,.08);
+  display:flex;flex-direction:column;
+  transition:.2s ease;
+}
+.card:hover{transform:translateY(-4px);box-shadow:0 15px 30px rgba(64,42,84,.13)}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-icon{
+  width:54px;height:54px;border-radius:18px;display:grid;place-items:center;
+  color:white;font-size:1.9rem;
+  background:linear-gradient(145deg,var(--violet),var(--rose),var(--coral));
+}
+.flag{font-size:1.65rem}
+.card h3{margin:10px 0 5px;color:var(--plum)}
+.location{color:#8a668f;font-size:.82rem;font-weight:850}
+.card p{margin:8px 0 0;color:var(--muted);line-height:1.45;font-size:.94rem}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
+.tag{
+  padding:4px 7px;border-radius:999px;background:#f1ecf8;color:#664d81;
+  font-size:.73rem;font-weight:850;
+}
+.card-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto;padding-top:12px}
+.card-actions a,.card-actions button{
+  flex:1;text-align:center;padding:8px 10px;border-radius:999px;font-weight:900;font-size:.84rem;
+}
+.visit{color:white;background:linear-gradient(135deg,var(--violet),var(--rose))}
+.passport{background:white;color:var(--plum);border:1px solid #ddd3e5;box-shadow:none}
+.passport.stamped{background:#fff2b9}
+.side-stack{display:grid;gap:14px}
+.activity{
+  border-radius:22px;padding:15px;background:linear-gradient(145deg,#fff,#fff9ed);
+  border:1px solid #ebe3ee;
+}
+.activity h2{margin:0 0 7px;color:var(--plum);font-size:1.22rem}
+.tour-card{
+  min-height:145px;border-radius:20px;padding:15px;display:grid;place-items:center;
+  text-align:center;color:white;
+  background:
+    radial-gradient(circle at 20% 18%,rgba(255,255,255,.2),transparent 24%),
+    linear-gradient(145deg,var(--violet),var(--rose),var(--coral));
+  font-size:1.05rem;font-weight:900;line-height:1.5;
+}
+.passport-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:9px;
+}
+.stamp{
+  aspect-ratio:1;border-radius:18px;display:grid;place-items:center;
+  background:#f3eef7;border:2px dashed #cdbed8;font-size:1.45rem;opacity:.45;
+}
+.stamp.earned{opacity:1;background:#fff1b8;border-style:solid;animation:pop .3s ease}
+@keyframes pop{from{transform:scale(.65)}to{transform:scale(1)}}
+textarea{
+  width:100%;min-height:115px;resize:vertical;
+  border-radius:18px;border:2px solid #e2d8e8;padding:11px;color:var(--ink);
+  background:white;
+}
+.progress{height:12px;border-radius:999px;overflow:hidden;background:#e9e3ed}
+.progress>div{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--rose),var(--sun),var(--mint),var(--sky));
+  transition:width .35s ease;
+}
+.empty{padding:28px;border-radius:20px;background:#faf7ff;text-align:center;color:var(--muted)}
+.site-footer{
+  margin-top:16px;padding:15px 12px;text-align:center;border-radius:18px;
+  background:rgba(255,255,255,.78);border:1px solid rgba(90,60,120,.12);
+  color:#665b72;font-size:.84rem;line-height:1.5;
+}
+.site-footer strong{color:#503a76}
+#backToTop{
+  position:fixed;right:18px;bottom:18px;z-index:10;display:none;
+  width:50px;height:50px;padding:0;border-radius:50%;
+}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:520px){.passport-grid{grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important}
+}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"><span>🏛️</span><span>🌍</span><span>🎨</span><span>✨</span><span>🧳</span></div>
+
+<main class="app">
+  <header class="hero">
+    <h1>Little Tykes World Art Museum</h1>
+    <p>Pack your imagination and visit child-friendly museum rooms around the world through free official online collections, activities, stories, and family resources.</p>
+    <div class="hero-icons"><span>🏛️</span><span>🌍</span><span>🎨</span><span>🧳</span></div>
+    <div class="notice">Free online exploration links · Museum admission and special events may vary</div>
+  </header>
+
+  <div class="toolbar">
+    <button class="region active" data-region="all">🌍 All Wings</button>
+    <button class="region secondary" data-region="north-america">North America</button>
+    <button class="region secondary" data-region="europe">Europe</button>
+    <button class="region secondary" data-region="asia-pacific">Asia–Pacific</button>
+    <button class="region secondary" data-region="passport">★ My Passport</button>
+    <input id="searchBox" type="search" placeholder="Search museums or activities">
+  </div>
+
+  <section class="stats">
+    <div class="stat"><strong id="museumStat">0</strong>Museum Rooms</div>
+    <div class="stat"><strong id="stampStat">0</strong>Passport Stamps</div>
+    <div class="stat"><strong id="regionStat">0</strong>Regions Explored</div>
+    <div class="stat"><strong id="journalStat">0</strong>Journal Notes</div>
+  </section>
+
+  <div class="layout">
+    <section class="panel">
+      <h2 class="section-title">🖼️ World Museum Wings</h2>
+      <p class="section-sub">Every card opens an official museum website with free online material suitable for family or classroom exploration.</p>
+      <div class="cards" id="museumCards"></div>
+    </section>
+
+    <aside class="side-stack">
+      <section class="activity">
+        <h2>🎲 Surprise Museum Tour</h2>
+        <div class="tour-card" id="tourCard">Press the button to choose a museum and receive a looking challenge.</div>
+        <div style="text-align:center;margin-top:9px">
+          <button id="tourBtn">Choose My Tour</button>
+          <button id="speakTour" class="secondary">🔊 Read It</button>
+        </div>
+      </section>
+
+      <section class="activity">
+        <h2>🛂 My Museum Passport</h2>
+        <div class="passport-grid" id="passportGrid"></div>
+        <p class="section-sub" id="passportText" style="margin-top:8px"></p>
+      </section>
+
+      <section class="activity">
+        <h2>✏️ Little Curator Journal</h2>
+        <textarea id="journal" placeholder="What did you notice? Which colors, shapes, people, animals, or stories did you find?"></textarea>
+        <div style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+          <button id="saveJournal">Save Note</button>
+          <button id="clearJournal" class="secondary">Clear</button>
+        </div>
+      </section>
+
+      <section class="activity">
+        <h2>🌟 World Tour Progress</h2>
+        <div class="progress"><div id="progressBar"></div></div>
+        <p class="section-sub" id="progressText" style="margin-top:8px"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <strong>© 2026 Verve N Veda · Khaemenes Academy · Jennifer Kay Pearl</strong><br>
+    All Rights Reserved.
+  </footer>
+</main>
+
+<button id="backToTop" aria-label="Back to top">⬆️</button>
+
+<script>
+(() => {
+"use strict";
+
+const MUSEUMS = [
+  {
+    id:"nga",name:"National Gallery of Art",city:"Washington, D.C., United States",
+    flag:"🇺🇸",icon:"🖼️",region:"north-america",
+    desc:"Paint-and-play activities, free coloring pages, art games, family guides, and art-inspired projects.",
+    tags:["Games","Coloring","Family"],url:"https://www.nga.gov/fun-and-games"
+  },
+  {
+    id:"met",name:"#MetKids — The Metropolitan Museum of Art",city:"New York, United States",
+    flag:"🇺🇸",icon:"🗺️",region:"north-america",
+    desc:"Kid-centered museum exploration with art stories, objects, videos, questions, and creative activities.",
+    tags:["Kids","Stories","Collection"],url:"https://www.metmuseum.org/art/online-features/metkids/"
+  },
+  {
+    id:"moma",name:"MoMA Family and Kids Guides",city:"New York, United States",
+    flag:"🇺🇸",icon:"🎧",region:"north-america",
+    desc:"Kids audio, downloadable activity guides, close-looking prompts, sensory resources, and at-home art activities.",
+    tags:["Audio","Modern Art","Activities"],url:"https://www.moma.org/visit/families/kids-guides"
+  },
+  {
+    id:"smithsonian",name:"Smithsonian Learning Lab",city:"Washington, D.C., United States",
+    flag:"🇺🇸",icon:"🔍",region:"north-america",
+    desc:"Explore millions of museum images, videos, texts, recordings, and educator-created learning collections.",
+    tags:["Collections","Research","Create"],url:"https://learninglab.si.edu/"
+  },
+  {
+    id:"getty",name:"Getty Online Field Trips",city:"Los Angeles, United States",
+    flag:"🇺🇸",icon:"🚌",region:"north-america",
+    desc:"Interactive, no-login museum journeys with artwork discoveries and age-appropriate pathways.",
+    tags:["Field Trip","Interactive","No Login"],url:"https://www.getty.edu/education/field-trips/online-field-trips/"
+  },
+  {
+    id:"ago",name:"Art Gallery of Ontario — Family Resources",city:"Toronto, Canada",
+    flag:"🇨🇦",icon:"🖍️",region:"north-america",
+    desc:"Free coloring cards, activity books, art-making videos, close-looking questions, and family learning resources.",
+    tags:["Coloring","Videos","Families"],url:"https://ago.ca/learn/learning-resources/families"
+  },
+  {
+    id:"tate",name:"Tate Kids",city:"United Kingdom",
+    flag:"🇬🇧",icon:"🎮",region:"europe",
+    desc:"Play art games, learn about artists, watch videos, take quizzes, and try creative activities.",
+    tags:["Games","Artists","Making"],url:"https://www.tate.org.uk/kids"
+  },
+  {
+    id:"louvre",name:"Louvre Kids and Family Exploration",city:"Paris, France",
+    flag:"🇫🇷",icon:"🏰",region:"europe",
+    desc:"Discover masterpieces, family visitor trails, stories, videos, and child-friendly museum resources.",
+    tags:["Masterpieces","Stories","Family"],url:"https://www.louvre.fr/en/visit/visit-as-a-family"
+  },
+  {
+    id:"rijks",name:"Rijksmuseum Families and Children",city:"Amsterdam, Netherlands",
+    flag:"🇳🇱",icon:"🚲",region:"europe",
+    desc:"Explore thousands of treasures, family quests, collection stories, activities, and museum adventures.",
+    tags:["Treasures","Family Quest","Stories"],url:"https://www.rijksmuseum.nl/en/families-and-children"
+  },
+  {
+    id:"prado",name:"Museo Nacional del Prado Education",city:"Madrid, Spain",
+    flag:"🇪🇸",icon:"👑",region:"europe",
+    desc:"Explore art education programs, collection-based learning, family activities, and cultural connections.",
+    tags:["Painting","Education","Culture"],url:"https://www.museodelprado.es/en/learn/pradoeducacion"
+  },
+  {
+    id:"ngv",name:"NGV Kids",city:"Melbourne, Australia",
+    flag:"🇦🇺",icon:"🦘",region:"asia-pacific",
+    desc:"Free online activity sheets, games, collection exploration, sensory experiences, and creative family programs.",
+    tags:["Games","Activity Sheets","Kids"],url:"https://www.ngv.vic.gov.au/kids/"
+  },
+  {
+    id:"tokyo",name:"Tokyo National Museum — Family and Children",city:"Tokyo, Japan",
+    flag:"🇯🇵",icon:"🌸",region:"asia-pacific",
+    desc:"Family programs, workshops, hands-on activities, exhibitions for children, and guidance for young visitors.",
+    tags:["Japanese Art","Workshops","Families"],url:"https://www.tnm.jp/modules/r_free_page/index.php?id=2670&lang=en"
+  }
+];
+
+const CHALLENGES = [
+  "Find an artwork with an animal. What do you think the animal is doing?",
+  "Choose one artwork and name every color you can see.",
+  "Look for a face. Copy the expression and imagine what the person is thinking.",
+  "Find three shapes hidden inside an artwork.",
+  "Choose an artwork that tells a story. What happened just before this moment?",
+  "Find something tiny and something enormous.",
+  "Look for repeated lines, dots, or patterns.",
+  "Choose a sculpture and imagine how it would move if it came alive.",
+  "Find an artwork from a place far from your home.",
+  "Pick one artwork and invent a sound or song for it.",
+  "Find a work showing nature. What might you hear, smell, or feel there?",
+  "Choose an artwork you would place in your own imaginary museum."
+];
+
+const state={
+  region:"all",
+  query:"",
+  stamps:new Set(JSON.parse(localStorage.getItem("littleMuseumStamps")||"[]")),
+  journal:localStorage.getItem("littleMuseumJournal")||"",
+  journalSaves:Number(localStorage.getItem("littleMuseumJournalSaves")||0),
+  currentTour:""
+};
+
+const $=id=>document.getElementById(id);
+
+function save(){
+  localStorage.setItem("littleMuseumStamps",JSON.stringify([...state.stamps]));
+  localStorage.setItem("littleMuseumJournal",state.journal);
+  localStorage.setItem("littleMuseumJournalSaves",String(state.journalSaves));
+}
+
+function filtered(){
+  const q=state.query.trim().toLowerCase();
+  return MUSEUMS.filter(m=>{
+    const regionOK=state.region==="all"
+      ||state.region==="passport"&&state.stamps.has(m.id)
+      ||m.region===state.region;
+    const searchOK=!q||`${m.name} ${m.city} ${m.desc} ${m.tags.join(" ")}`.toLowerCase().includes(q);
+    return regionOK&&searchOK;
+  });
+}
+
+function renderCards(){
+  const cards=$("museumCards");
+  const list=filtered();
+  cards.innerHTML="";
+  if(!list.length){
+    cards.innerHTML='<div class="empty">No museum rooms match this search yet.</div>';
+  }
+  list.forEach(m=>{
+    const card=document.createElement("article");
+    card.className="card";
+    card.innerHTML=`
+      <div class="card-top">
+        <div class="card-icon">${m.icon}</div>
+        <div class="flag">${m.flag}</div>
+      </div>
+      <h3>${m.name}</h3>
+      <div class="location">${m.city}</div>
+      <p>${m.desc}</p>
+      <div class="tags">${m.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+      <div class="card-actions">
+        <a class="visit" href="${m.url}" target="_blank" rel="noopener noreferrer">Enter Museum</a>
+        <button class="passport ${state.stamps.has(m.id)?"stamped":""}" type="button">
+          ${state.stamps.has(m.id)?"★ Stamped":"☆ Stamp"}
+        </button>
+      </div>
+    `;
+    card.querySelector(".passport").addEventListener("click",()=>{
+      if(state.stamps.has(m.id))state.stamps.delete(m.id);
+      else state.stamps.add(m.id);
+      save();
+      renderAll();
+    });
+    cards.appendChild(card);
+  });
+  $("museumStat").textContent=list.length;
+}
+
+function renderPassport(){
+  const box=$("passportGrid");
+  box.innerHTML="";
+  MUSEUMS.forEach(m=>{
+    const s=document.createElement("div");
+    s.className="stamp"+(state.stamps.has(m.id)?" earned":"");
+    s.title=m.name;
+    s.textContent=state.stamps.has(m.id)?m.flag:"?";
+    box.appendChild(s);
+  });
+  $("passportText").textContent=`${state.stamps.size} of ${MUSEUMS.length} museum stamps collected.`;
+}
+
+function renderFilters(){
+  document.querySelectorAll(".region").forEach(b=>{
+    b.classList.toggle("active",b.dataset.region===state.region);
+    b.classList.toggle("secondary",b.dataset.region!==state.region);
+  });
+}
+
+function updateStats(){
+  $("stampStat").textContent=state.stamps.size;
+  const regions=new Set(MUSEUMS.filter(m=>state.stamps.has(m.id)).map(m=>m.region));
+  $("regionStat").textContent=regions.size;
+  $("journalStat").textContent=state.journalSaves;
+  $("progressBar").style.width=(state.stamps.size/MUSEUMS.length*100)+"%";
+  $("progressText").textContent=state.stamps.size===MUSEUMS.length
+    ?"Your world museum passport is complete! 🌍"
+    :`${state.stamps.size} of ${MUSEUMS.length} museums explored.`;
+}
+
+function renderAll(){
+  renderFilters();
+  renderCards();
+  renderPassport();
+  updateStats();
+}
+
+function randomTour(){
+  const museum=MUSEUMS[Math.floor(Math.random()*MUSEUMS.length)];
+  const challenge=CHALLENGES[Math.floor(Math.random()*CHALLENGES.length)];
+  state.currentTour=`Today we are visiting ${museum.name} in ${museum.city}. Your curator challenge: ${challenge}`;
+  $("tourCard").textContent=state.currentTour;
+}
+
+function speak(text){
+  if(!("speechSynthesis" in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  const voices=speechSynthesis.getVoices();
+  u.voice=voices.find(v=>/child|kid|jenny|samantha|aria|female/i.test(v.name)&&/^en/i.test(v.lang))
+    ||voices.find(v=>/^en/i.test(v.lang))||voices[0]||null;
+  u.rate=.88;u.pitch=1.08;
+  speechSynthesis.speak(u);
+}
+
+document.querySelectorAll(".region").forEach(b=>b.addEventListener("click",()=>{
+  state.region=b.dataset.region;
+  renderAll();
+}));
+$("searchBox").addEventListener("input",e=>{state.query=e.target.value;renderCards()});
+$("tourBtn").addEventListener("click",randomTour);
+$("speakTour").addEventListener("click",()=>speak(state.currentTour||$("tourCard").textContent));
+$("journal").value=state.journal;
+$("saveJournal").addEventListener("click",()=>{
+  state.journal=$("journal").value;
+  state.journalSaves++;
+  save();
+  updateStats();
+});
+$("clearJournal").addEventListener("click",()=>{
+  $("journal").value="";
+  state.journal="";
+  save();
+});
+$("backToTop").addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+window.addEventListener("scroll",()=>{
+  $("backToTop").style.display=document.documentElement.scrollTop>300?"block":"none";
+});
+
+renderAll();
+})();
+</script>
+</body>
+</html>
