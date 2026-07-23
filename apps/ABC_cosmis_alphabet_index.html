@@ -1,1 +1,754 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Cosmic Alphabet — a sovereign Arabic alphabet discovery game exploring space, Earth, nature, science, and life.">
+<title>Cosmic Alphabet</title>
+<style>
+:root{
+  --space:#0d1238;
+  --space2:#242268;
+  --violet:#7b5bd6;
+  --gold:#f4c95d;
+  --sun:#ffb347;
+  --rose:#e26d9f;
+  --sky:#65cef4;
+  --mint:#66d2af;
+  --earth:#3d9b65;
+  --paper:#fffdf8;
+  --ink:#2f2942;
+  --muted:#756d86;
+  --good:#3bb273;
+  --bad:#d85b6a;
+  --shadow:0 20px 60px rgba(20,17,58,.22);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--ink);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 15% 12%,rgba(255,255,255,.85) 0 2px,transparent 3px),
+    radial-gradient(circle at 80% 20%,rgba(255,255,255,.7) 0 2px,transparent 3px),
+    linear-gradient(145deg,#fdf1bd 0%,#dff5ff 45%,#ebddff 100%);
+  overflow-x:hidden;
+}
+button,select{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.app{
+  width:min(1180px,calc(100% - 22px));
+  margin:0 auto;
+  padding:22px 0 52px;
+}
+.hero{
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+  color:white;
+  border-radius:34px;
+  padding:30px 20px 28px;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(255,255,255,.16),transparent 24%),
+    radial-gradient(circle at 75% 30%,rgba(244,201,93,.18),transparent 25%),
+    linear-gradient(135deg,var(--space),var(--space2),#4c2d7b);
+  box-shadow:var(--shadow);
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:
+    radial-gradient(circle at 12% 22%,#fff 0 1.5px,transparent 2px),
+    radial-gradient(circle at 36% 15%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 66% 25%,#fff 0 1.5px,transparent 2px),
+    radial-gradient(circle at 84% 12%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 52% 74%,#fff 0 1px,transparent 1.5px);
+  opacity:.8;
+}
+.hero > *{position:relative;z-index:1}
+.badge{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:7px 13px;
+  border-radius:999px;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.28);
+  font-weight:800;
+  font-size:.85rem;
+}
+.hero h1{
+  margin:12px 0 8px;
+  font-size:clamp(2.4rem,7vw,5.4rem);
+  line-height:.96;
+  letter-spacing:-.05em;
+}
+.hero p{
+  max-width:760px;
+  margin:0 auto;
+  line-height:1.6;
+  color:#eeeaff;
+}
+.hero-icons{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:18px;
+  font-size:2rem;
+}
+.hero-icons span{
+  display:grid;
+  place-items:center;
+  width:52px;height:52px;
+  border-radius:17px;
+  background:rgba(255,255,255,.12);
+  animation:float 3s ease-in-out infinite;
+}
+.hero-icons span:nth-child(2){animation-delay:-.5s}
+.hero-icons span:nth-child(3){animation-delay:-1s}
+.hero-icons span:nth-child(4){animation-delay:-1.5s}
+.hero-icons span:nth-child(5){animation-delay:-2s}
+@keyframes float{50%{transform:translateY(-8px) rotate(2deg)}}
+
+.toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  justify-content:center;
+  margin:16px 0;
+}
+button,.pill{
+  border:0;
+  border-radius:999px;
+  padding:10px 14px;
+  font-weight:850;
+}
+button{
+  background:linear-gradient(135deg,var(--gold),var(--sun));
+  color:#392a14;
+  box-shadow:0 7px 18px rgba(90,56,25,.14);
+  transition:.18s ease;
+}
+button:hover{transform:translateY(-2px)}
+button.secondary{
+  background:white;
+  color:var(--space2);
+  border:1px solid #ded8ee;
+}
+button.good{
+  background:linear-gradient(135deg,#79dea8,var(--good));
+  color:#113421;
+}
+button.danger{
+  background:white;
+  color:var(--bad);
+  border:1px solid #efc4cb;
+}
+.pill{
+  background:rgba(255,255,255,.9);
+  border:1px solid rgba(80,60,120,.12);
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:14px;
+}
+.stat{
+  background:rgba(255,255,255,.9);
+  border-radius:18px;
+  padding:12px;
+  text-align:center;
+  box-shadow:0 8px 22px rgba(56,40,76,.08);
+}
+.stat strong{
+  display:block;
+  color:var(--violet);
+  font-size:1.25rem;
+}
+.main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr);
+  gap:16px;
+}
+.panel{
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:28px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+.panel h2{
+  margin:0 0 6px;
+  color:var(--space2);
+}
+.muted{color:var(--muted)}
+.letter-stage{
+  display:grid;
+  grid-template-columns:190px 1fr;
+  gap:16px;
+  align-items:center;
+  border-radius:26px;
+  padding:18px;
+  background:
+    radial-gradient(circle at 80% 20%,rgba(255,255,255,.7),transparent 25%),
+    linear-gradient(135deg,#fff5ce,#dff8ff,#eee3ff);
+}
+.big-letter{
+  min-height:200px;
+  display:grid;
+  place-items:center;
+  border-radius:28px;
+  background:linear-gradient(145deg,var(--space),var(--violet));
+  color:var(--gold);
+  font-size:clamp(6rem,14vw,10rem);
+  direction:rtl;
+  box-shadow:0 16px 34px rgba(30,22,70,.2);
+}
+.letter-meta h3{
+  margin:0;
+  font-size:1.8rem;
+}
+.arabic-name{
+  direction:rtl;
+  color:var(--rose);
+  font-size:1.65rem;
+  font-weight:900;
+}
+.example-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:12px;
+  padding:12px;
+  border-radius:18px;
+  background:white;
+}
+.example-card .emoji{font-size:2.8rem}
+.example-arabic{direction:rtl;font-size:1.5rem;font-weight:900}
+.forms{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:12px;
+}
+.form{
+  text-align:center;
+  padding:9px;
+  border-radius:14px;
+  background:white;
+  border:1px solid #ebe4f1;
+}
+.form span{display:block;font-size:.72rem;color:var(--muted)}
+.form strong{font-size:1.5rem;direction:rtl}
+.game-block{
+  margin-top:16px;
+  padding:16px;
+  border-radius:24px;
+  background:linear-gradient(145deg,#fff,#fff9ed);
+  border:1px solid #eee7f2;
+}
+.choices{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+.choice{
+  min-height:120px;
+  border-radius:22px;
+  border:2px solid #ece5f3;
+  background:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:5px;
+  font-size:2.5rem;
+  color:var(--ink);
+}
+.choice small{
+  font-size:.8rem;
+  color:var(--muted);
+}
+.choice.correct{
+  outline:4px solid var(--good);
+  background:#eafff2;
+}
+.choice.wrong{
+  outline:4px solid var(--bad);
+  background:#fff0f2;
+}
+.side-stack{display:grid;gap:14px}
+.letter-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:7px;
+  max-height:330px;
+  overflow:auto;
+}
+.letter-btn{
+  aspect-ratio:1/1;
+  border-radius:14px;
+  padding:0;
+  background:white;
+  border:1px solid #e5def0;
+  color:var(--space2);
+  box-shadow:none;
+  font-size:1.45rem;
+}
+.letter-btn.active{
+  background:linear-gradient(135deg,var(--violet),var(--rose));
+  color:white;
+}
+.story-card{
+  min-height:200px;
+  border-radius:22px;
+  padding:16px;
+  background:
+    radial-gradient(circle at 80% 20%,rgba(255,255,255,.7),transparent 24%),
+    linear-gradient(145deg,#e9f9ff,#f9eaff,#fff6dc);
+}
+.story-emoji{
+  font-size:3.4rem;
+  text-align:center;
+  margin-bottom:10px;
+}
+.story-arabic{
+  direction:rtl;
+  text-align:center;
+  font-size:1.35rem;
+  font-weight:900;
+  color:var(--space2);
+}
+.story-latin,.story-english{text-align:center;margin-top:5px}
+.progress{
+  height:12px;
+  background:#ece5f3;
+  border-radius:999px;
+  overflow:hidden;
+}
+.progress > div{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,var(--rose),var(--gold),var(--mint));
+  transition:width .35s ease;
+}
+.message{
+  min-height:28px;
+  margin-top:10px;
+  font-weight:850;
+  color:var(--violet);
+}
+.reward{
+  position:fixed;
+  z-index:20;
+  pointer-events:none;
+  font-size:28px;
+  animation:reward 1.2s ease-out forwards;
+}
+@keyframes reward{
+  to{opacity:0;transform:translateY(-100px) rotate(25deg) scale(1.35)}
+}
+.footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:.85rem;
+  margin-top:18px;
+}
+@media(max-width:900px){
+  .main-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:620px){
+  .letter-stage{grid-template-columns:1fr;text-align:center}
+  .big-letter{min-height:150px}
+  .forms{grid-template-columns:repeat(2,1fr)}
+  .choices{grid-template-columns:1fr 1fr}
+  .letter-grid{grid-template-columns:repeat(5,1fr)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+  }
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="hero">
+    <div class="badge">🌌 Khaemenes Academy • Preschool Languages</div>
+    <h1>Cosmic Alphabet</h1>
+    <p>Blast into the universe and discover the Arabic alphabet through stars, planets, animals, oceans, forests, weather, science, people, and all life on Earth.</p>
+    <div class="hero-icons" aria-hidden="true">
+      <span>🌙</span><span>🌍</span><span>🦊</span><span>🌊</span><span>🔬</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button id="hearBtn">🔊 Hear Letter</button>
+    <button id="newRoundBtn">🪐 New Picture Round</button>
+    <button id="storyBtn" class="secondary">✨ New Cosmic Story</button>
+    <button id="themeBtn" class="secondary">🎨 Change Theme</button>
+    <button id="resetBtn" class="danger">↺ Reset Progress</button>
+  </div>
+
+  <section class="stats">
+    <div class="stat"><strong id="letterStat">ا</strong>Current Letter</div>
+    <div class="stat"><strong id="starStat">0</strong>Stars</div>
+    <div class="stat"><strong id="completeStat">0</strong>Letters Explored</div>
+    <div class="stat"><strong id="roundStat">0</strong>Correct Rounds</div>
+  </section>
+
+  <div class="main-grid">
+    <section class="panel">
+      <div id="letterStage"></div>
+
+      <div class="game-block">
+        <h2>🪐 Cosmic Picture Match</h2>
+        <p class="muted">Choose the image that matches the Arabic word.</p>
+        <div id="question"></div>
+        <div class="choices" id="choices"></div>
+        <div class="message" id="message"></div>
+      </div>
+    </section>
+
+    <aside class="side-stack">
+      <section class="panel">
+        <h2>🌟 Letter Orbit</h2>
+        <p class="muted">Choose any Arabic letter.</p>
+        <div class="letter-grid" id="letterGrid"></div>
+      </section>
+
+      <section class="panel">
+        <h2>🌍 Cosmic Story Builder</h2>
+        <p class="muted">Earth, nature, science, and life all belong to the universe.</p>
+        <div class="story-card" id="storyCard"></div>
+        <button id="speakStoryBtn" class="secondary" style="margin-top:10px">🔊 Read Story</button>
+      </section>
+
+      <section class="panel">
+        <h2>🏆 Constellation Progress</h2>
+        <div class="progress"><div id="progressBar"></div></div>
+        <p class="message" id="progressMessage">Explore all 28 letters to complete the constellation.</p>
+      </section>
+    </aside>
+  </div>
+
+  <p class="footer">Single-file • Vanilla JavaScript • Local-only progress • No tracking • No external libraries</p>
+</main>
+
+<script>
+const ICONS = {
+  character: [
+    "🦊","🦉","🐉","🐇","🐢","🦋","🐾","🕊️","🦌","🐻","🐺","🦝","🐿️","🦔","🦦","🦫",
+    "🦁","🐯","🐱","🐶","🐭","🐹","🐸","🦆","🦢","🦜","🦅","🦚","🦩","🐧","🦭","🐬",
+    "🐳","🐠","🐝","🐞","🦗","🪲","🐌","🦎","🦕","🦄","🐐","🦙","🐑","🫎","🦥","🐨"
+  ],
+  setting: [
+    "🌲","🌳","🌴","🌿","🍀","🍄","🌾","🌸","🌺","🌼","🌷","🪻","🌻","🌹","🍁","🍂",
+    "🌊","💧","🏞️","🏕️","⛰️","🪨","🏔️","🌋","🌙","🌞","⭐","✨","💫","🌈","☁️","🌤️",
+    "🌦️","🌧️","❄️","🌫️","🪵","🪺","🕯️","🏰","🌉","🌌","🛶","🧺","🪷","🌱","🌼","🍃"
+  ],
+  verb: [
+    "🧭","🔍","🗺️","🥾","🚶","🏃","🪽","🛶","✨","💫","⭐","🌟","🎵","🎶","🎨","🖌️",
+    "🪄","📖","📜","🗝️","🧩","💡","🌱","🌸","🍄","🍓","🫐","🪺","🪶","🍂","🍃","🌈",
+    "☀️","🌙","🔥","💖","🤝","🎁","🧺","🫧","🦋","🐾","🌊","🪨","🛤️","🌼","🔔","🎈"
+  ],
+  adjective: [
+    "✨","💫","⭐","🌟","🌈","🌸","🍃","🌿","🌼","🌺","🪷","🌙","☀️","❄️","🔥","💎",
+    "🍯","🪶","🦋","☁️","🌤️","💖","🎀","🫧","🌱","🍄","🌹","🍁","🕯️","🎨","🪄","🦄"
+  ],
+  pronoun:["👦","👧","🧒","👤","👥","💙","💜","💚"]
+};
+
+const ALPHABET = [
+  ["ا","أَلِف","Alif","a as in father","أَسَد","Asad","Lion","🦁","ا","ا","ـا","ـا"],
+  ["ب","بَاء","Baa","b as in ball","بَطَّة","Baṭṭah","Duck","🦆","ب","بـ","ـبـ","ـب"],
+  ["ت","تَاء","Taa","t as in top","تُفَّاح","Tuffāḥ","Apples","🍎","ت","تـ","ـتـ","ـت"],
+  ["ث","ثَاء","Thaa","th as in three","ثَعْلَب","Thaʿlab","Fox","🦊","ث","ثـ","ـثـ","ـث"],
+  ["ج","جِيم","Jeem","j as in jam","جَمَل","Jamal","Camel","🐪","ج","جـ","ـجـ","ـج"],
+  ["ح","حَاء","Haa","deep breathy h","حِصَان","Ḥiṣān","Horse","🐴","ح","حـ","ـحـ","ـح"],
+  ["خ","خَاء","Khaa","kh sound","خُبْز","Khubz","Bread","🍞","خ","خـ","ـخـ","ـخ"],
+  ["د","دَال","Daal","d as in door","دُبّ","Dubb","Bear","🐻","د","د","ـد","ـد"],
+  ["ذ","ذَال","Dhaal","th as in this","ذِئْب","Dhiʾb","Wolf","🐺","ذ","ذ","ـذ","ـذ"],
+  ["ر","رَاء","Raa","light rolled r","رُمَّان","Rummān","Pomegranate","🍎","ر","ر","ـر","ـر"],
+  ["ز","زَاي","Zaay","z as in zoo","زَهْرَة","Zahrah","Flower","🌸","ز","ز","ـز","ـز"],
+  ["س","سِين","Seen","s as in sun","سَمَك","Samak","Fish","🐟","س","سـ","ـسـ","ـس"],
+  ["ش","شِين","Sheen","sh as in ship","شَمْس","Shams","Sun","☀️","ش","شـ","ـشـ","ـش"],
+  ["ص","صَاد","Saad","deep strong s","صَقْر","Ṣaqr","Falcon","🦅","ص","صـ","ـصـ","ـص"],
+  ["ض","ضَاد","Daad","deep strong d","ضِفْدَع","Ḍifdaʿ","Frog","🐸","ض","ضـ","ـضـ","ـض"],
+  ["ط","طَاء","Taa","deep strong t","طَائِر","Ṭāʾir","Bird","🐦","ط","طـ","ـطـ","ـط"],
+  ["ظ","ظَاء","Dhaa","deep th or z","ظِلّ","Ẓill","Shadow","🌳","ظ","ظـ","ـظـ","ـظ"],
+  ["ع","عَيْن","Ayn","throat sound","عَيْن","ʿAyn","Eye","👁️","ع","عـ","ـعـ","ـع"],
+  ["غ","غَيْن","Ghayn","gargled gh","غَزَال","Ghazāl","Gazelle","🦌","غ","غـ","ـغـ","ـغ"],
+  ["ف","فَاء","Faa","f as in fish","فِيل","Fīl","Elephant","🐘","ف","فـ","ـفـ","ـف"],
+  ["ق","قَاف","Qaaf","deep k sound","قَمَر","Qamar","Moon","🌙","ق","قـ","ـقـ","ـق"],
+  ["ك","كَاف","Kaaf","k as in kite","كِتَاب","Kitāb","Book","📖","ك","كـ","ـكـ","ـك"],
+  ["ل","لَام","Laam","l as in lamp","لَيْمُون","Laymūn","Lemon","🍋","ل","لـ","ـلـ","ـل"],
+  ["م","مِيم","Meem","m as in moon","مَوْز","Mawz","Banana","🍌","م","مـ","ـمـ","ـم"],
+  ["ن","نُون","Noon","n as in nest","نَجْم","Najm","Star","⭐","ن","نـ","ـنـ","ـن"],
+  ["ه","هَاء","Haa","soft h as in hat","هِلَال","Hilāl","Crescent moon","🌙","ه","هـ","ـهـ","ـه"],
+  ["و","وَاو","Waaw","w or long oo","وَرْدَة","Wardah","Rose","🌹","و","و","ـو","ـو"],
+  ["ي","يَاء","Yaa","y or long ee","يَد","Yad","Hand","✋","ي","يـ","ـيـ","ـي"]
+].map((r,i)=>({
+  id:i+1,letter:r[0],nameArabic:r[1],transliteration:r[2],englishSound:r[3],
+  exampleArabic:r[4],exampleTransliteration:r[5],exampleEnglish:r[6],emoji:r[7],
+  isolated:r[8],beginning:r[9],middle:r[10],ending:r[11]
+}));
+
+const STORY_LINES = [
+  {ar:"الثعلب يمشي تحت القمر.",tr:"Ath-thaʿlab yamshī taḥta al-qamar.",en:"The fox walks beneath the moon."},
+  {ar:"الطائر يطير فوق البحر.",tr:"Aṭ-ṭāʾir yaṭīru fawqa al-baḥr.",en:"The bird flies above the sea."},
+  {ar:"الطفل يقرأ تحت الشجرة.",tr:"Aṭ-ṭifl yaqraʾu taḥta ash-shajarah.",en:"The child reads beneath the tree."},
+  {ar:"الفراشة ترقص بين الزهور.",tr:"Al-farāshah tarquṣu bayna az-zuhūr.",en:"The butterfly dances among the flowers."},
+  {ar:"القمر يضيء الجبل.",tr:"Al-qamar yuḍīʾu al-jabal.",en:"The moon lights the mountain."}
+];
+
+const themes = [
+  {space:"#0d1238",space2:"#242268",violet:"#7b5bd6",gold:"#f4c95d",rose:"#e26d9f",mint:"#66d2af"},
+  {space:"#143b46",space2:"#1c6672",violet:"#4e96a8",gold:"#f4cf62",rose:"#df7c84",mint:"#5ed2b0"},
+  {space:"#3f1735",space2:"#742a62",violet:"#a3488a",gold:"#f0c85b",rose:"#ec7aac",mint:"#6bc9ae"},
+  {space:"#1d3528",space2:"#386849",violet:"#5a8c6b",gold:"#f4ce67",rose:"#d97a78",mint:"#6fd0a3"}
+];
+
+const state = {
+  index:Number(localStorage.getItem("cosmicAlphabetIndex")||0),
+  stars:Number(localStorage.getItem("cosmicAlphabetStars")||0),
+  correct:Number(localStorage.getItem("cosmicAlphabetCorrect")||0),
+  explored:new Set(JSON.parse(localStorage.getItem("cosmicAlphabetExplored")||"[]")),
+  theme:Number(localStorage.getItem("cosmicAlphabetTheme")||0),
+  currentRound:null,
+  storyIndex:0
+};
+
+const $=id=>document.getElementById(id);
+
+function save(){
+  localStorage.setItem("cosmicAlphabetIndex",String(state.index));
+  localStorage.setItem("cosmicAlphabetStars",String(state.stars));
+  localStorage.setItem("cosmicAlphabetCorrect",String(state.correct));
+  localStorage.setItem("cosmicAlphabetExplored",JSON.stringify([...state.explored]));
+  localStorage.setItem("cosmicAlphabetTheme",String(state.theme));
+}
+
+function applyTheme(){
+  const t=themes[state.theme%themes.length];
+  for(const [k,v] of Object.entries(t)){
+    document.documentElement.style.setProperty("--"+k,v);
+  }
+}
+
+function chooseVoice(prefix){
+  if(!("speechSynthesis" in window)) return null;
+  const voices=speechSynthesis.getVoices();
+  return voices.find(v=>v.lang?.toLowerCase().startsWith(prefix))
+    || voices.find(v=>/^en/i.test(v.lang))
+    || voices[0]
+    || null;
+}
+
+function speak(text,lang="ar-SA"){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang;
+  u.rate=lang.startsWith("ar")?.72:.84;
+  u.pitch=1.04;
+  const voice=chooseVoice(lang.startsWith("ar")?"ar":"en");
+  if(voice) u.voice=voice;
+  speechSynthesis.speak(u);
+}
+
+function reward(target,symbol="⭐"){
+  const r=target.getBoundingClientRect();
+  const el=document.createElement("div");
+  el.className="reward";
+  el.textContent=symbol;
+  el.style.left=(r.left+r.width/2)+"px";
+  el.style.top=(r.top+r.height/2)+"px";
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1250);
+}
+
+function markExplored(){
+  if(!state.explored.has(state.index)){
+    state.explored.add(state.index);
+    state.stars++;
+    save();
+  }
+}
+
+function current(){return ALPHABET[state.index]}
+
+function renderLetter(){
+  const l=current();
+  markExplored();
+  $("letterStage").innerHTML=`
+    <div class="letter-stage">
+      <div class="big-letter">${l.letter}</div>
+      <div class="letter-meta">
+        <h3>${l.transliteration}</h3>
+        <div class="arabic-name">${l.nameArabic}</div>
+        <p><strong>English sound guide:</strong> ${l.englishSound}</p>
+        <div class="example-card">
+          <div class="emoji">${l.emoji}</div>
+          <div>
+            <div class="example-arabic">${l.exampleArabic}</div>
+            <strong>${l.exampleTransliteration}</strong> — ${l.exampleEnglish}
+          </div>
+        </div>
+        <div class="forms">
+          <div class="form"><span>Isolated</span><strong>${l.isolated}</strong></div>
+          <div class="form"><span>Beginning</span><strong>${l.beginning}</strong></div>
+          <div class="form"><span>Middle</span><strong>${l.middle}</strong></div>
+          <div class="form"><span>Ending</span><strong>${l.ending}</strong></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderLetterGrid(){
+  const box=$("letterGrid");
+  box.innerHTML="";
+  ALPHABET.forEach((l,i)=>{
+    const b=document.createElement("button");
+    b.className="letter-btn"+(i===state.index?" active":"");
+    b.textContent=l.letter;
+    b.title=l.transliteration;
+    b.onclick=()=>{
+      state.index=i;
+      newRound();
+      renderAll();
+    };
+    box.appendChild(b);
+  });
+}
+
+function makeRound(){
+  const answer=current();
+  const pool=ALPHABET.filter(x=>x.id!==answer.id);
+  const distractors=[];
+  while(distractors.length<3){
+    const candidate=pool[Math.floor(Math.random()*pool.length)];
+    if(!distractors.some(x=>x.id===candidate.id)) distractors.push(candidate);
+  }
+  const choices=[answer,...distractors].sort(()=>Math.random()-.5);
+  return {answer,choices};
+}
+
+function newRound(){
+  state.currentRound=makeRound();
+  renderRound();
+}
+
+function renderRound(){
+  const round=state.currentRound||makeRound();
+  state.currentRound=round;
+  $("question").innerHTML=`
+    <div style="text-align:center">
+      <div class="example-arabic" style="font-size:2rem">${round.answer.exampleArabic}</div>
+      <strong>${round.answer.exampleTransliteration}</strong> — ${round.answer.exampleEnglish}
+    </div>`;
+  const box=$("choices");
+  box.innerHTML="";
+  $("message").textContent="";
+  round.choices.forEach(choice=>{
+    const b=document.createElement("button");
+    b.className="choice";
+    b.innerHTML=`<span>${choice.emoji}</span><small>${choice.exampleEnglish}</small>`;
+    b.onclick=()=>{
+      if(choice.id===round.answer.id){
+        b.classList.add("correct");
+        $("message").textContent="Correct! "+round.answer.exampleArabic+" means "+round.answer.exampleEnglish+".";
+        state.stars++;
+        state.correct++;
+        save();
+        reward(b,"🌟");
+        updateStats();
+        setTimeout(newRound,900);
+      }else{
+        b.classList.add("wrong");
+        $("message").textContent="Try another cosmic image.";
+        setTimeout(()=>b.classList.remove("wrong"),700);
+      }
+    };
+    box.appendChild(b);
+  });
+}
+
+function newStory(){
+  state.storyIndex=(state.storyIndex+1)%STORY_LINES.length;
+  const s=STORY_LINES[state.storyIndex];
+  const icons=[
+    ICONS.character[Math.floor(Math.random()*ICONS.character.length)],
+    ICONS.setting[Math.floor(Math.random()*ICONS.setting.length)],
+    ICONS.verb[Math.floor(Math.random()*ICONS.verb.length)],
+    ICONS.adjective[Math.floor(Math.random()*ICONS.adjective.length)]
+  ];
+  $("storyCard").innerHTML=`
+    <div class="story-emoji">${icons.join(" ")}</div>
+    <div class="story-arabic">${s.ar}</div>
+    <div class="story-latin">${s.tr}</div>
+    <div class="story-english">${s.en}</div>`;
+}
+
+function updateStats(){
+  $("letterStat").textContent=current().letter;
+  $("starStat").textContent=state.stars;
+  $("completeStat").textContent=state.explored.size;
+  $("roundStat").textContent=state.correct;
+  $("progressBar").style.width=(state.explored.size/28*100)+"%";
+  $("progressMessage").textContent=
+    state.explored.size===28
+      ?"The Arabic alphabet constellation is complete! ✨"
+      :`${28-state.explored.size} letters remain in the constellation.`;
+}
+
+function renderAll(){
+  renderLetter();
+  renderLetterGrid();
+  renderRound();
+  updateStats();
+  save();
+}
+
+$("hearBtn").onclick=()=>{
+  const l=current();
+  speak(`${l.nameArabic}. ${l.exampleArabic}`,"ar-SA");
+};
+$("newRoundBtn").onclick=newRound;
+$("storyBtn").onclick=newStory;
+$("speakStoryBtn").onclick=()=>{
+  const s=STORY_LINES[state.storyIndex];
+  speak(s.ar,"ar-SA");
+};
+$("themeBtn").onclick=()=>{
+  state.theme=(state.theme+1)%themes.length;
+  applyTheme();
+  save();
+};
+$("resetBtn").onclick=()=>{
+  if(!confirm("Reset all Cosmic Alphabet stars and explored letters?")) return;
+  state.stars=0;
+  state.correct=0;
+  state.explored.clear();
+  state.index=0;
+  save();
+  renderAll();
+};
+
+applyTheme();
+newStory();
+newRound();
+renderAll();
+</script>
+</body>
+</html>
